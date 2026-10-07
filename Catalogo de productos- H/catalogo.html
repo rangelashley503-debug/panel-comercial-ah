@@ -1,11 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Panel de Pedidos</title>
+    <!-- 1. Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. Tu archivo de configuración de colores centralizado -->
+    <script src="./settings.js"></script>
 </head>
-<body>
-    
+<body class="bg-surface-app text-content-body antialiased">
+    <!-- Barra de navegación -->
+    <header class="bg-surface-card border-b border-border-subtle shadow-sm">
+        <nav class="mx-auto flex max-w-5xl items-center justify-between p-4">
+            <span class="text-xl font-bold tracking-tight text-brand-navy">AH</span>
+            <ul class="hidden gap-6 text-sm font-medium sm:flex">
+                <li><a href="#" class="text-brand-terracotta border-b-2 border-brand-terracotta pb-1">Pedidos</a></li>
+                <li><a href="#" class="text-content-muted hover:text-brand-cyan transition-colors">Clientes</a></li>
+                <li><a href="#" class="text-content-muted hover:text-brand-cyan transition-colors">Catálogos</a></li>
+            </ul>
+            <button class="rounded-lg bg-brand-terracotta hover:bg-brand-hover-terracotta px-4 py-2 text-sm font-medium text-white transition-all shadow-sm active:scale-95">
+                Nuevo Pedido
+            </button>
+        </nav>
+    </header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+        <h1 class="text-3xl font-bold text-content-heading">Pedidos de la Semana</h1>
+
+        <!-- Indicadores: 1 columna para móvil, 3 para pantalla grande -->
+        <section class="grid gap-4 sm:grid-cols-3">
+            <article class="rounded-xl border border-border-subtle bg-surface-card p-5 shadow-sm">
+                <p class="text-sm font-medium text-content-muted">En Producción</p>
+                <p class="mt-1 text-3xl font-bold text-brand-amber">18</p>
+            </article>
+            <article class="rounded-xl border border-border-subtle bg-surface-card p-5 shadow-sm">
+                <p class="text-sm font-medium text-content-muted">Por Entregar</p>
+                <p class="mt-1 text-3xl font-bold text-brand-cyan">5</p>
+            </article>
+            <article class="rounded-xl border border-border-subtle bg-surface-card p-5 shadow-sm">
+                <p class="text-sm font-medium text-content-muted">Entregados</p>
+                <p class="mt-1 text-3xl font-bold text-status-success-text">45</p>
+            </article>
+        </section>
+
+        <!-- Tabla -->
+        <section class="overflow-hidden rounded-xl border border-border-subtle bg-surface-card shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-brand-navy text-white text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="p-4 font-semibold">Folio</th>
+                            <th class="p-4 font-semibold">Cliente</th>
+                            <th class="p-4 font-semibold">Etapa</th>
+                            <th class="p-4 font-semibold">Entrega</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-subtle">
+                        <tr class="hover:bg-table-hover transition-colors">
+                            <td class="p-4 font-mono font-medium text-brand-navy">#1045</td>
+                            <td class="p-4 font-medium">Casa Talavera</td>
+                            <td class="p-4">
+                                <span class="rounded-full bg-status-info-bg text-status-info-text border border-brand-cyan/20 px-3 py-1 text-xs font-semibold">
+                                    Esmaltado
+                                </span>
+                            </td>
+                            <td class="p-4 text-content-muted">14 octubre</td>
+                        </tr>
+                        <tr class="bg-table-zebra hover:bg-table-hover transition-colors">
+                            <td class="p-4 font-mono font-medium text-brand-navy">#1046</td>
+                            <td class="p-4 font-medium">Hotel Posada</td>
+                            <td class="p-4">
+                                <span class="rounded-full bg-brand-cream/40 text-brand-navy border border-brand-cream px-3 py-1 text-xs font-semibold">
+                                    Empaque
+                                </span>
+                            </td>
+                            <td class="p-4 text-content-muted">20 de noviembre</td>
+                        </tr>
+                        <tr class="hover:bg-table-hover transition-colors">
+                            <td class="p-4 font-mono font-medium text-brand-navy">#1047</td>
+                            <td class="p-4 font-medium">Hermione</td>
+                            <td class="p-4">
+                                <span class="rounded-full bg-status-warning-bg text-status-warning-text border border-brand-amber/30 px-3 py-1 text-xs font-semibold">
+                                    Horneado
+                                </span>
+                            </td>
+                            <td class="p-4 text-content-muted">25 de octubre</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Formulario -->
+        <section class="rounded-xl border border-border-subtle bg-surface-card p-6 shadow-sm">
+            <h2 class="text-xl font-bold text-content-heading">Registrar Pedido</h2>
+            <form class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label for="cliente" class="block text-sm font-medium text-content-body">Cliente</label>
+                    <input id="cliente" type="text" placeholder="Nombre o empresa" class="mt-1 w-full rounded-lg border border-border-subtle bg-surface-app p-2.5 text-sm focus:border-brand-cyan focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-cyan/20 transition-all">
+                </div>
+                <div>
+                    <label for="piezas" class="block text-sm font-medium text-content-body">Piezas</label>
+                    <input id="piezas" type="number" placeholder="0" class="mt-1 w-full rounded-lg border border-border-subtle bg-surface-app p-2.5 text-sm focus:border-brand-cyan focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-cyan/20 transition-all">
+                </div>
+                <div class="sm:col-span-2 text-right">
+                    <button type="submit" class="w-full sm:w-auto rounded-lg bg-brand-terracotta hover:bg-brand-hover-terracotta px-6 py-2.5 text-sm font-medium text-white transition-all shadow-sm active:scale-95">
+                        Guardar Pedido
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
 </body>
 </html>

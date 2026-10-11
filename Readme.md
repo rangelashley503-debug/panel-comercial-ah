@@ -52,12 +52,13 @@ Los pedidos pasan por cuatro estatus: **Registrado**, **En preparación**, **Lis
 - HTML5
 - [Tailwind CSS](https://tailwindcss.com/) mediante CDN
 - JavaScript (sin frameworks ni librerías externas)
+- `Paletadecolores.js`: archivo con la paleta de colores del proyecto
 
 No requiere npm ni instalación de dependencias.
 
 ## Cómo abrir el proyecto
 
-1. Descarga o clona la carpeta completa del proyecto.
+1. Descarga o clona la carpeta completa `panel-comercial-ah`.
 2. Abre `Inicio de sesión.html` en el navegador (doble clic o clic derecho > Abrir con).
 3. Navega entre módulos con el menú superior.
 
@@ -66,14 +67,28 @@ No requiere npm ni instalación de dependencias.
 ## Estructura de archivos
 
 ```
-proyecto/
-├── index.html      # Página principal
-├── pedidos.html    # Pedidos y cotizaciones
-├── almacen.html    # Surtido de almacén y logística
-├── clientes.html   # Clientes y cuentas comerciales
-├── pagos.html      # Pagos, reportes y panel administrativo
-├── login.html      # Autenticación y usuarios
-└── README.md
+panel-comercial-ah/
+├── Administración y supervisión-H/
+│   └── admi.html
+├── Autenticación y usuarios/
+│   └── Inicio de sesión.html
+├── Catalogo de productos- H/
+│   └── catalogo.html
+├── Clientes y cuentas comerciales - K/
+│   └── Clientes.html
+├── Gestión de pedidos y cotizaciones - K/
+│   └── Gestión.html
+├── Inventario y existencias-H/
+│   └── inventario.html
+├── Pagos, reportes y panel - K/
+│   └── Pagos.html
+├── Surtido de almacén y logística - K/
+│   └── Surtido.html
+├── Ventas de mostrador-H/
+│   └── ventas_mostrador.html
+├── index.html
+├── Paletadecolores.js
+└── Readme.md
 ```
 
 ## Alcance y limitaciones

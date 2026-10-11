@@ -20,25 +20,26 @@
 
     <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
 
+<!-- Título del módulo -->
 <h1 class="text-3xl font-bold">Gestión de Pedidos y Cotizaciones</h1>
 
 <!-- Tarjetas resumen: 1 columna en móvil, 2 en tablet, 4 en pantalla grande -->
 <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">Nuevos</p>
-        <p class="mt-1 text-3xl font-bold">12</p>
+        <p id="resumen-nuevos" class="mt-1 text-3xl font-bold">2</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">En Preparación</p>
-        <p class="mt-1 text-3xl font-bold">8</p>
+        <p class="mt-1 text-3xl font-bold">1</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">En Ruta</p>
-        <p class="mt-1 text-3xl font-bold">5</p>
+        <p class="mt-1 text-3xl font-bold">1</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">Entregados</p>
-        <p class="mt-1 text-3xl font-bold">46</p>
+        <p class="mt-1 text-3xl font-bold">1</p>
     </article>
 </section>
 
@@ -47,7 +48,7 @@
     <!-- Encabezado de la tarjeta -->
     <div class="flex items-center justify-between p-4">
         <h2 class="text-xl font-bold">Pedidos Recientes</h2>
-        <span class="text-sm text-gray-500">5 registros</span>
+        <span id="total-registros" class="text-sm text-gray-500">5 registros</span>
     </div>
 
     <div class="overflow-x-auto">
@@ -61,7 +62,7 @@
                     <th class="p-4 font-semibold">Estatus</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody id="tabla-pedidos" class="divide-y divide-gray-100">
                 <tr class="hover:bg-gray-50">
                     <td class="p-4 font-mono font-medium">#PED-1021</td>
                     <td class="p-4 font-medium">Miscelánea La Esperanza</td>
@@ -117,40 +118,40 @@
     <h2 class="text-xl font-bold">Registrar / Cotizar Pedido</h2>
     <p class="mt-1 text-sm text-gray-500">Captura los datos del cliente y los productos solicitados.</p>
 
-    <form class="mt-4 grid gap-4 sm:grid-cols-2">
+    <form id="form-pedido" class="mt-4 grid gap-4 sm:grid-cols-2">
         <!-- Cliente -->
-        <div>
+        <div class="sm:col-span-2">
             <label for="cliente" class="block text-sm font-medium">Cliente</label>
             <input id="cliente" type="text" placeholder="Nombre de la miscelánea o tienda"
                 class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
         </div>
 
-        <!-- Categoría del producto -->
+        <!-- Producto (el data-precio es el precio por pieza) -->
         <div>
-            <label for="categoria" class="block text-sm font-medium">Categoría</label>
-            <select id="categoria"
+            <label for="producto" class="block text-sm font-medium">Producto</label>
+            <select id="producto"
                 class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <option>Confitería (paletas, chocolates, gomitas)</option>
-                <option>Energizantes (Monster, Red Bull)</option>
-                <option>Isotónicas (Electrolit)</option>
+                <optgroup label="Energizantes e isotónicas">
+                    <option data-precio="38">Monster Energy 473 ml</option>
+                    <option data-precio="35">Red Bull 250 ml</option>
+                    <option data-precio="22">Electrolit 600 ml</option>
+                </optgroup>
+                <optgroup label="Confitería">
+                    <option data-precio="4">Panditas (bolsa)</option>
+                    <option data-precio="5">Paletas Payaso</option>
+                    <option data-precio="12">Chocolate en barra</option>
+                </optgroup>
             </select>
         </div>
 
-        <!-- Producto -->
-        <div>
-            <label for="producto" class="block text-sm font-medium">Producto</label>
-            <input id="producto" type="text" placeholder="Ej. Monster Energy 473 ml"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
-
-        <!-- Escala de venta -->
+        <!-- Escala de venta (el value es cuántas piezas trae cada escala) -->
         <div>
             <label for="escala" class="block text-sm font-medium">Escala de venta</label>
             <select id="escala"
                 class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <option>Pieza</option>
-                <option>Caja</option>
-                <option>Tarima / Mayoreo</option>
+                <option value="1">Pieza</option>
+                <option value="24">Caja (24 pzs)</option>
+                <option value="960">Tarima / Mayoreo (40 cajas)</option>
             </select>
         </div>
 
@@ -175,9 +176,16 @@
                 class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none"></textarea>
         </div>
 
+        <!-- Resultado de la cotización (oculto hasta que se genera) -->
+        <div id="cotizacion" class="hidden rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm sm:col-span-2">
+            <p class="font-semibold">Cotización</p>
+            <p id="cotizacion-detalle" class="mt-1 text-gray-500"></p>
+            <p class="mt-2 text-lg font-bold">Total: <span id="cotizacion-total">$0.00</span></p>
+        </div>
+
         <!-- Botones de acción -->
         <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-end">
-            <button type="button"
+            <button type="button" id="btn-cotizar"
                 class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
                 Generar Cotización
             </button>
@@ -188,3 +196,97 @@
         </div>
     </form>
 </section>
+
+<!-- Script del módulo de pedidos -->
+<script>
+    // Seleccionamos los elementos que vamos a usar
+    const formulario = document.getElementById('form-pedido');
+    const inputCliente = document.getElementById('cliente');
+    const selectProducto = document.getElementById('producto');
+    const selectEscala = document.getElementById('escala');
+    const inputCantidad = document.getElementById('cantidad');
+    const cajaCotizacion = document.getElementById('cotizacion');
+    const tablaPedidos = document.getElementById('tabla-pedidos');
+    const resumenNuevos = document.getElementById('resumen-nuevos');
+    const totalRegistros = document.getElementById('total-registros');
+
+    // Contadores para el folio, los pedidos nuevos y los registros
+    let siguienteFolio = 1026;
+    let nuevos = 2;
+    let registros = 5;
+
+    // Convierte un número a pesos mexicanos (ej. $3,450.00)
+    function aPesos(numero) {
+        return numero.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    }
+
+    // Calcula el total: precio por pieza x piezas por escala x cantidad
+    function calcularTotal() {
+        const precioPieza = Number(selectProducto.selectedOptions[0].dataset.precio);
+        const piezasPorEscala = Number(selectEscala.value);
+        const cantidad = Number(inputCantidad.value);
+
+        return precioPieza * piezasPorEscala * cantidad;
+    }
+
+    // Revisa que el formulario tenga datos válidos
+    function datosValidos() {
+        if (inputCliente.value.trim() === '' || Number(inputCantidad.value) <= 0) {
+            alert('Escribe el nombre del cliente y una cantidad mayor a 0.');
+            return false;
+        }
+        return true;
+    }
+
+    // Botón "Generar Cotización": muestra el resumen sin guardar el pedido
+    document.getElementById('btn-cotizar').addEventListener('click', function () {
+        if (!datosValidos()) {
+            return;
+        }
+
+        const escalaTexto = selectEscala.selectedOptions[0].text;
+
+        document.getElementById('cotizacion-detalle').textContent =
+            inputCantidad.value + ' x ' + escalaTexto + ' de ' + selectProducto.value +
+            ' para ' + inputCliente.value.trim();
+        document.getElementById('cotizacion-total').textContent = aPesos(calcularTotal());
+
+        cajaCotizacion.classList.remove('hidden');
+    });
+
+    // Botón "Registrar Pedido": agrega una fila nueva a la tabla
+    formulario.addEventListener('submit', function (evento) {
+        // Evitamos que la página se recargue
+        evento.preventDefault();
+
+        if (!datosValidos()) {
+            return;
+        }
+
+        // Nombre corto de la escala: Pieza, Caja o Tarima
+        const volumen = selectEscala.selectedOptions[0].text.split(' ')[0];
+
+        const fila = document.createElement('tr');
+        fila.className = 'hover:bg-gray-50';
+        fila.innerHTML =
+            '<td class="p-4 font-mono font-medium">#PED-' + siguienteFolio + '</td>' +
+            '<td class="p-4 font-medium">' + inputCliente.value.trim() + '</td>' +
+            '<td class="p-4 text-gray-500">' + volumen + '</td>' +
+            '<td class="p-4">' + aPesos(calcularTotal()) + '</td>' +
+            '<td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span></td>';
+
+        // Insertamos la fila al principio de la tabla
+        tablaPedidos.prepend(fila);
+
+        // Actualizamos los contadores
+        siguienteFolio++;
+        nuevos++;
+        registros++;
+        resumenNuevos.textContent = nuevos;
+        totalRegistros.textContent = registros + ' registros';
+
+        // Limpiamos el formulario y ocultamos la cotización
+        formulario.reset();
+        cajaCotizacion.classList.add('hidden');
+    });
+</script>

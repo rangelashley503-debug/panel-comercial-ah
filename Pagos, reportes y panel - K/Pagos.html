@@ -20,136 +20,302 @@
 
     <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
 
-<h1 class="text-3xl font-bold text-stone-800">Pagos, Reportes y Panel Administrativo</h1>
+<!-- Título del módulo -->
+<h1 class="text-3xl font-bold">Pagos, Reportes y Panel Administrativo</h1>
 
 <!-- Tarjetas de corte de turno: 1 columna en móvil, 3 en pantalla grande -->
 <section class="grid gap-4 sm:grid-cols-3">
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-        <p class="text-sm font-medium text-stone-500">Ventas Totales del Turno</p>
-        <p class="mt-1 text-3xl font-bold text-green-600">$84,520.00</p>
+    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">Ventas Totales del Turno</p>
+        <p id="card-ventas" class="mt-1 text-3xl font-bold">$84,520.00</p>
     </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-        <p class="text-sm font-medium text-stone-500">Pedidos Completados</p>
-        <p class="mt-1 text-3xl font-bold text-blue-600">23</p>
+    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">Pedidos Completados</p>
+        <p id="card-pedidos" class="mt-1 text-3xl font-bold">23</p>
     </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-        <p class="text-sm font-medium text-stone-500">Alertas de Stock Mínimo</p>
-        <p class="mt-1 text-3xl font-bold text-amber-600">4</p>
+    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-gray-500">Alertas de Stock Mínimo</p>
+        <p id="card-alertas" class="mt-1 text-3xl font-bold">4</p>
     </article>
 </section>
 
-<!-- Desglose del corte de caja -->
-<section class="rounded-xl border border-stone-200 bg-white p-6">
-    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 class="text-xl font-bold text-stone-800">Corte de Caja</h2>
-        <span class="w-fit rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">Turno matutino</span>
+<!-- Corte de caja -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Encabezado de la tarjeta -->
+    <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-xl font-bold">Corte de Caja</h2>
+        <span id="estado-turno" class="w-fit rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Turno abierto</span>
     </div>
 
-    <div class="mt-4 overflow-x-auto">
+    <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-            <thead class="border-b border-stone-200 text-xs uppercase tracking-wider text-stone-500">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                 <tr>
-                    <th class="py-3 pr-4 font-semibold">Método de pago</th>
-                    <th class="py-3 pr-4 font-semibold">Operaciones</th>
-                    <th class="py-3 text-right font-semibold">Monto</th>
+                    <th class="p-4 font-semibold">Método de pago</th>
+                    <th class="p-4 font-semibold">Operaciones</th>
+                    <th class="p-4 text-right font-semibold">Monto</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-stone-100">
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Efectivo</td>
-                    <td class="py-3 pr-4 text-stone-500">11</td>
-                    <td class="py-3 text-right text-stone-800">$32,150.00</td>
+            <tbody id="tabla-corte" class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50" data-metodo="Efectivo" data-ops="11" data-monto="32150">
+                    <td class="p-4 font-medium">Efectivo</td>
+                    <td class="celda-ops p-4 text-gray-500">11</td>
+                    <td class="celda-monto p-4 text-right">$32,150.00</td>
                 </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Tarjeta</td>
-                    <td class="py-3 pr-4 text-stone-500">7</td>
-                    <td class="py-3 text-right text-stone-800">$21,870.00</td>
+                <tr class="hover:bg-gray-50" data-metodo="Tarjeta" data-ops="7" data-monto="21870">
+                    <td class="p-4 font-medium">Tarjeta</td>
+                    <td class="celda-ops p-4 text-gray-500">7</td>
+                    <td class="celda-monto p-4 text-right">$21,870.00</td>
                 </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Transferencia</td>
-                    <td class="py-3 pr-4 text-stone-500">5</td>
-                    <td class="py-3 text-right text-stone-800">$30,500.00</td>
+                <tr class="hover:bg-gray-50" data-metodo="Transferencia" data-ops="5" data-monto="30500">
+                    <td class="p-4 font-medium">Transferencia</td>
+                    <td class="celda-ops p-4 text-gray-500">5</td>
+                    <td class="celda-monto p-4 text-right">$30,500.00</td>
                 </tr>
             </tbody>
             <!-- Fila de total -->
-            <tfoot class="border-t border-stone-200">
+            <tfoot class="border-t border-gray-200">
                 <tr>
-                    <td class="py-3 pr-4 font-bold text-stone-800">Total</td>
-                    <td class="py-3 pr-4 font-medium text-stone-500">23</td>
-                    <td class="py-3 text-right font-bold text-stone-800">$84,520.00</td>
+                    <td class="p-4 font-bold">Total</td>
+                    <td id="total-ops" class="p-4 font-medium text-gray-500">23</td>
+                    <td id="total-monto" class="p-4 text-right font-bold">$84,520.00</td>
                 </tr>
             </tfoot>
         </table>
     </div>
 
-    <!-- Botón de acción -->
-    <div class="mt-6 border-t border-stone-100 pt-4 text-right">
-        <button type="button"
-            class="w-full rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 sm:w-auto">
+    <!-- Formulario para registrar un pago -->
+    <form id="form-pago" class="grid gap-4 border-t border-gray-100 p-4 sm:grid-cols-3">
+        <div>
+            <label for="metodo" class="block text-sm font-medium">Método de pago</label>
+            <select id="metodo"
+                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+                <option>Efectivo</option>
+                <option>Tarjeta</option>
+                <option>Transferencia</option>
+            </select>
+        </div>
+        <div>
+            <label for="monto" class="block text-sm font-medium">Monto (MXN)</label>
+            <input id="monto" type="number" min="1" step="0.01" placeholder="0.00"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+        <div class="flex items-end">
+            <button type="submit" id="btn-pago"
+                class="w-full rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                Registrar Pago
+            </button>
+        </div>
+    </form>
+
+    <!-- Pie con el botón de cierre -->
+    <div class="flex flex-col gap-3 border-t border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p id="mensaje-turno" class="text-sm text-gray-500">Registra los pagos del turno y ciérralo al terminar.</p>
+        <button type="button" id="btn-cerrar"
+            class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
             Cerrar Turno
         </button>
     </div>
 </section>
 
-<!-- Reporte de productos más vendidos por categoría -->
-<section class="rounded-xl border border-stone-200 bg-white p-5">
-    <div class="flex items-center justify-between">
-        <h2 class="text-xl font-bold text-stone-800">Productos Más Vendidos</h2>
-        <span class="text-sm text-stone-500">Semana actual</span>
+<!-- Alertas de stock mínimo -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between p-4">
+        <h2 class="text-xl font-bold">Alertas de Stock Mínimo</h2>
+        <span class="text-sm text-gray-500">Productos por debajo del mínimo</span>
     </div>
 
-    <div class="mt-4 overflow-x-auto">
+    <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-            <thead class="border-b border-stone-200 text-xs uppercase tracking-wider text-stone-500">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
                 <tr>
-                    <th class="py-3 pr-4 font-semibold">Producto</th>
-                    <th class="py-3 pr-4 font-semibold">Categoría</th>
-                    <th class="py-3 pr-4 font-semibold">Cajas vendidas</th>
-                    <th class="py-3 text-right font-semibold">Ingresos</th>
+                    <th class="p-4 font-semibold">Producto</th>
+                    <th class="p-4 font-semibold">Existencia</th>
+                    <th class="p-4 font-semibold">Mínimo</th>
+                    <th class="p-4 font-semibold">Estatus</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-stone-100">
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Monster Energy 473 ml</td>
-                    <td class="py-3 pr-4">
-                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">Energizantes</span>
-                    </td>
-                    <td class="py-3 pr-4 text-stone-500">120</td>
-                    <td class="py-3 text-right text-stone-800">$27,600.00</td>
+            <tbody id="tabla-alertas" class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
+                    <td class="p-4">18 cajas</td>
+                    <td class="p-4 text-gray-500">30 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
                 </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Electrolit 600 ml</td>
-                    <td class="py-3 pr-4">
-                        <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">Isotónicas</span>
-                    </td>
-                    <td class="py-3 pr-4 text-stone-500">95</td>
-                    <td class="py-3 text-right text-stone-800">$19,000.00</td>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Electrolit 600 ml</td>
+                    <td class="p-4">12 cajas</td>
+                    <td class="p-4 text-gray-500">25 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
                 </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Caja Panditas 24 pzs</td>
-                    <td class="py-3 pr-4">
-                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">Confitería</span>
-                    </td>
-                    <td class="py-3 pr-4 text-stone-500">80</td>
-                    <td class="py-3 text-right text-stone-800">$9,600.00</td>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
+                    <td class="p-4">9 cajas</td>
+                    <td class="p-4 text-gray-500">20 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
                 </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Red Bull 250 ml (paquete 24 pzs)</td>
-                    <td class="py-3 pr-4">
-                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">Energizantes</span>
-                    </td>
-                    <td class="py-3 pr-4 text-stone-500">64</td>
-                    <td class="py-3 text-right text-stone-800">$20,480.00</td>
-                </tr>
-                <tr class="hover:bg-stone-50">
-                    <td class="py-3 pr-4 font-medium text-stone-800">Paletas Payaso (bolsa 20 pzs)</td>
-                    <td class="py-3 pr-4">
-                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">Confitería</span>
-                    </td>
-                    <td class="py-3 pr-4 text-stone-500">58</td>
-                    <td class="py-3 text-right text-stone-800">$5,220.00</td>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
+                    <td class="p-4">14 cajas</td>
+                    <td class="p-4 text-gray-500">20 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </section>
+
+<!-- Reporte de productos más vendidos por categoría -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Encabezado con filtro de categoría -->
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-xl font-bold">Productos Más Vendidos</h2>
+            <p class="text-sm text-gray-500">Semana actual</p>
+        </div>
+        <select id="filtro-categoria"
+            class="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none sm:w-56">
+            <option value="todas">Todas las categorías</option>
+            <option value="Energizantes">Energizantes</option>
+            <option value="Isotónicas">Isotónicas</option>
+            <option value="Confitería">Confitería</option>
+        </select>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <tr>
+                    <th class="p-4 font-semibold">Producto</th>
+                    <th class="p-4 font-semibold">Categoría</th>
+                    <th class="p-4 font-semibold">Cajas vendidas</th>
+                    <th class="p-4 text-right font-semibold">Ingresos</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-ventas" class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50" data-categoria="Energizantes">
+                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Energizantes</span></td>
+                    <td class="p-4 text-gray-500">120</td>
+                    <td class="p-4 text-right">$27,600.00</td>
+                </tr>
+                <tr class="hover:bg-gray-50" data-categoria="Isotónicas">
+                    <td class="p-4 font-medium">Electrolit 600 ml</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Isotónicas</span></td>
+                    <td class="p-4 text-gray-500">95</td>
+                    <td class="p-4 text-right">$19,000.00</td>
+                </tr>
+                <tr class="hover:bg-gray-50" data-categoria="Confitería">
+                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Confitería</span></td>
+                    <td class="p-4 text-gray-500">80</td>
+                    <td class="p-4 text-right">$9,600.00</td>
+                </tr>
+                <tr class="hover:bg-gray-50" data-categoria="Energizantes">
+                    <td class="p-4 font-medium">Red Bull 250 ml (paquete 24 pzs)</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Energizantes</span></td>
+                    <td class="p-4 text-gray-500">64</td>
+                    <td class="p-4 text-right">$20,480.00</td>
+                </tr>
+                <tr class="hover:bg-gray-50" data-categoria="Confitería">
+                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Confitería</span></td>
+                    <td class="p-4 text-gray-500">58</td>
+                    <td class="p-4 text-right">$5,220.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Script del módulo de pagos y reportes -->
+<script>
+    // Seleccionamos los elementos que vamos a usar
+    const tablaCorte = document.getElementById('tabla-corte');
+    const formPago = document.getElementById('form-pago');
+    const selectMetodo = document.getElementById('metodo');
+    const inputMonto = document.getElementById('monto');
+    const botonPago = document.getElementById('btn-pago');
+    const botonCerrar = document.getElementById('btn-cerrar');
+    const estadoTurno = document.getElementById('estado-turno');
+    const mensajeTurno = document.getElementById('mensaje-turno');
+    const filtroCategoria = document.getElementById('filtro-categoria');
+    const tablaVentas = document.getElementById('tabla-ventas');
+
+    // Convierte un número a pesos mexicanos (ej. $3,450.00)
+    function aPesos(numero) {
+        return numero.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    }
+
+    // Recalcula los totales y actualiza las tarjetas
+    function actualizarTotales() {
+        let totalOps = 0;
+        let totalMonto = 0;
+
+        for (const fila of tablaCorte.rows) {
+            totalOps += Number(fila.dataset.ops);
+            totalMonto += Number(fila.dataset.monto);
+        }
+
+        document.getElementById('total-ops').textContent = totalOps;
+        document.getElementById('total-monto').textContent = aPesos(totalMonto);
+        document.getElementById('card-pedidos').textContent = totalOps;
+        document.getElementById('card-ventas').textContent = aPesos(totalMonto);
+    }
+
+    // La tarjeta de alertas cuenta las filas de la tabla de stock
+    document.getElementById('card-alertas').textContent =
+        document.getElementById('tabla-alertas').rows.length;
+
+    // Registrar un pago: suma la operación y el monto al método elegido
+    formPago.addEventListener('submit', function (evento) {
+        // Evitamos que la página se recargue
+        evento.preventDefault();
+
+        const monto = Number(inputMonto.value);
+        if (monto <= 0) {
+            alert('Escribe un monto mayor a 0.');
+            return;
+        }
+
+        // Buscamos la fila del método seleccionado
+        for (const fila of tablaCorte.rows) {
+            if (fila.dataset.metodo === selectMetodo.value) {
+                fila.dataset.ops = Number(fila.dataset.ops) + 1;
+                fila.dataset.monto = Number(fila.dataset.monto) + monto;
+
+                fila.querySelector('.celda-ops').textContent = fila.dataset.ops;
+                fila.querySelector('.celda-monto').textContent = aPesos(Number(fila.dataset.monto));
+            }
+        }
+
+        actualizarTotales();
+        formPago.reset();
+    });
+
+    // Cerrar turno: bloquea el registro de pagos
+    botonCerrar.addEventListener('click', function () {
+        if (!confirm('¿Cerrar el turno? Ya no podrás registrar más pagos.')) {
+            return;
+        }
+
+        botonPago.disabled = true;
+        inputMonto.disabled = true;
+        selectMetodo.disabled = true;
+        botonCerrar.disabled = true;
+
+        estadoTurno.textContent = 'Turno cerrado';
+        mensajeTurno.textContent = 'Turno cerrado el ' + new Date().toLocaleString('es-MX') +
+            ' con ventas por ' + document.getElementById('total-monto').textContent + '.';
+    });
+
+    // Filtro del reporte: muestra solo la categoría elegida
+    filtroCategoria.addEventListener('change', function () {
+        const categoria = filtroCategoria.value;
+
+        for (const fila of tablaVentas.rows) {
+            const coincide = categoria === 'todas' || fila.dataset.categoria === categoria;
+            fila.classList.toggle('hidden', !coincide);
+        }
+    });
+</script>

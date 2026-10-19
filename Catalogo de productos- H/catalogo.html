@@ -10,18 +10,54 @@
     <script src="../Paletadecolores.js"></script>
 </head>
 <body class="bg-surface-app text-content-body antialiased">
-    <!-- Barra de navegación -->
-    <header class="bg-surface-card border-b border-border-subtle shadow-sm">
-        <nav class="mx-auto flex max-w-5xl items-center justify-between p-4">
-            <span class="text-xl font-bold tracking-tight text-brand-navy">AH</span>
-            <ul class="hidden gap-6 text-sm font-medium sm:flex">
-                <li><a href="#" class="text-brand-terracotta border-b-2 border-brand-terracotta pb-1">Pedidos</a></li>
-                <li><a href="#" class="text-content-muted hover:text-brand-cyan transition-colors">Clientes</a></li>
-                <li><a href="#" class="text-content-muted hover:text-brand-cyan transition-colors">Catálogos</a></li>
+    <!-- Barra de navegación fluida -->
+    <header class="pt-8 pb-4 flex justify-center">
+        <nav class="relative bg-surface-card w-[420px] h-[70px rounded-2xl] flex justify-center items-center shadow-sm border border-border-subtle px-2">
+            <!-- indicador flotate , borde con color de fondo principal -->
+            <div id=""indicador" class="absolute -top-6 w-16 h-16 bg-brand-terracota rounded-full border-[6px] border-surface-app transition-all duration-500 flex items-center shadow-md">
+            </div>
+            <!-- lista de botones -->
+            <ul class="flex w-full justify-around z-10">
+                <!-- boton 1 -->
+                <li class="nav-item active flex-1 text-center group cursor-pointer" onclick="moveIndicator(this, 0)">
+                    <a class="flex flex-col items-center justify-center relative">
+                        <span class="icon text-white group-[.active]:-translate-y-8 transition-transform duration-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24 xmlns" xmlns="http://www.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                        </span>
+                        <span class="text text-xs text-content-body absolute bottom-[-18px] opacity-0 group-[.active]:opacity-100 group-[.active]:translate-y-[-10px] transition-all font-medium">
+                            Inicio
+                        </span>
+                    </a>
+                </li>
+                <!-- boton 2 -->
+                <li class="nav-item flex-1 text-center group cursor-pointer" onclick="moveIndicator(this, 1)">
+                    <a class="flex flex-col items-center justify-center relative">
+                        <span class="icon text-content-muted group-[.active]:-translate-y-8 group-[.active]:text-white transition-transform duration-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </span>
+                        <span class="text text-xs text-content-body absolute bottom-[-18px] opacity-0 group-[.active]:opacity-100 group-[.active]:translate-y-[-10px] transition-all duration-500 font-medium">
+                            Pedidos
+                        </span>
+                    </a>
+                </li>
+                <!-- boton 3 -->
+                <li class="nav-item flex-1 text-center group cursor-pointer" onclick="moveIndicator(this, 2)">
+                    <a class="flex flex-col items-center justify-center relative">
+                        <span class="icon text-content-muted group-[.active]:-translate-y-8 group-[.active]:text-white transition-transform duration-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </span>
+                        <span class="text text-xs text-content-body absolute bottom-[-18px] opacity-0 group-[.active]:opacity-100 group-[.active]:translate-y-[-10px] transition-all duration-500 font-medium">
+                            Nuevo
+                        </span>
+                    </a>
+                </li>
             </ul>
-            <button class="rounded-lg bg-brand-terracotta hover:bg-brand-hover-terracotta px-4 py-2 text-sm font-medium text-white transition-all shadow-sm active:scale-95">
-                Nuevo Pedido
-            </button>
         </nav>
     </header>
 
@@ -112,5 +148,39 @@
             </form>
         </section>
     </main>
+    <script>
+    const items = document.querySelectorAll('.nav-item');
+    const indicator = document.getElementById('indicator');
+
+    function moveIndicator(element, index) {
+        items.forEach((item) => {
+        item.classList.remove('active');
+        const icon = item.querySelector('.icon');
+        icon.classList.remove('text-white');
+        icon.classList.add('text-content-muted');
+        });
+
+        element.classList.add('active');
+        const activeIcon = element.querySelector('.icon');
+        activeIcon.classList.remove('text-content-muted');
+        activeIcon.classList.add('text-white');
+
+      // Cálculo del desplazamiento horizontal según el ancho (420px - padding)
+        const totalWidth = 420 - 16;
+        const step = totalWidth / items.length;
+      const offset = (step * index) + (step / 2) - (totalWidth / 2);
+
+        indicator.style.transform = `translateX(${offset}px)`;
+    }
+
+    // Inicializar posición en el primer botón al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        const activeItem = document.querySelector('.nav-item.active');
+        if (activeItem) {
+        moveIndicator(activeItem, 0);
+        }
+    });
+</script>
+</body>
 </body>
 </html>

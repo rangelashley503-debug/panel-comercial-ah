@@ -74,3 +74,29 @@
         </button>
     </form>
 </section>
+
+<script>
+    // Login: valida los campos y saluda según el rol
+    formLogin.addEventListener('submit', function (evento) {
+    // Evitamos que la página se recargue
+    evento.preventDefault();
+
+    const rol = document.getElementById('rol').value;
+    const correo = document.getElementById('login-correo').value.trim();
+    const password = inputPasswordLogin.value;
+
+    if (!formatoCorreo.test(correo)) {
+        mostrarMensaje(mensajeLogin, 'Escribe un correo electrónico válido.');
+        return;
+    }
+
+    if (password === '') {
+        mostrarMensaje(mensajeLogin, 'Escribe tu contraseña.');
+        return;
+    }
+
+    // Aquí iría la petición al servidor. Por ahora solo simulamos el acceso.
+    mostrarMensaje(mensajeLogin, 'Sesión iniciada como ' + rol + ' (' + correo + ').');
+    formLogin.reset();
+    });
+</script>

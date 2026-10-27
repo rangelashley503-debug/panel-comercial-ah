@@ -32,4 +32,37 @@
                 class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
         </div>
 
-        
+        <!-- Contraseña -->
+        <div>
+            <label for="reg-password" class="block text-sm font-medium">Contraseña</label>
+            <input id="reg-password" type="password" placeholder="Mínimo 8 caracteres"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div>
+            <label for="reg-confirmar" class="block text-sm font-medium">Confirmar contraseña</label>
+            <input id="reg-confirmar" type="password" placeholder="Repite la contraseña"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Aceptación de términos -->
+        <div class="sm:col-span-2">
+            <label class="flex items-center gap-2 text-sm text-gray-500">
+                <input id="reg-terminos" type="checkbox" class="h-4 w-4 accent-orange-600">
+                Acepto los términos y condiciones de venta mayorista
+            </label>
+        </div>
+
+        <!-- Mensaje de resultado del registro -->
+        <p id="mensaje-registro" class="hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm sm:col-span-2"></p>
+
+        <!-- Botón de registro -->
+        <div class="text-right sm:col-span-2">
+            <button type="submit"
+                class="w-full rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 sm:w-auto">
+                Registrar Negocio
+            </button>
+        </div>
+    </form>
+</section>

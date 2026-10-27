@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagos, Reportes y Panel Administrativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-black antialiased">
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+        <nav class="mx-auto flex max-w-5xl items-center justify-between p-4">
+            <span class="text-xl font-bold tracking-tight">AH</span>
+            <ul class="hidden gap-6 text-sm font-medium sm:flex">
+                <li><a href="pedidos.html" class="border-b-2 border-orange-600 pb-1 text-orange-600">Pedidos</a></li>
+                <li><a href="clientes.html" class="text-gray-500 hover:text-orange-600">Clientes</a></li>
+                <li><a href="almacen.html" class="text-gray-500 hover:text-orange-600">Almacén</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+        <h1 class="text-2xl font-bold">Lista de Stock Mínimo</h1>
+        <p class="text-sm text-gray-500">Revisa los productos que están por debajo del stock mínimo establecido.</p>
+
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between p-4">
+        <h2 class="text-xl font-bold">Alertas de Stock Mínimo</h2>
+        <span class="text-sm text-gray-500">Productos por debajo del mínimo</span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <tr>
+                    <th class="p-4 font-semibold">Producto</th>
+                    <th class="p-4 font-semibold">Existencia</th>
+                    <th class="p-4 font-semibold">Mínimo</th>
+                    <th class="p-4 font-semibold">Estatus</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-alertas" class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
+                    <td class="p-4">18 cajas</td>
+                    <td class="p-4 text-gray-500">30 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Electrolit 600 ml</td>
+                    <td class="p-4">12 cajas</td>
+                    <td class="p-4 text-gray-500">25 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
+                    <td class="p-4">9 cajas</td>
+                    <td class="p-4 text-gray-500">20 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
+                    <td class="p-4">14 cajas</td>
+                    <td class="p-4 text-gray-500">20 cajas</td>
+                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

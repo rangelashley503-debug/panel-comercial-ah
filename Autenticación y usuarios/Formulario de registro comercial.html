@@ -83,3 +83,26 @@
         </div>
     </form>
 </section>
+
+<!-- Script del módulo de autenticación -->
+<script>
+    // Seleccionamos los elementos que vamos a usar
+    const formLogin = document.getElementById('form-login');
+    const formRegistro = document.getElementById('form-registro');
+    const mensajeLogin = document.getElementById('mensaje-login');
+    const mensajeRegistro = document.getElementById('mensaje-registro');
+    const inputPasswordLogin = document.getElementById('login-password');
+    const botonMostrar = document.getElementById('btn-mostrar');
+    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function mostrarMensaje(caja, texto) {
+        caja.textContent = texto;
+        caja.classList.remove('hidden');
+    }
+
+    botonMostrar.addEventListener('click', function () {
+        const estaOculta = inputPasswordLogin.type === 'password';
+
+        inputPasswordLogin.type = estaOculta ? 'text' : 'password';
+        botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
+    });

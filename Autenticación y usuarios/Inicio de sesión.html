@@ -7,11 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white text-black antialiased">
-    <header class="border-b border-gray-200 bg-white shadow-sm">
-        <nav class="mx-auto flex max-w-5xl items-center justify-center p-4">
-            <span class="text-xl font-bold tracking-tight">Impulso Mexa</span>
-        </nav>
-    </header>
+    <!-- Barra de navegación -->
+<header class="border-b border-gray-200 bg-white shadow-sm">
+    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+        <!-- Menú con scroll horizontal para pantallas chicas -->
+        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+            <li><a href="../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html">Acceso</a></li>
+            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+            <li><a href="../Pagos,%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+        </ul>
+    </nav>
+</header>
 
     <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
 

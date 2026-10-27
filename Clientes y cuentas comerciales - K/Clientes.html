@@ -8,12 +8,20 @@
 </head>
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
-        <nav class="mx-auto flex max-w-5xl items-center justify-between p-4">
-            <span class="text-xl font-bold tracking-tight">Impulso Mexa</span>
-            <ul class="hidden gap-6 text-sm font-medium sm:flex">
-                <li><a href="pedidos.html" class="border-b-2 border-orange-600 pb-1 text-orange-600">Pedidos</a></li>
-                <li><a href="clientes.html" class="text-gray-500 hover:text-orange-600">Clientes</a></li>
-                <li><a href="almacen.html" class="text-gray-500 hover:text-orange-600">Almacén</a></li>
+        <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+            <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+            <!-- Menú con scroll horizontal para pantallas chicas -->
+            <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+                <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+                <li><a href="../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html">Acceso</a></li>
+                <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+                <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+                <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+                <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+                <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+                <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+                <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
             </ul>
         </nav>
     </header>
@@ -21,7 +29,13 @@
     <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
 
 <!-- Título del módulo -->
-<h1 class="text-3xl font-bold">Clientes y Cuentas Comerciales</h1>
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h1 class="text-3xl font-bold">Clientes y Cuentas Comerciales</h1>
+    <a href="registrar%20nueva%20cuenta%20comercial.html"
+        class="w-fit rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
+        Registrar Nueva Cuenta
+    </a>
+</div>
 
 <!-- Directorio de clientes mayoristas -->
 <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -115,3 +129,75 @@
     <!-- Mensaje cuando la búsqueda no encuentra resultados -->
     <p id="sin-resultados" class="hidden p-4 text-center text-sm text-gray-500">No se encontraron clientes.</p>
 </section>
+
+    </main>
+
+    <!-- Script del directorio de clientes -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const tabla = document.getElementById('tabla-clientes');
+        const buscador = document.getElementById('buscador');
+        const mensajeVacio = document.getElementById('sin-resultados');
+
+        // Buscador: oculta las filas que no coinciden con el texto escrito
+        buscador.addEventListener('input', function () {
+            const texto = buscador.value.trim().toLowerCase();
+            let visibles = 0;
+
+            for (const fila of tabla.rows) {
+                // Buscamos en el nombre del cliente y en el RFC
+                const contenido = (fila.cells[0].textContent + ' ' + fila.cells[1].textContent).toLowerCase();
+                const coincide = contenido.includes(texto);
+
+                fila.classList.toggle('hidden', !coincide);
+                if (coincide) {
+                    visibles++;
+                }
+            }
+
+            mensajeVacio.classList.toggle('hidden', visibles > 0);
+        });
+
+        // Botón de cada fila: cambia entre Activo y Suspendido
+        tabla.addEventListener('click', function (evento) {
+            const boton = evento.target.closest('.btn-estatus');
+            if (!boton) {
+                return;
+            }
+
+            const fila = boton.closest('tr');
+            const badge = fila.querySelector('.estatus');
+            const estabaActivo = badge.textContent.trim() === 'Activo';
+
+            badge.textContent = estabaActivo ? 'Suspendido' : 'Activo';
+            boton.textContent = estabaActivo ? 'Activar' : 'Suspender';
+        });
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

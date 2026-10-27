@@ -5,141 +5,503 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .campo-error {
+            border-color: #dc2626 !important;
+        }
+
+        .campo-error:focus {
+            outline: 2px solid #fecaca;
+            outline-offset: 1px;
+        }
+    </style>
 </head>
+
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
         <nav class="mx-auto flex max-w-5xl items-center justify-center p-4">
-            <span class="text-xl font-bold tracking-tight">Impulso Mexa</span>
+            <span class="text-xl font-bold tracking-tight">
+                Impulso Mexa
+            </span>
         </nav>
     </header>
 
-    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+    <main class="mx-auto max-w-5xl p-4 py-8">
+        <section
+            class="mx-auto w-full max-w-2xl rounded-xl border
+                   border-gray-200 bg-white p-6 shadow-sm"
+        >
+            <h2 class="text-xl font-bold">Registro Comercial</h2>
 
-<!-- Formulario de registro comercial -->
-<section class="mx-auto w-full max-w-2xl rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-    <h2 class="text-xl font-bold">Registro Comercial</h2>
-    <p class="mt-1 text-sm text-gray-500">Da de alta tu negocio con sus datos fiscales para solicitar una cuenta de mayoreo.</p>
+            <p class="mt-1 text-sm text-gray-500">
+                Da de alta tu negocio con sus datos fiscales
+                para solicitar una cuenta de mayoreo.
+            </p>
 
-    <form id="form-registro" class="mt-4 grid gap-4 sm:grid-cols-2">
-        <!-- Razón social -->
-        <div class="sm:col-span-2">
-            <label for="razon" class="block text-sm font-medium">Razón social</label>
-            <input id="razon" type="text" placeholder="Nombre legal del negocio"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
+            <p class="mt-2 text-sm text-gray-600">
+                Todos los campos son obligatorios.
+            </p>
 
-        <!-- RFC -->
-        <div>
-            <label for="reg-rfc" class="block text-sm font-medium">RFC</label>
-            <input id="reg-rfc" type="text" maxlength="13" placeholder="12 o 13 caracteres"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm uppercase focus:border-orange-500 focus:outline-none">
-        </div>
+            <!-- Los mensajes se controlan con JavaScript. -->
+            <form
+                id="form-registro"
+                class="mt-4 grid gap-4 sm:grid-cols-2"
+                novalidate
+            >
+                <div class="sm:col-span-2">
+                    <label for="razon" class="block text-sm font-medium">
+                        Razón social
+                    </label>
 
-        <!-- Teléfono -->
-        <div>
-            <label for="reg-telefono" class="block text-sm font-medium">Teléfono</label>
-            <input id="reg-telefono" type="tel" maxlength="10" placeholder="10 dígitos"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
+                    <input
+                        id="razon"
+                        name="razon"
+                        type="text"
+                        required
+                        autocomplete="organization"
+                        aria-describedby="error-razon"
+                        placeholder="Nombre legal del negocio"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
 
-        <!-- Correo -->
-        <div class="sm:col-span-2">
-            <label for="reg-correo" class="block text-sm font-medium">Correo electrónico</label>
-            <input id="reg-correo" type="email" placeholder="correo@ejemplo.com"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
+                    <p
+                        id="error-razon"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
 
-        <!-- Contraseña -->
-        <div>
-            <label for="reg-password" class="block text-sm font-medium">Contraseña</label>
-            <input id="reg-password" type="password" placeholder="Mínimo 8 caracteres"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
+                <div>
+                    <label for="reg-rfc" class="block text-sm font-medium">
+                        RFC
+                    </label>
 
-        <!-- Confirmar contraseña -->
-        <div>
-            <label for="reg-confirmar" class="block text-sm font-medium">Confirmar contraseña</label>
-            <input id="reg-confirmar" type="password" placeholder="Repite la contraseña"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
+                    <input
+                        id="reg-rfc"
+                        name="rfc"
+                        type="text"
+                        required
+                        minlength="12"
+                        maxlength="13"
+                        autocapitalize="characters"
+                        spellcheck="false"
+                        aria-describedby="error-reg-rfc"
+                        placeholder="12 o 13 caracteres"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm uppercase focus:border-orange-500
+                               focus:outline-none"
+                    >
 
-        <!-- Aceptación de términos -->
-        <div class="sm:col-span-2">
-            <label class="flex items-center gap-2 text-sm text-gray-500">
-                <input id="reg-terminos" type="checkbox" class="h-4 w-4 accent-orange-600">
-                Acepto los términos y condiciones de venta mayorista
-            </label>
-        </div>
+                    <p
+                        id="error-reg-rfc"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
 
-        <!-- Mensaje de resultado del registro -->
-        <p id="mensaje-registro" class="hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm sm:col-span-2"></p>
+                <div>
+                    <label
+                        for="reg-telefono"
+                        class="block text-sm font-medium"
+                    >
+                        Teléfono
+                    </label>
 
-        <!-- Botón de registro -->
-        <div class="text-right sm:col-span-2">
-            <button type="submit"
-                class="w-full rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 sm:w-auto">
-                Registrar Negocio
-            </button>
-        </div>
-    </form>
-</section>
+                    <input
+                        id="reg-telefono"
+                        name="telefono"
+                        type="tel"
+                        required
+                        inputmode="numeric"
+                        maxlength="10"
+                        autocomplete="tel-national"
+                        aria-describedby="error-reg-telefono"
+                        placeholder="10 dígitos"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
 
-<!-- Script del módulo de autenticación -->
-<script>
-    // Seleccionamos los elementos que vamos a usar
-    const formLogin = document.getElementById('form-login');
-    const formRegistro = document.getElementById('form-registro');
-    const mensajeLogin = document.getElementById('mensaje-login');
-    const mensajeRegistro = document.getElementById('mensaje-registro');
-    const inputPasswordLogin = document.getElementById('login-password');
-    const botonMostrar = document.getElementById('btn-mostrar');
-    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    <p
+                        id="error-reg-telefono"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
 
-    function mostrarMensaje(caja, texto) {
-        caja.textContent = texto;
-        caja.classList.remove('hidden');
-    }
+                <div class="sm:col-span-2">
+                    <label
+                        for="reg-correo"
+                        class="block text-sm font-medium"
+                    >
+                        Correo electrónico
+                    </label>
 
-    botonMostrar.addEventListener('click', function () {
-        const estaOculta = inputPasswordLogin.type === 'password';
+                    <input
+                        id="reg-correo"
+                        name="correo"
+                        type="email"
+                        required
+                        autocomplete="email"
+                        aria-describedby="error-reg-correo"
+                        placeholder="correo@ejemplo.com"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
 
-        inputPasswordLogin.type = estaOculta ? 'text' : 'password';
-        botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
-    });
+                    <p
+                        id="error-reg-correo"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
 
-    // Registro comercial: valida todos los datos antes de aceptar
-    formRegistro.addEventListener('submit', function (evento) {
-        // Evitamos que la página se recargue
-        evento.preventDefault();
+                <div>
+                    <label
+                        for="reg-password"
+                        class="block text-sm font-medium"
+                    >
+                        Contraseña
+                    </label>
 
-        const razon = document.getElementById('razon').value.trim();
-        const rfc = document.getElementById('reg-rfc').value.trim().toUpperCase();
-        const telefono = document.getElementById('reg-telefono').value.trim();
-        const correo = document.getElementById('reg-correo').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const confirmar = document.getElementById('reg-confirmar').value;
-        const terminos = document.getElementById('reg-terminos').checked;
+                    <div class="relative mt-1">
+                        <input
+                            id="reg-password"
+                            name="password"
+                            type="password"
+                            required
+                            minlength="8"
+                            autocomplete="new-password"
+                            aria-describedby="ayuda-password error-reg-password"
+                            placeholder="Mínimo 8 caracteres"
+                            class="w-full rounded-lg border border-gray-200
+                                   p-2.5 pr-20 text-sm focus:border-orange-500
+                                   focus:outline-none"
+                        >
 
-        // Formato básico de RFC: 3 o 4 letras, 6 dígitos de fecha y 3 de homoclave
+                        <button
+                            type="button"
+                            data-password="reg-password"
+                            aria-controls="reg-password"
+                            aria-pressed="false"
+                            aria-label="Mostrar contraseña"
+                            class="absolute inset-y-0 right-0 px-3
+                                   text-sm font-medium text-orange-700"
+                        >
+                            Mostrar
+                        </button>
+                    </div>
+
+                    <p id="ayuda-password" class="mt-1 text-xs text-gray-500">
+                        Usa al menos 8 caracteres e incluye un número.
+                    </p>
+
+                    <p
+                        id="error-reg-password"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
+
+                <div>
+                    <label
+                        for="reg-confirmar"
+                        class="block text-sm font-medium"
+                    >
+                        Confirmar contraseña
+                    </label>
+
+                    <div class="relative mt-1">
+                        <input
+                            id="reg-confirmar"
+                            type="password"
+                            required
+                            autocomplete="new-password"
+                            aria-describedby="error-reg-confirmar"
+                            placeholder="Repite la contraseña"
+                            class="w-full rounded-lg border border-gray-200
+                                   p-2.5 pr-20 text-sm focus:border-orange-500
+                                   focus:outline-none"
+                        >
+
+                        <button
+                            type="button"
+                            data-password="reg-confirmar"
+                            aria-controls="reg-confirmar"
+                            aria-pressed="false"
+                            aria-label="Mostrar confirmación de contraseña"
+                            class="absolute inset-y-0 right-0 px-3
+                                   text-sm font-medium text-orange-700"
+                        >
+                            Mostrar
+                        </button>
+                    </div>
+
+                    <p
+                        id="error-reg-confirmar"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label
+                        for="reg-terminos"
+                        class="flex items-center gap-2 text-sm text-gray-600"
+                    >
+                        <input
+                            id="reg-terminos"
+                            name="terminos"
+                            type="checkbox"
+                            required
+                            aria-describedby="error-reg-terminos"
+                            class="h-4 w-4 accent-orange-600"
+                        >
+                        Acepto los términos y condiciones de venta mayorista
+                    </label>
+
+                    <p
+                        id="error-reg-terminos"
+                        class="mt-1 text-sm text-red-600"
+                    ></p>
+                </div>
+
+                <p
+                    id="mensaje-registro"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    class="hidden rounded-lg border p-3 text-sm sm:col-span-2"
+                ></p>
+
+                <div class="text-right sm:col-span-2">
+                    <button
+                        type="submit"
+                        class="w-full rounded-lg bg-orange-600 px-6 py-2.5
+                               text-sm font-medium text-white
+                               hover:bg-orange-700 sm:w-auto"
+                    >
+                        Registrar Negocio
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const formRegistro = document.getElementById('form-registro');
+        const mensajeRegistro = document.getElementById('mensaje-registro');
+
+        const campos = {
+            razon: document.getElementById('razon'),
+            rfc: document.getElementById('reg-rfc'),
+            telefono: document.getElementById('reg-telefono'),
+            correo: document.getElementById('reg-correo'),
+            password: document.getElementById('reg-password'),
+            confirmar: document.getElementById('reg-confirmar'),
+            terminos: document.getElementById('reg-terminos')
+        };
+
         const formatoRfc = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+        const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (razon === '') {
-            mostrarMensaje(mensajeRegistro, 'Escribe la razón social del negocio.');
-        } else if (!formatoRfc.test(rfc)) {
-            mostrarMensaje(mensajeRegistro, 'El RFC no tiene un formato válido (ej. MLE850312AB4).');
-        } else if (!/^\d{10}$/.test(telefono)) {
-            mostrarMensaje(mensajeRegistro, 'El teléfono debe tener 10 dígitos.');
-        } else if (!formatoCorreo.test(correo)) {
-            mostrarMensaje(mensajeRegistro, 'Escribe un correo electrónico válido.');
-        } else if (password.length < 8 || !/\d/.test(password)) {
-            mostrarMensaje(mensajeRegistro, 'La contraseña debe tener al menos 8 caracteres e incluir un número.');
-        } else if (password !== confirmar) {
-            mostrarMensaje(mensajeRegistro, 'Las contraseñas no coinciden.');
-        } else if (!terminos) {
-            mostrarMensaje(mensajeRegistro, 'Debes aceptar los términos y condiciones.');
-        } else {
-            mostrarMensaje(mensajeRegistro, 'Solicitud enviada para ' + razon + '. Revisaremos tus datos y te contactaremos.');
-            formRegistro.reset();
+        let intentoEnviar = false;
+
+        function mostrarMensaje(texto, esError = true) {
+            mensajeRegistro.textContent = texto;
+
+            mensajeRegistro.className =
+                'rounded-lg border p-3 text-sm sm:col-span-2 ' +
+                (esError
+                    ? 'border-red-300 bg-red-50 text-red-700'
+                    : 'border-blue-300 bg-blue-50 text-blue-800');
         }
-    });
-</script>
+
+        function ocultarMensaje() {
+            mensajeRegistro.textContent = '';
+            mensajeRegistro.classList.add('hidden');
+        }
+
+        function establecerError(campo, mensaje) {
+            const aviso = document.getElementById('error-' + campo.id);
+
+            aviso.textContent = mensaje;
+            campo.classList.toggle('campo-error', mensaje !== '');
+            campo.setAttribute('aria-invalid', String(mensaje !== ''));
+
+            return mensaje === '';
+        }
+
+        function validarCampo(nombre) {
+            const campo = campos[nombre];
+            let error = '';
+
+            switch (nombre) {
+                case 'razon':
+                    if (!campo.value.trim()) {
+                        error = 'Escribe la razón social del negocio.';
+                    }
+                    break;
+
+                case 'rfc': {
+                    const rfc = campo.value.trim().toUpperCase();
+
+                    if (!rfc) {
+                        error = 'Escribe el RFC.';
+                    } else if (rfc.length !== 12 && rfc.length !== 13) {
+                        error = 'El RFC debe tener 12 o 13 caracteres.';
+                    } else if (!formatoRfc.test(rfc)) {
+                        error =
+                            'Formato incorrecto: usa 3 o 4 letras, ' +
+                            '6 dígitos y 3 caracteres de homoclave.';
+                    }
+                    break;
+                }
+
+                case 'telefono':
+                    if (!campo.value.trim()) {
+                        error = 'Escribe el teléfono.';
+                    } else if (!/^\d{10}$/.test(campo.value.trim())) {
+                        error = 'El teléfono debe contener exactamente 10 dígitos.';
+                    }
+                    break;
+
+                case 'correo': {
+                    const correo = campo.value.trim();
+
+                    if (!correo) {
+                        error = 'Escribe el correo electrónico.';
+                    } else if (
+                        campo.validity.typeMismatch ||
+                        !formatoCorreo.test(correo)
+                    ) {
+                        error = 'Escribe un correo válido, por ejemplo: correo@ejemplo.com.';
+                    }
+                    break;
+                }
+
+                case 'password':
+                    if (!campo.value) {
+                        error = 'Escribe una contraseña.';
+                    } else if (campo.value.length < 8) {
+                        error = 'La contraseña debe tener al menos 8 caracteres.';
+                    } else if (!/\d/.test(campo.value)) {
+                        error = 'La contraseña debe incluir al menos un número.';
+                    }
+                    break;
+
+                case 'confirmar':
+                    if (!campo.value) {
+                        error = 'Repite la contraseña.';
+                    } else if (campo.value !== campos.password.value) {
+                        error = 'Las contraseñas no coinciden.';
+                    }
+                    break;
+
+                case 'terminos':
+                    if (!campo.checked) {
+                        error = 'Debes aceptar los términos y condiciones.';
+                    }
+                    break;
+            }
+
+            return establecerError(campo, error);
+        }
+
+        // Validar al salir del campo y al corregir un campo ya revisado.
+        Object.entries(campos).forEach(([nombre, campo]) => {
+            const evento = campo.type === 'checkbox' ? 'change' : 'input';
+
+            campo.addEventListener(evento, () => {
+                ocultarMensaje();
+
+                if (intentoEnviar || campo.dataset.revisado === 'true') {
+                    validarCampo(nombre);
+                }
+
+                if (
+                    nombre === 'password' &&
+                    (
+                        intentoEnviar ||
+                        campos.confirmar.dataset.revisado === 'true'
+                    )
+                ) {
+                    validarCampo('confirmar');
+                }
+            });
+
+            campo.addEventListener('blur', () => {
+                campo.dataset.revisado = 'true';
+                validarCampo(nombre);
+            });
+        });
+
+        // Convertir el RFC a mayúsculas al terminar de editarlo.
+        campos.rfc.addEventListener('blur', () => {
+            campos.rfc.value = campos.rfc.value.trim().toUpperCase();
+        });
+
+        // Mostrar u ocultar cada contraseña de forma independiente.
+        document.querySelectorAll('[data-password]').forEach((boton) => {
+            const etiquetaOriginal = boton.getAttribute('aria-label');
+
+            boton.addEventListener('click', () => {
+                const campo = document.getElementById(
+                    boton.dataset.password
+                );
+
+                const mostrar = campo.type === 'password';
+
+                campo.type = mostrar ? 'text' : 'password';
+                boton.textContent = mostrar ? 'Ocultar' : 'Mostrar';
+                boton.setAttribute('aria-pressed', String(mostrar));
+                boton.setAttribute(
+                    'aria-label',
+                    mostrar
+                        ? etiquetaOriginal.replace('Mostrar', 'Ocultar')
+                        : etiquetaOriginal
+                );
+            });
+        });
+
+        formRegistro.addEventListener('submit', (evento) => {
+            evento.preventDefault();
+            intentoEnviar = true;
+
+            let primerCampoInvalido = null;
+
+            // Revisar todos los campos, no solo el primero incorrecto.
+            Object.keys(campos).forEach((nombre) => {
+                const esValido = validarCampo(nombre);
+
+                if (!esValido && primerCampoInvalido === null) {
+                    primerCampoInvalido = campos[nombre];
+                }
+            });
+
+            if (primerCampoInvalido) {
+                mostrarMensaje(
+                    'No se puede registrar el negocio. ' +
+                    'Completa los campos obligatorios y corrige ' +
+                    'los errores indicados.'
+                );
+
+                primerCampoInvalido.focus();
+                return;
+            }
+
+            campos.razon.value = campos.razon.value.trim();
+            campos.rfc.value = campos.rfc.value.trim().toUpperCase();
+            campos.telefono.value = campos.telefono.value.trim();
+            campos.correo.value = campos.correo.value.trim();
+
+            // Aquí debe conectarse el envío al servidor.
+            // No se borra el formulario porque aún no se ha guardado.
+            mostrarMensaje(
+                'Los datos pasaron las validaciones del formulario. ' +
+                'Aún no se ha enviado ni guardado el registro: ' +
+                'falta conectar este formulario con el servidor.',
+                false
+            );
+        });
+    </script>
+</body>
+</html>

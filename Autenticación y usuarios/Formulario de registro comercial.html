@@ -106,3 +106,40 @@
         inputPasswordLogin.type = estaOculta ? 'text' : 'password';
         botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
     });
+
+    // Registro comercial: valida todos los datos antes de aceptar
+    formRegistro.addEventListener('submit', function (evento) {
+        // Evitamos que la página se recargue
+        evento.preventDefault();
+
+        const razon = document.getElementById('razon').value.trim();
+        const rfc = document.getElementById('reg-rfc').value.trim().toUpperCase();
+        const telefono = document.getElementById('reg-telefono').value.trim();
+        const correo = document.getElementById('reg-correo').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const confirmar = document.getElementById('reg-confirmar').value;
+        const terminos = document.getElementById('reg-terminos').checked;
+
+        // Formato básico de RFC: 3 o 4 letras, 6 dígitos de fecha y 3 de homoclave
+        const formatoRfc = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+
+        if (razon === '') {
+            mostrarMensaje(mensajeRegistro, 'Escribe la razón social del negocio.');
+        } else if (!formatoRfc.test(rfc)) {
+            mostrarMensaje(mensajeRegistro, 'El RFC no tiene un formato válido (ej. MLE850312AB4).');
+        } else if (!/^\d{10}$/.test(telefono)) {
+            mostrarMensaje(mensajeRegistro, 'El teléfono debe tener 10 dígitos.');
+        } else if (!formatoCorreo.test(correo)) {
+            mostrarMensaje(mensajeRegistro, 'Escribe un correo electrónico válido.');
+        } else if (password.length < 8 || !/\d/.test(password)) {
+            mostrarMensaje(mensajeRegistro, 'La contraseña debe tener al menos 8 caracteres e incluir un número.');
+        } else if (password !== confirmar) {
+            mostrarMensaje(mensajeRegistro, 'Las contraseñas no coinciden.');
+        } else if (!terminos) {
+            mostrarMensaje(mensajeRegistro, 'Debes aceptar los términos y condiciones.');
+        } else {
+            mostrarMensaje(mensajeRegistro, 'Solicitud enviada para ' + razon + '. Revisaremos tus datos y te contactaremos.');
+            formRegistro.reset();
+        }
+    });
+</script>

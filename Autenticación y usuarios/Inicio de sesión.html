@@ -76,26 +76,21 @@
 </section>
 
 <script>
-    // Login: valida los campos y saluda según el rol
-    formLogin.addEventListener('submit', function (evento) {
-    // Evitamos que la página se recargue
-    evento.preventDefault();
-
-    const rol = document.getElementById('rol').value;
-    const correo = document.getElementById('login-correo').value.trim();
-    const password = inputPasswordLogin.value;
+    // Referencias a los elementos del formulario
+    const formLogin = document.getElementById('form-login');
+    const inputPasswordLogin = document.getElementById('login-password');
     const botonMostrar = document.getElementById('btn-mostrar');
+    const mensajeLogin = document.getElementById('mensaje-login');
 
-    if (!formatoCorreo.test(correo)) {
-        mostrarMensaje(mensajeLogin, 'Escribe un correo electrónico válido.');
-        return;
+    // Validación básica del formato del correo
+    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function mostrarMensaje(elemento, texto) {
+        elemento.textContent = texto;
+        elemento.classList.remove('hidden');
     }
 
-    if (password === '') {
-        mostrarMensaje(mensajeLogin, 'Escribe tu contraseña.');
-        return;
-    }
-
+    // Mostrar u ocultar contraseña: independiente del envío del formulario
     botonMostrar.addEventListener('click', function () {
         const estaOculta = inputPasswordLogin.type === 'password';
 
@@ -103,8 +98,40 @@
         botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
     });
 
-    // Aquí iría la petición al servidor. Por ahora solo simulamos el acceso.
-    mostrarMensaje(mensajeLogin, 'Sesión iniciada como ' + rol + ' (' + correo + ').');
-    formLogin.reset();
+    // Validar y simular el inicio de sesión
+    formLogin.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+
+        const rol = document.getElementById('rol').value;
+        const correo = document.getElementById('login-correo').value.trim();
+        const password = inputPasswordLogin.value;
+
+        if (!formatoCorreo.test(correo)) {
+            mostrarMensaje(
+                mensajeLogin,
+                'Escribe un correo electrónico válido.'
+            );
+            return;
+        }
+
+        if (password === '') {
+            mostrarMensaje(
+                mensajeLogin,
+                'Escribe tu contraseña.'
+            );
+            return;
+        }
+
+        // Solo es una simulación; aquí iría la petición al servidor.
+        mostrarMensaje(
+            mensajeLogin,
+            'Sesión iniciada como ' + rol + ' (' + correo + ').'
+        );
+
+        formLogin.reset();
+
+        // Restaurar también la visibilidad y el texto del botón
+        inputPasswordLogin.type = 'password';
+        botonMostrar.textContent = 'Mostrar';
     });
 </script>

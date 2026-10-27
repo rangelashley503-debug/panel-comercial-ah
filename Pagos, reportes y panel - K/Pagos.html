@@ -105,16 +105,6 @@
             <h1 class="text-3xl font-bold">
                 Pagos, Reportes y Panel Administrativo
             </h1>
-
-            <p
-                class="mt-3 rounded-lg border border-amber-200
-                       bg-amber-50 p-3 text-sm text-amber-900"
-            >
-                Demostración local con datos de ejemplo.
-                Los pagos y el cierre de turno no se guardan
-                en un servidor. No se procesa ningún cobro real.
-                Los cambios se perderán al recargar la página.
-            </p>
         </div>
 
         <!-- Indicadores -->
@@ -397,19 +387,19 @@
                     ></p>
                 </div>
 
-                <div class="flex items-end">
-                    <button
-                        type="submit"
-                        id="btn-pago"
-                        class="w-full rounded-lg border border-gray-200
-                               px-6 py-2.5 text-sm font-medium
-                               hover:bg-gray-50
-                               disabled:cursor-not-allowed
-                               disabled:opacity-50"
-                    >
-                        Registrar Pago
-                    </button>
-                </div>
+                <div class="self-start sm:pt-6">
+    <button
+        type="submit"
+        id="btn-pago"
+        class="w-full rounded-lg border border-gray-200
+               px-6 py-2.5 text-sm font-medium
+               hover:bg-gray-50
+               disabled:cursor-not-allowed
+               disabled:opacity-50"
+    >
+        Registrar Pago
+    </button>
+</div>
 
                 <p
                     id="mensaje-pago"

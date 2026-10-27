@@ -95,6 +95,13 @@
         return;
     }
 
+    botonMostrar.addEventListener('click', function () {
+        const estaOculta = inputPasswordLogin.type === 'password';
+
+        inputPasswordLogin.type = estaOculta ? 'text' : 'password';
+        botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
+    });
+
     // Aquí iría la petición al servidor. Por ahora solo simulamos el acceso.
     mostrarMensaje(mensajeLogin, 'Sesión iniciada como ' + rol + ' (' + correo + ').');
     formLogin.reset();

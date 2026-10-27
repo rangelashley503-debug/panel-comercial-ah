@@ -1,0 +1,229 @@
+!-- Formulario para registrar nueva tienda / cuenta comercial -->
+<section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <h2 class="text-xl font-bold">Registrar Nueva Cuenta Comercial</h2>
+    <p class="mt-1 text-sm text-gray-500">Captura los datos fiscales, de contacto y la dirección de entrega.</p>
+
+    <form id="form-cliente" class="mt-4 grid gap-4 sm:grid-cols-2">
+        <!-- Nombre de la tienda -->
+        <div>
+            <label for="tienda" class="block text-sm font-medium">Nombre de la tienda</label>
+            <input id="tienda" type="text" placeholder="Ej. Miscelánea San Miguel"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- RFC -->
+        <div>
+            <label for="rfc" class="block text-sm font-medium">RFC</label>
+            <input id="rfc" type="text" maxlength="13" placeholder="12 o 13 caracteres"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm uppercase focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Contacto -->
+        <div>
+            <label for="contacto" class="block text-sm font-medium">Nombre del contacto</label>
+            <input id="contacto" type="text" placeholder="Persona encargada"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+            <label for="telefono" class="block text-sm font-medium">Teléfono</label>
+            <input id="telefono" type="tel" maxlength="10" placeholder="10 dígitos"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Dirección de entrega -->
+        <div class="sm:col-span-2">
+            <label for="direccion" class="block text-sm font-medium">Dirección de entrega</label>
+            <input id="direccion" type="text" placeholder="Calle, número y colonia"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Ciudad -->
+        <div>
+            <label for="ciudad" class="block text-sm font-medium">Ciudad</label>
+            <input id="ciudad" type="text" placeholder="Ciudad o municipio"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Código postal -->
+        <div>
+            <label for="cp" class="block text-sm font-medium">Código postal</label>
+            <input id="cp" type="text" maxlength="5" placeholder="00000"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Estatus de la cuenta -->
+        <div>
+            <label for="estatus" class="block text-sm font-medium">Estatus</label>
+            <select id="estatus"
+                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+                <option>Activo</option>
+                <option>Suspendido</option>
+            </select>
+        </div>
+
+        <!-- Referencias de entrega -->
+        <div>
+            <label for="referencias" class="block text-sm font-medium">Referencias de entrega</label>
+            <input id="referencias" type="text" placeholder="Ej. Frente a la plaza, horario de recepción"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Botón de guardado -->
+        <div class="text-right sm:col-span-2">
+            <button type="submit"
+                class="w-full rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 sm:w-auto">
+                Guardar Cuenta
+            </button>
+        </div>
+    </form>
+</section>
+
+<!-- Script del módulo de clientes -->
+<script>
+    // Seleccionamos los elementos que vamos a usar
+    const formulario = document.getElementById('form-cliente');
+    const tabla = document.getElementById('tabla-clientes');
+    const buscador = document.getElementById('buscador');
+    const mensajeVacio = document.getElementById('sin-resultados');
+    const textoTotal = document.getElementById('total-clientes');
+
+    // Clases del badge de estatus (siempre las mismas)
+    const claseBadge = 'estatus rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+
+    // Actualiza el texto "X clientes registrados"
+    function actualizarTotal() {
+        textoTotal.textContent = tabla.rows.length + ' clientes registrados';
+    }
+
+    // Agrega una celda de texto simple a una fila
+    function agregarCelda(fila, texto, clases) {
+        const celda = fila.insertCell();
+        celda.className = clases;
+        celda.textContent = texto;
+        return celda;
+    }
+
+    // Crea la fila de un cliente nuevo y la agrega a la tabla
+    function agregarCliente(datos) {
+        const fila = tabla.insertRow(0);
+        fila.className = 'hover:bg-gray-50';
+
+        // Celda del cliente con su dirección debajo
+        const celdaCliente = fila.insertCell();
+        celdaCliente.className = 'p-4';
+
+        const nombre = document.createElement('p');
+        nombre.className = 'font-medium';
+        nombre.textContent = datos.tienda;
+
+        const direccion = document.createElement('p');
+        direccion.className = 'text-xs text-gray-500';
+        direccion.textContent = datos.direccion + ', ' + datos.ciudad + ' C.P. ' + datos.cp;
+
+        celdaCliente.appendChild(nombre);
+        celdaCliente.appendChild(direccion);
+
+        agregarCelda(fila, datos.rfc, 'p-4 font-mono text-gray-500');
+        agregarCelda(fila, datos.contacto, 'p-4');
+        agregarCelda(fila, datos.telefono, 'p-4 text-gray-500');
+
+        // Celda del badge de estatus
+        const celdaEstatus = fila.insertCell();
+        celdaEstatus.className = 'p-4';
+        const badge = document.createElement('span');
+        badge.className = claseBadge;
+        badge.textContent = datos.estatus;
+        celdaEstatus.appendChild(badge);
+
+        // Celda del botón de acción
+        const celdaAccion = fila.insertCell();
+        celdaAccion.className = 'p-4';
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'btn-estatus text-sm font-medium text-orange-600 hover:text-orange-700';
+        boton.textContent = datos.estatus === 'Activo' ? 'Suspender' : 'Activar';
+        celdaAccion.appendChild(boton);
+    }
+
+    // Buscador: oculta las filas que no coinciden con el texto escrito
+    buscador.addEventListener('input', function () {
+        const texto = buscador.value.trim().toLowerCase();
+        let visibles = 0;
+
+        for (const fila of tabla.rows) {
+            // Buscamos en el nombre del cliente y en el RFC
+            const contenido = (fila.cells[0].textContent + ' ' + fila.cells[1].textContent).toLowerCase();
+            const coincide = contenido.includes(texto);
+
+            fila.classList.toggle('hidden', !coincide);
+            if (coincide) {
+                visibles++;
+            }
+        }
+
+        mensajeVacio.classList.toggle('hidden', visibles > 0);
+    });
+
+    // Botón de cada fila: cambia entre Activo y Suspendido
+    tabla.addEventListener('click', function (evento) {
+        const boton = evento.target.closest('.btn-estatus');
+        if (!boton) {
+            return;
+        }
+
+        const fila = boton.closest('tr');
+        const badge = fila.querySelector('.estatus');
+        const estabaActivo = badge.textContent === 'Activo';
+
+        badge.textContent = estabaActivo ? 'Suspendido' : 'Activo';
+        boton.textContent = estabaActivo ? 'Activar' : 'Suspender';
+    });
+
+    // Formulario: valida y registra el cliente nuevo
+    formulario.addEventListener('submit', function (evento) {
+        // Evitamos que la página se recargue
+        evento.preventDefault();
+
+        const datos = {
+            tienda: document.getElementById('tienda').value.trim(),
+            rfc: document.getElementById('rfc').value.trim().toUpperCase(),
+            contacto: document.getElementById('contacto').value.trim(),
+            telefono: document.getElementById('telefono').value.trim(),
+            direccion: document.getElementById('direccion').value.trim(),
+            ciudad: document.getElementById('ciudad').value.trim(),
+            cp: document.getElementById('cp').value.trim(),
+            estatus: document.getElementById('estatus').value
+        };
+
+        // Validación de campos obligatorios
+        if (!datos.tienda || !datos.contacto || !datos.direccion || !datos.ciudad) {
+            alert('Completa nombre, contacto, dirección y ciudad.');
+            return;
+        }
+
+        // Formato básico de RFC: 3 o 4 letras, 6 dígitos de fecha y 3 de homoclave
+        const formatoRfc = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+        if (!formatoRfc.test(datos.rfc)) {
+            alert('El RFC no tiene un formato válido (ej. MLE850312AB4).');
+            return;
+        }
+
+        // El teléfono debe tener exactamente 10 dígitos
+        if (!/^\d{10}$/.test(datos.telefono)) {
+            alert('El teléfono debe tener 10 dígitos.');
+            return;
+        }
+
+        // El código postal debe tener 5 dígitos
+        if (!/^\d{5}$/.test(datos.cp)) {
+            alert('El código postal debe tener 5 dígitos.');
+            return;
+        }
+
+        agregarCliente(datos);
+        actualizarTotal();
+        formulario.reset();
+    });
+</script>

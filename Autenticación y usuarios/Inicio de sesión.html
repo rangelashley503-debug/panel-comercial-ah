@@ -84,6 +84,7 @@
     const rol = document.getElementById('rol').value;
     const correo = document.getElementById('login-correo').value.trim();
     const password = inputPasswordLogin.value;
+    const botonMostrar = document.getElementById('btn-mostrar');
 
     if (!formatoCorreo.test(correo)) {
         mostrarMensaje(mensajeLogin, 'Escribe un correo electrónico válido.');

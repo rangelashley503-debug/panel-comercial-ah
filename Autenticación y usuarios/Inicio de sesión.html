@@ -135,13 +135,26 @@
         // Solo es una simulación; aquí iría la petición al servidor.
         mostrarMensaje(
             mensajeLogin,
-            'Sesión iniciada como ' + rol + ' (' + correo + ').'
+            'Sesión iniciada como ' + rol + ' (' + correo + '). Redirigiendo...'
         );
+
+        // Página de destino según el rol elegido (rutas relativas a esta carpeta)
+        const destinos = {
+            'Vendedor': '../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html',
+            'Almacén': '../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html',
+            'Administrador': '../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html',
+            'Cliente': '../Catalogo%20de%20productos-%20H/catalogo.html'
+        };
 
         formLogin.reset();
 
         // Restaurar también la visibilidad y el texto del botón
         inputPasswordLogin.type = 'password';
         botonMostrar.textContent = 'Mostrar';
+
+        // Esperamos un momento para que se alcance a leer el mensaje y luego cambiamos de página
+    setTimeout(function () {
+        window.location.href = destinos[rol];
+    }, 800);
     });
 </script>

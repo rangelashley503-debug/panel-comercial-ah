@@ -6,6 +6,31 @@
     <title>Registro de cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script>
+    (function () {
+        const enlacesMenu = document.querySelectorAll('#menu a');
+
+        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+        function carpetaDe(ruta) {
+            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+        }
+
+        const carpetaActual = carpetaDe(window.location.pathname);
+
+        enlacesMenu.forEach(function (enlace) {
+            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+            if (carpetaEnlace === carpetaActual) {
+                // Módulo actual: naranja y subrayado
+                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+            } else {
+                // Los demás: grises, naranja al pasar el cursor
+                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+            }
+        });
+    })();
+</script>
+
     <style>
         .campo-error {
             border-color: #dc2626 !important;

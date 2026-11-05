@@ -6,8 +6,8 @@ import os
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = int(os.environ.get('DB_PORT', '3306'))
 DB_USER = os.environ.get('DB_USER', 'root')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
-DB_NAME = os.environ.get('DB_NAME', 'impulso_mexa')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'winnie')
+DB_NAME = os.environ.get('DB_NAME', 'Impulso_mexa')
 
 # Clave para firmar la sesión. En un proyecto real debe ser larga y secreta.
-SECRET_KEY = os.environ.get('SECRET_KEY', 'cambia-esta-clave-en-desarrollo')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'Winnie@1718PigletP@choclo')

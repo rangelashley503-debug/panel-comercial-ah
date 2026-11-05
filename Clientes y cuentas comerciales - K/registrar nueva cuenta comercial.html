@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registrar nuevo cliente</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+    (function () {
+        const enlacesMenu = document.querySelectorAll('#menu a');
+
+        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+        function carpetaDe(ruta) {
+            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+        }
+
+        const carpetaActual = carpetaDe(window.location.pathname);
+
+        enlacesMenu.forEach(function (enlace) {
+            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+            if (carpetaEnlace === carpetaActual) {
+                // Módulo actual: naranja y subrayado
+                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+            } else {
+                // Los demás: grises, naranja al pasar el cursor
+                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+            }
+        });
+    })();
+</script>
+
+    <style>
+        .campo-error {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 1px #dc2626;
+        }
+
+        .error-campo {
+            margin-top: 4px;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+
+        .mensaje {
+            grid-column: 1 / -1;
+            padding: 12px;
+            border: 1px solid;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .mensaje-error {
+            color: #991b1b;
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .mensaje-info {
+            color: #1e40af;
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-black antialiased">
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+        <!-- Menú con scroll horizontal para pantallas chicas -->
+        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <main class="mx-auto max-w-5xl p-4 py-8">
+        <section
+            class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        >
+            <h2 class="text-xl font-bold">
+                Registrar Nueva Cuenta Comercial
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-500">
+                Captura los datos fiscales, de contacto y la dirección de entrega.
+            </p>
+
+            <p class="mt-2 text-sm text-gray-600">
+                Los campos con * son obligatorios.
+            </p>
+
+            <form
+                id="form-cliente"
+                class="mt-4 grid gap-4 sm:grid-cols-2"
+                novalidate
+            >
+                <!-- Nombre de la tienda -->
+                <div>
+                    <label for="tienda" class="block text-sm font-medium">
+                        Nombre de la tienda *
+                    </label>
+
+                    <input
+                        id="tienda"
+                        name="tienda"
+                        type="text"
+                        required
+                        autocomplete="organization"
+                        aria-describedby="error-tienda"
+                        placeholder="Ej. Miscelánea San Miguel"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-tienda" class="error-campo" hidden></p>
+                </div>
+
+                <!-- RFC -->
+                <div>
+                    <label for="rfc" class="block text-sm font-medium">
+                        RFC *
+                    </label>
+
+                    <input
+                        id="rfc"
+                        name="rfc"
+                        type="text"
+                        required
+                        minlength="12"
+                        maxlength="13"
+                        spellcheck="false"
+                        autocapitalize="characters"
+                        aria-describedby="error-rfc"
+                        placeholder="12 o 13 caracteres"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm uppercase focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-rfc" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Contacto -->
+                <div>
+                    <label for="contacto" class="block text-sm font-medium">
+                        Nombre del contacto *
+                    </label>
+
+                    <input
+                        id="contacto"
+                        name="contacto"
+                        type="text"
+                        required
+                        autocomplete="name"
+                        aria-describedby="error-contacto"
+                        placeholder="Persona encargada"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-contacto" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                    <label for="telefono" class="block text-sm font-medium">
+                        Teléfono *
+                    </label>
+
+                    <input
+                        id="telefono"
+                        name="telefono"
+                        type="tel"
+                        required
+                        inputmode="numeric"
+                        maxlength="10"
+                        autocomplete="tel-national"
+                        aria-describedby="error-telefono"
+                        placeholder="10 dígitos"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-telefono" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Dirección -->
+                <div class="sm:col-span-2">
+                    <label for="direccion" class="block text-sm font-medium">
+                        Dirección de entrega *
+                    </label>
+
+                    <input
+                        id="direccion"
+                        name="direccion"
+                        type="text"
+                        required
+                        autocomplete="street-address"
+                        aria-describedby="error-direccion"
+                        placeholder="Calle, número y colonia"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-direccion" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Ciudad -->
+                <div>
+                    <label for="ciudad" class="block text-sm font-medium">
+                        Ciudad *
+                    </label>
+
+                    <input
+                        id="ciudad"
+                        name="ciudad"
+                        type="text"
+                        required
+                        autocomplete="address-level2"
+                        aria-describedby="error-ciudad"
+                        placeholder="Ciudad o municipio"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-ciudad" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Código postal -->
+                <div>
+                    <label for="cp" class="block text-sm font-medium">
+                        Código postal *
+                    </label>
+
+                    <input
+                        id="cp"
+                        name="cp"
+                        type="text"
+                        required
+                        inputmode="numeric"
+                        maxlength="5"
+                        autocomplete="postal-code"
+                        aria-describedby="error-cp"
+                        placeholder="00000"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+
+                    <p id="error-cp" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Estatus -->
+                <div>
+                    <label for="estatus" class="block text-sm font-medium">
+                        Estatus *
+                    </label>
+
+                    <select
+                        id="estatus"
+                        name="estatus"
+                        required
+                        aria-describedby="error-estatus"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               bg-white p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+                        <option value="Activo">Activo</option>
+                        <option value="Suspendido">Suspendido</option>
+                    </select>
+
+                    <p id="error-estatus" class="error-campo" hidden></p>
+                </div>
+
+                <!-- Referencias opcionales -->
+                <div>
+                    <label for="referencias" class="block text-sm font-medium">
+                        Referencias de entrega (opcional)
+                    </label>
+
+                    <input
+                        id="referencias"
+                        name="referencias"
+                        type="text"
+                        placeholder="Ej. Frente a la plaza"
+                        class="mt-1 w-full rounded-lg border border-gray-200
+                               p-2.5 text-sm focus:border-orange-500
+                               focus:outline-none"
+                    >
+                </div>
+
+                <!-- Mensaje general -->
+                <p
+                    id="mensaje-cliente"
+                    class="mensaje"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    hidden
+                ></p>
+
+                <!-- Botón -->
+                <div class="text-right sm:col-span-2">
+                    <button
+                        type="submit"
+                        class="w-full rounded-lg bg-orange-600 px-6 py-2.5
+                               text-sm font-medium text-white
+                               hover:bg-orange-700 sm:w-auto"
+                    >
+                        Guardar Cuenta
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const formulario = document.getElementById('form-cliente');
+        const mensajeGeneral = document.getElementById('mensaje-cliente');
+
+        const campos = {
+            tienda: document.getElementById('tienda'),
+            rfc: document.getElementById('rfc'),
+            contacto: document.getElementById('contacto'),
+            telefono: document.getElementById('telefono'),
+            direccion: document.getElementById('direccion'),
+            ciudad: document.getElementById('ciudad'),
+            cp: document.getElementById('cp'),
+            estatus: document.getElementById('estatus')
+        };
+
+        const referencias = document.getElementById('referencias');
+        const camposRevisados = new Set();
+
+        let intentoEnviar = false;
+
+        function mostrarMensaje(texto, esError = true) {
+            mensajeGeneral.textContent = texto;
+            mensajeGeneral.className =
+                'mensaje ' + (esError ? 'mensaje-error' : 'mensaje-info');
+            mensajeGeneral.hidden = false;
+        }
+
+        function ocultarMensaje() {
+            mensajeGeneral.textContent = '';
+            mensajeGeneral.hidden = true;
+        }
+
+        function establecerError(nombre, texto) {
+            const campo = campos[nombre];
+            const aviso = document.getElementById('error-' + nombre);
+            const hayError = texto !== '';
+
+            aviso.textContent = texto;
+            aviso.hidden = !hayError;
+
+            campo.classList.toggle('campo-error', hayError);
+            campo.setAttribute('aria-invalid', String(hayError));
+
+            return !hayError;
+        }
+
+        function validarCampo(nombre) {
+            const valor = campos[nombre].value.trim();
+            let error = '';
+
+            switch (nombre) {
+                case 'tienda':
+                    if (!valor) {
+                        error = 'Escribe el nombre de la tienda.';
+                    }
+                    break;
+
+                case 'rfc': {
+                    const rfc = valor.toUpperCase();
+                    const formato = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+
+                    if (!rfc) {
+                        error = 'Escribe el RFC.';
+                    } else if (rfc.length !== 12 && rfc.length !== 13) {
+                        error = 'El RFC debe tener 12 o 13 caracteres.';
+                    } else if (!formato.test(rfc)) {
+                        error =
+                            'El RFC debe contener 3 o 4 letras, ' +
+                            '6 dígitos y 3 caracteres de homoclave.';
+                    }
+                    break;
+                }
+
+                case 'contacto':
+                    if (!valor) {
+                        error = 'Escribe el nombre del contacto.';
+                    }
+                    break;
+
+                case 'telefono':
+                    if (!valor) {
+                        error = 'Escribe el teléfono.';
+                    } else if (!/^\d{10}$/.test(valor)) {
+                        error =
+                            'El teléfono debe tener exactamente 10 dígitos, ' +
+                            'sin espacios ni guiones.';
+                    }
+                    break;
+
+                case 'direccion':
+                    if (!valor) {
+                        error = 'Escribe la dirección de entrega.';
+                    }
+                    break;
+
+                case 'ciudad':
+                    if (!valor) {
+                        error = 'Escribe la ciudad o municipio.';
+                    }
+                    break;
+
+                case 'cp':
+                    if (!valor) {
+                        error = 'Escribe el código postal.';
+                    } else if (!/^\d{5}$/.test(valor)) {
+                        error =
+                            'El código postal debe contener exactamente 5 dígitos.';
+                    }
+                    break;
+
+                case 'estatus':
+                    if (!['Activo', 'Suspendido'].includes(valor)) {
+                        error = 'Selecciona un estatus válido.';
+                    }
+                    break;
+            }
+
+            return establecerError(nombre, error);
+        }
+
+        // Mostrar advertencias al salir del campo y al corregirlo.
+        Object.entries(campos).forEach(([nombre, campo]) => {
+            campo.addEventListener('blur', () => {
+                if (nombre === 'rfc') {
+                    campo.value = campo.value.trim().toUpperCase();
+                }
+
+                camposRevisados.add(nombre);
+                validarCampo(nombre);
+            });
+
+            const evento =
+                campo.tagName === 'SELECT' ? 'change' : 'input';
+
+            campo.addEventListener(evento, () => {
+                ocultarMensaje();
+
+                if (intentoEnviar || camposRevisados.has(nombre)) {
+                    validarCampo(nombre);
+                }
+            });
+        });
+
+        referencias.addEventListener('input', ocultarMensaje);
+
+        formulario.addEventListener('submit', (evento) => {
+            evento.preventDefault();
+            intentoEnviar = true;
+
+            let primerCampoInvalido = null;
+
+            // Validar todos los campos, no solamente el primero.
+            Object.keys(campos).forEach((nombre) => {
+                const esValido = validarCampo(nombre);
+
+                if (!esValido && primerCampoInvalido === null) {
+                    primerCampoInvalido = campos[nombre];
+                }
+            });
+
+            if (primerCampoInvalido) {
+                mostrarMensaje(
+                    'No se puede guardar la cuenta. ' +
+                    'Completa los campos obligatorios y corrige ' +
+                    'las advertencias marcadas en rojo.'
+                );
+
+                primerCampoInvalido.focus();
+                return;
+            }
+
+            const datos = {
+                tienda: campos.tienda.value.trim(),
+                rfc: campos.rfc.value.trim().toUpperCase(),
+                contacto: campos.contacto.value.trim(),
+                telefono: campos.telefono.value.trim(),
+                direccion: campos.direccion.value.trim(),
+                ciudad: campos.ciudad.value.trim(),
+                cp: campos.cp.value.trim(),
+                estatus: campos.estatus.value,
+                referencias: referencias.value.trim()
+            };
+
+            campos.rfc.value = datos.rfc;
+
+            /*
+             * Aquí debe implementarse el envío de "datos" al servidor.
+             * El formulario no se limpia porque todavía no se ha
+             * confirmado ningún guardado.
+             */
+
+            mostrarMensaje(
+                'Los datos pasaron las validaciones del formulario. ' +
+                'La cuenta aún no se ha guardado: falta conectar ' +
+                'el formulario con el servidor.',
+                false
+            );
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pagos, Reportes y Panel Administrativo</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+    (function () {
+        const enlacesMenu = document.querySelectorAll('#menu a');
+
+        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+        function carpetaDe(ruta) {
+            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+        }
+
+        const carpetaActual = carpetaDe(window.location.pathname);
+
+        enlacesMenu.forEach(function (enlace) {
+            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+            if (carpetaEnlace === carpetaActual) {
+                // Módulo actual: naranja y subrayado
+                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+            } else {
+                // Los demás: grises, naranja al pasar el cursor
+                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+            }
+        });
+    })();
+</script>
+
+    <style>
+        [hidden] {
+            display: none !important;
+        }
+
+        .campo-error {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 1px #dc2626;
+        }
+
+        .error-campo {
+            margin-top: 4px;
+            font-size: 14px;
+            color: #b91c1c;
+        }
+
+        .mensaje {
+            padding: 12px;
+            border: 1px solid;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .mensaje-error {
+            color: #991b1b;
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .mensaje-exito {
+            color: #166534;
+            background-color: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .turno-cerrado {
+            color: #991b1b;
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-black antialiased">
+
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+        <!-- Menú con scroll horizontal para pantallas chicas -->
+        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+
+        <!-- Título -->
+        <div>
+            <h1 class="text-3xl font-bold">
+                Pagos, Reportes y Panel Administrativo
+            </h1>
+
+            <div class="flex flex-wrap gap-3">
+    <a href="Lista%20de%20stock%20minimo.html"
+        class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
+        Ver stock mínimo
+    </a>
+    <a href="Productos%20m%C3%A1s%20vendidos.html"
+        class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
+        Productos más vendidos
+    </a>
+</div>
+
+        </div>
+
+        <!-- Indicadores -->
+        <section
+            aria-label="Indicadores del turno"
+            class="grid gap-4 sm:grid-cols-3"
+        >
+            <article
+                class="rounded-xl border border-gray-200
+                       bg-white p-5 shadow-sm"
+            >
+                <p class="text-sm font-medium text-gray-500">
+                    Ventas Totales del Turno
+                </p>
+
+                <p
+                    id="card-ventas"
+                    class="mt-1 text-3xl font-bold"
+                >
+                    $84,520.00
+                </p>
+            </article>
+
+            <article
+                class="rounded-xl border border-gray-200
+                       bg-white p-5 shadow-sm"
+            >
+                <p class="text-sm font-medium text-gray-500">
+                    Pedidos Completados
+                </p>
+
+                <p
+                    id="card-pedidos"
+                    class="mt-1 text-3xl font-bold"
+                >
+                    23
+                </p>
+            </article>
+
+            <article
+                class="rounded-xl border border-gray-200
+                       bg-white p-5 shadow-sm"
+            >
+                <p class="text-sm font-medium text-gray-500">
+                    Alertas de Stock Mínimo
+                </p>
+
+                <p
+                    id="card-alertas"
+                    class="mt-1 text-3xl font-bold"
+                >
+                    4
+                </p>
+            </article>
+        </section>
+
+        <!-- Corte de caja -->
+        <section
+            class="overflow-hidden rounded-xl border
+                   border-gray-200 bg-white shadow-sm"
+        >
+            <div
+                class="flex flex-col gap-2 p-4 sm:flex-row
+                       sm:items-center sm:justify-between"
+            >
+                <h2 class="text-xl font-bold">
+                    Corte de Caja
+                </h2>
+
+                <span
+                    id="estado-turno"
+                    class="w-fit rounded-full border border-gray-200
+                           px-3 py-1 text-xs font-semibold"
+                >
+                    Turno abierto
+                </span>
+            </div>
+
+            <!-- Tabla de pagos -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <caption class="sr-only">
+                        Resumen de operaciones e importes por método de pago
+                    </caption>
+
+                    <thead
+                        class="bg-gray-50 text-xs uppercase
+                               tracking-wider text-gray-500"
+                    >
+                        <tr>
+                            <th scope="col" class="p-4 font-semibold">
+                                Método de pago
+                            </th>
+
+                            <th scope="col" class="p-4 font-semibold">
+                                Operaciones
+                            </th>
+
+                            <th
+                                scope="col"
+                                class="p-4 text-right font-semibold"
+                            >
+                                Monto
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody
+                        id="tabla-corte"
+                        class="divide-y divide-gray-100"
+                    >
+                        <tr
+                            class="hover:bg-gray-50"
+                            data-metodo="Efectivo"
+                            data-ops="11"
+                            data-monto="32150"
+                        >
+                            <td class="p-4 font-medium">
+                                Efectivo
+                            </td>
+
+                            <td class="celda-ops p-4 text-gray-500">
+                                11
+                            </td>
+
+                            <td class="celda-monto p-4 text-right">
+                                $32,150.00
+                            </td>
+                        </tr>
+
+                        <tr
+                            class="hover:bg-gray-50"
+                            data-metodo="Tarjeta"
+                            data-ops="7"
+                            data-monto="21870"
+                        >
+                            <td class="p-4 font-medium">
+                                Tarjeta
+                            </td>
+
+                            <td class="celda-ops p-4 text-gray-500">
+                                7
+                            </td>
+
+                            <td class="celda-monto p-4 text-right">
+                                $21,870.00
+                            </td>
+                        </tr>
+
+                        <tr
+                            class="hover:bg-gray-50"
+                            data-metodo="Transferencia"
+                            data-ops="5"
+                            data-monto="30500"
+                        >
+                            <td class="p-4 font-medium">
+                                Transferencia
+                            </td>
+
+                            <td class="celda-ops p-4 text-gray-500">
+                                5
+                            </td>
+
+                            <td class="celda-monto p-4 text-right">
+                                $30,500.00
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tfoot class="border-t border-gray-200">
+                        <tr>
+                            <th scope="row" class="p-4 font-bold">
+                                Total
+                            </th>
+
+                            <td
+                                id="total-ops"
+                                class="p-4 font-medium text-gray-500"
+                            >
+                                23
+                            </td>
+
+                            <td
+                                id="total-monto"
+                                class="p-4 text-right font-bold"
+                            >
+                                $84,520.00
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Formulario -->
+            <form
+                id="form-pago"
+                class="grid gap-4 border-t border-gray-100
+                       p-4 sm:grid-cols-3"
+                novalidate
+            >
+                <div>
+                    <label
+                        for="metodo"
+                        class="block text-sm font-medium"
+                    >
+                        Método de pago *
+                    </label>
+
+                    <select
+                        id="metodo"
+                        name="metodo"
+                        required
+                        aria-describedby="error-metodo"
+                        class="mt-1 w-full rounded-lg border
+                               border-gray-200 bg-white p-2.5 text-sm
+                               focus:border-orange-500 focus:outline-none
+                               disabled:cursor-not-allowed
+                               disabled:bg-gray-100"
+                    >
+                        <option value="">
+                            Selecciona un método
+                        </option>
+
+                        <option value="Efectivo">
+                            Efectivo
+                        </option>
+
+                        <option value="Tarjeta">
+                            Tarjeta
+                        </option>
+
+                        <option value="Transferencia">
+                            Transferencia
+                        </option>
+                    </select>
+
+                    <p
+                        id="error-metodo"
+                        class="error-campo"
+                        hidden
+                    ></p>
+                </div>
+
+                <div>
+                    <label
+                        for="monto"
+                        class="block text-sm font-medium"
+                    >
+                        Monto (MXN) *
+                    </label>
+
+                    <input
+                        id="monto"
+                        name="monto"
+                        type="number"
+                        required
+                        min="1"
+                        step="0.01"
+                        inputmode="decimal"
+                        placeholder="0.00"
+                        aria-describedby="ayuda-monto error-monto"
+                        class="mt-1 w-full rounded-lg border
+                               border-gray-200 p-2.5 text-sm
+                               focus:border-orange-500 focus:outline-none
+                               disabled:cursor-not-allowed
+                               disabled:bg-gray-100"
+                    >
+
+                    <p
+                        id="ayuda-monto"
+                        class="mt-1 text-xs text-gray-500"
+                    >
+                        Mínimo $1.00 y hasta dos decimales.
+                    </p>
+
+                    <p
+                        id="error-monto"
+                        class="error-campo"
+                        hidden
+                    ></p>
+                </div>
+
+                <div class="self-start sm:pt-6">
+    <button
+        type="submit"
+        id="btn-pago"
+        class="w-full rounded-lg border border-gray-200
+               px-6 py-2.5 text-sm font-medium
+               hover:bg-gray-50
+               disabled:cursor-not-allowed
+               disabled:opacity-50"
+    >
+        Registrar Pago
+    </button>
+</div>
+
+                <p
+                    id="mensaje-pago"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    class="mensaje sm:col-span-3"
+                    hidden
+                ></p>
+            </form>
+
+            <!-- Cierre del turno -->
+            <div
+                class="flex flex-col gap-3 border-t border-gray-100
+                       p-4 sm:flex-row sm:items-center
+                       sm:justify-between"
+            >
+                <p
+                    id="mensaje-turno"
+                    class="text-sm text-gray-500"
+                >
+                    Registra los pagos del turno y ciérralo al terminar.
+                </p>
+
+                <button
+                    type="button"
+                    id="btn-cerrar"
+                    class="rounded-lg bg-orange-600 px-6 py-2.5
+                           text-sm font-medium text-white
+                           hover:bg-orange-700
+                           disabled:cursor-not-allowed
+                           disabled:opacity-50"
+                >
+                    Cerrar Turno
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const formulario = document.getElementById('form-pago');
+        const metodo = document.getElementById('metodo');
+        const monto = document.getElementById('monto');
+
+        const mensajePago = document.getElementById('mensaje-pago');
+        const tabla = document.getElementById('tabla-corte');
+
+        const totalOperaciones = document.getElementById('total-ops');
+        const totalMonto = document.getElementById('total-monto');
+
+        const estadoTurno = document.getElementById('estado-turno');
+        const mensajeTurno = document.getElementById('mensaje-turno');
+
+        const botonPago = document.getElementById('btn-pago');
+        const botonCerrar = document.getElementById('btn-cerrar');
+
+        const metodosPermitidos = [
+            'Efectivo',
+            'Tarjeta',
+            'Transferencia'
+        ];
+
+        const camposRevisados = new Set();
+
+        let intentoEnviar = false;
+        let turnoCerrado = false;
+
+        const moneda = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        });
+
+        // Los importes se acumulan en centavos enteros.
+        const resumen = Array.from(tabla.rows).map((fila) => ({
+            fila: fila,
+            metodo: fila.dataset.metodo,
+            operaciones: Number(fila.dataset.ops),
+            centavos: Math.round(Number(fila.dataset.monto) * 100)
+        }));
+
+        function mostrarMensaje(texto, esError = true) {
+            mensajePago.textContent = texto;
+
+            mensajePago.className =
+                'mensaje sm:col-span-3 ' +
+                (esError ? 'mensaje-error' : 'mensaje-exito');
+
+            mensajePago.hidden = false;
+        }
+
+        function ocultarMensaje() {
+            mensajePago.textContent = '';
+            mensajePago.hidden = true;
+        }
+
+        function establecerError(campo, texto) {
+            const aviso = document.getElementById(
+                'error-' + campo.id
+            );
+
+            const hayError = texto !== '';
+
+            aviso.textContent = texto;
+            aviso.hidden = !hayError;
+
+            campo.classList.toggle('campo-error', hayError);
+            campo.setAttribute('aria-invalid', String(hayError));
+
+            return !hayError;
+        }
+
+        function validarMetodo() {
+            let error = '';
+
+            if (!metodo.value) {
+                error = 'Selecciona un método de pago.';
+            } else if (!metodosPermitidos.includes(metodo.value)) {
+                error = 'El método de pago no es válido.';
+            }
+
+            return establecerError(metodo, error);
+        }
+
+        function validarMonto() {
+            let error = '';
+
+            const numero = monto.valueAsNumber;
+            const centavos = Math.round(numero * 100);
+
+            if (monto.validity.badInput) {
+                error = 'Escribe un monto numérico válido.';
+            } else if (monto.value.trim() === '') {
+                error = 'Escribe el monto del pago.';
+            } else if (!Number.isFinite(numero)) {
+                error = 'Escribe un monto numérico válido.';
+            } else if (numero < 1) {
+                error = 'El monto mínimo permitido es $1.00.';
+            } else if (monto.validity.stepMismatch) {
+                error =
+                    'El monto debe tener como máximo dos decimales.';
+            } else if (!Number.isSafeInteger(centavos)) {
+                error = 'El monto es demasiado grande.';
+            }
+
+            return establecerError(monto, error);
+        }
+
+        function actualizarResumen() {
+            let operaciones = 0;
+            let centavos = 0;
+
+            resumen.forEach((registro) => {
+                registro.fila.dataset.ops =
+                    String(registro.operaciones);
+
+                registro.fila.dataset.monto =
+                    (registro.centavos / 100).toFixed(2);
+
+                registro.fila
+                    .querySelector('.celda-ops')
+                    .textContent = registro.operaciones;
+
+                registro.fila
+                    .querySelector('.celda-monto')
+                    .textContent = moneda.format(
+                        registro.centavos / 100
+                    );
+
+                operaciones += registro.operaciones;
+                centavos += registro.centavos;
+            });
+
+            totalOperaciones.textContent = operaciones;
+            totalMonto.textContent = moneda.format(centavos / 100);
+
+            /*
+             * Las tarjetas de ventas, pedidos y stock conservan
+             * sus datos de ejemplo. Registrar un pago no equivale
+             * automáticamente a una nueva venta o pedido completado.
+             */
+        }
+
+        // Revisar al salir del campo y al corregir un campo revisado.
+        const validadores = new Map([
+            [metodo, validarMetodo],
+            [monto, validarMonto]
+        ]);
+
+        validadores.forEach((validar, campo) => {
+            campo.addEventListener('blur', () => {
+                if (turnoCerrado) {
+                    return;
+                }
+
+                camposRevisados.add(campo.id);
+                validar();
+            });
+
+            const evento =
+                campo.tagName === 'SELECT' ? 'change' : 'input';
+
+            campo.addEventListener(evento, () => {
+                if (turnoCerrado) {
+                    return;
+                }
+
+                ocultarMensaje();
+
+                if (
+                    intentoEnviar ||
+                    camposRevisados.has(campo.id)
+                ) {
+                    validar();
+                }
+            });
+        });
+
+        // Registrar un pago en el resumen local.
+        formulario.addEventListener('submit', (evento) => {
+            evento.preventDefault();
+
+            if (turnoCerrado) {
+                mostrarMensaje(
+                    'El turno está cerrado. ' +
+                    'No se pueden registrar más pagos.'
+                );
+                return;
+            }
+
+            intentoEnviar = true;
+
+            // Ejecutar ambas validaciones para mostrar ambos errores.
+            const metodoValido = validarMetodo();
+            const montoValido = validarMonto();
+
+            if (!metodoValido || !montoValido) {
+                mostrarMensaje(
+                    'No se puede registrar el pago. ' +
+                    'Completa los campos obligatorios y corrige ' +
+                    'las advertencias marcadas en rojo.'
+                );
+
+                if (!metodoValido) {
+                    metodo.focus();
+                } else {
+                    monto.focus();
+                }
+
+                return;
+            }
+
+            const registro = resumen.find(
+                (item) => item.metodo === metodo.value
+            );
+
+            if (!registro) {
+                mostrarMensaje(
+                    'No se encontró el método de pago en el resumen.'
+                );
+                return;
+            }
+
+            const centavos = Math.round(
+                monto.valueAsNumber * 100
+            );
+
+            const totalActual = resumen.reduce(
+                (total, item) => total + item.centavos,
+                0
+            );
+
+            if (!Number.isSafeInteger(totalActual + centavos)) {
+                mostrarMensaje(
+                    'El pago excede el límite de cálculo ' +
+                    'de esta demostración.'
+                );
+                return;
+            }
+
+            registro.operaciones += 1;
+            registro.centavos += centavos;
+
+            actualizarResumen();
+
+            mostrarMensaje(
+                'Pago de ' + moneda.format(centavos / 100) +
+                ' por ' + registro.metodo +
+                ' agregado al resumen local. ' +
+                'No se ha guardado en un servidor ' +
+                'ni procesado un cobro real.',
+                false
+            );
+
+            formulario.reset();
+
+            intentoEnviar = false;
+            camposRevisados.clear();
+
+            establecerError(metodo, '');
+            establecerError(monto, '');
+        });
+
+        // Cerrar el turno de la demostración.
+        botonCerrar.addEventListener('click', () => {
+            if (turnoCerrado) {
+                return;
+            }
+
+            const confirmar = window.confirm(
+                '¿Deseas cerrar el turno de esta demostración?\n\n' +
+                'No podrás agregar más pagos hasta recargar la página.\n' +
+                'Los cambios y el cierre no se guardan en un servidor.'
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            turnoCerrado = true;
+
+            metodo.disabled = true;
+            monto.disabled = true;
+            botonPago.disabled = true;
+            botonCerrar.disabled = true;
+
+            establecerError(metodo, '');
+            establecerError(monto, '');
+
+            estadoTurno.textContent = 'Turno cerrado';
+            estadoTurno.classList.add('turno-cerrado');
+
+            mensajeTurno.textContent =
+                'Turno cerrado en esta demostración local. ' +
+                'No se guardó el cierre en un servidor.';
+
+            mostrarMensaje(
+                'El turno se cerró localmente. ' +
+                'El registro de pagos quedó deshabilitado.',
+                false
+            );
+        });
+
+        actualizarResumen();
+    </script>
+</body>
+</html>

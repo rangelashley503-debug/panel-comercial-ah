@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-black antialiased">
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+        <nav class="mx-auto flex max-w-5xl items-center justify-center p-4">
+            <span class="text-xl font-bold tracking-tight">Impulso Mexa</span>
+        </nav>
+    </header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+
+<!-- Tarjeta centrada de inicio de sesión -->
+<section class="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div class="text-center">
+    <!-- Logo de la empresa -->
+    <img
+        src="../Imagenes/logo-impulso-mexa.png"
+        alt="Logo de Impulso Mexa"
+        class="mx-auto mb-4 h-24 w-24 object-contain"
+    >
+
+    <h1 class="text-2xl font-bold">Iniciar Sesión</h1>
+
+    <p class="mt-1 text-sm text-gray-500">
+        Accede con tu cuenta y selecciona tu rol.
+    </p>
+</div>
+
+    <form id="form-login" class="mt-6 space-y-4">
+        <!-- Selector de rol -->
+        <div>
+            <label for="rol" class="block text-sm font-medium">Rol</label>
+            <select id="rol"
+                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+                <option>Vendedor</option>
+                <option>Almacén</option>
+                <option>Administrador</option>
+                <option>Cliente</option>
+            </select>
+        </div>
+
+        <!-- Correo -->
+        <div>
+            <label for="login-correo" class="block text-sm font-medium">Correo electrónico</label>
+            <input id="login-correo" type="email" placeholder="correo@ejemplo.com"
+                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+        </div>
+
+        <!-- Contraseña con botón para mostrarla -->
+        <div>
+            <label for="login-password" class="block text-sm font-medium">Contraseña</label>
+            <div class="relative mt-1">
+                <input id="login-password" type="password" placeholder="Tu contraseña"
+                    class="w-full rounded-lg border border-gray-200 p-2.5 pr-20 text-sm focus:border-orange-500 focus:outline-none">
+                <button type="button" id="btn-mostrar"
+                    class="absolute inset-y-0 right-0 px-3 text-sm font-medium text-orange-600 hover:text-orange-700">
+                    Mostrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Recordarme y enlace de recuperación -->
+        <div class="flex items-center justify-between text-sm">
+            <label class="flex items-center gap-2 text-gray-500">
+                <input type="checkbox" class="h-4 w-4 accent-orange-600">
+                Recordarme
+            </label>
+            <a href="#" class="font-medium text-orange-600 hover:text-orange-700">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Mensaje de resultado del login -->
+        <p id="mensaje-login" class="hidden rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm"></p>
+
+        <!-- Botón de acceso -->
+        <button type="submit"
+            class="w-full rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
+            Entrar
+        </button>
+    </form>
+</section>
+
+<script>
+    // Referencias a los elementos del formulario
+    const formLogin = document.getElementById('form-login');
+    const inputPasswordLogin = document.getElementById('login-password');
+    const botonMostrar = document.getElementById('btn-mostrar');
+    const mensajeLogin = document.getElementById('mensaje-login');
+
+    // Validación básica del formato del correo
+    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function mostrarMensaje(elemento, texto) {
+        elemento.textContent = texto;
+        elemento.classList.remove('hidden');
+    }
+
+    // Mostrar u ocultar contraseña: independiente del envío del formulario
+    botonMostrar.addEventListener('click', function () {
+        const estaOculta = inputPasswordLogin.type === 'password';
+
+        inputPasswordLogin.type = estaOculta ? 'text' : 'password';
+        botonMostrar.textContent = estaOculta ? 'Ocultar' : 'Mostrar';
+    });
+
+    // Validar y simular el inicio de sesión
+    formLogin.addEventListener('submit', async function (evento) {
+        evento.preventDefault();
+
+        const rol = document.getElementById('rol').value;
+        const correo = document.getElementById('login-correo').value.trim();
+        const password = inputPasswordLogin.value;
+
+        if (!formatoCorreo.test(correo)) {
+            mostrarMensaje(mensajeLogin, 'Escribe un correo electrónico válido.');
+            return;
+        }
+        if (password === '') {
+            mostrarMensaje(mensajeLogin, 'Escribe tu contraseña.');
+            return;
+        }
+
+    // Página de destino según el rol
+    const destinos = {
+        'Vendedor': '../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html',
+        'Almacén': '../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html',
+        'Administrador': '../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html',
+        'Cliente': '../Catalogo%20de%20productos-%20H/catalogo.html'
+    };
+
+    try {
+        const respuesta = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo: correo, password: password, rol: rol })
+        });
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            mostrarMensaje(mensajeLogin, datos.error);
+            return;
+        }
+
+        mostrarMensaje(mensajeLogin, 'Sesión iniciada como ' + datos.rol + '. Redirigiendo...');
+        window.location.href = destinos[datos.rol];
+    } catch (error) {
+        mostrarMensaje(mensajeLogin, 'No se pudo conectar con el servidor.');
+    }
+});
+        // Esperamos un momento para que se alcance a leer el mensaje y luego cambiamos de página
+    setTimeout(function () {
+        window.location.href = destinos[rol];
+    }, 800);
+</script>

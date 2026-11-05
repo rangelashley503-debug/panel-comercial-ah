@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surtido de Almacén y Logística</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+    (function () {
+        const enlacesMenu = document.querySelectorAll('#menu a');
+
+        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+        function carpetaDe(ruta) {
+            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+        }
+
+        const carpetaActual = carpetaDe(window.location.pathname);
+
+        enlacesMenu.forEach(function (enlace) {
+            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+            if (carpetaEnlace === carpetaActual) {
+                // Módulo actual: naranja y subrayado
+                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+            } else {
+                // Los demás: grises, naranja al pasar el cursor
+                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+            }
+        });
+    })();
+</script>
+
+</head>
+<body class="bg-white text-black antialiased">
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+        <!-- Menú con scroll horizontal para pantallas chicas -->
+        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+        </ul>
+    </nav>
+</header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+
+<h1 class="text-3xl font-bold">Surtido de Almacén y Logística</h1>
+
+<!-- Cola de pedidos para bodega -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Encabezado de la tarjeta -->
+    <div class="flex items-center justify-between p-4">
+        <h2 class="text-xl font-bold">Cola de Surtido</h2>
+        <span class="text-sm text-gray-500">3 pedidos pendientes</span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <tr>
+                    <th class="p-4 font-semibold">Folio</th>
+                    <th class="p-4 font-semibold">Cliente</th>
+                    <th class="p-4 font-semibold">Volumen</th>
+                    <th class="p-4 font-semibold">Entrega</th>
+                    <th class="p-4 font-semibold">Estatus</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-mono font-medium">#PED-1022</td>
+                    <td class="p-4 font-medium">Abarrotes Don Chuy</td>
+                    <td class="p-4 text-gray-500">Tarima</td>
+                    <td class="p-4 text-gray-500">Hoy, 4:00 pm</td>
+                    <td class="p-4">
+                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-mono font-medium">#PED-1021</td>
+                    <td class="p-4 font-medium">Miscelánea La Esperanza</td>
+                    <td class="p-4 text-gray-500">Caja</td>
+                    <td class="p-4 text-gray-500">Mañana, 10:00 am</td>
+                    <td class="p-4">
+                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-mono font-medium">#PED-1025</td>
+                    <td class="p-4 font-medium">Super Mayoreo del Centro</td>
+                    <td class="p-4 text-gray-500">Tarima</td>
+                    <td class="p-4 text-gray-500">Mañana, 2:00 pm</td>
+                    <td class="p-4">
+                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Hoja de surtido del pedido seleccionado -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Encabezado de la tarjeta -->
+    <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-xl font-bold">Hoja de Surtido</h2>
+            <p class="mt-1 text-sm text-gray-500">
+                Pedido <span class="font-mono font-medium text-black">#PED-1022</span> · Abarrotes Don Chuy
+            </p>
+        </div>
+        <span class="w-fit rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <tr>
+                    <th class="p-4 font-semibold">Producto</th>
+                    <th class="p-4 font-semibold">Cantidad</th>
+                    <th class="p-4 font-semibold">Lote</th>
+                    <th class="p-4 font-semibold">Caducidad</th>
+                    <th class="p-4 text-center font-semibold">Verificado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
+                    <td class="p-4">40 cajas</td>
+                    <td class="p-4 font-mono text-gray-500">L-2406-A</td>
+                    <td class="p-4 text-gray-500">15/03/2027</td>
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Red Bull 250 ml (paquete 24 pzs)</td>
+                    <td class="p-4">25 cajas</td>
+                    <td class="p-4 font-mono text-gray-500">L-2407-C</td>
+                    <td class="p-4 text-gray-500">22/04/2027</td>
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Electrolit 600 ml</td>
+                    <td class="p-4">30 cajas</td>
+                    <td class="p-4 font-mono text-gray-500">L-2405-B</td>
+                    <td class="p-4 text-gray-500">10/01/2027</td>
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
+                    <td class="p-4">50 cajas</td>
+                    <td class="p-4 font-mono text-gray-500">L-2408-D</td>
+                    <td class="p-4 text-gray-500">30/06/2027</td>
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
+                    </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
+                    <td class="p-4">35 cajas</td>
+                    <td class="p-4 font-mono text-gray-500">L-2406-F</td>
+                    <td class="p-4 text-gray-500">18/05/2027</td>
+                    <td class="p-4 text-center">
+                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pie de la hoja: avance y botón de acción -->
+    <div class="flex flex-col gap-3 border-t border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-gray-500">
+            Productos verificados: <span id="contador" class="font-medium text-black">0 de 5</span>
+        </p>
+        <button type="button" id="btn-listo" disabled
+            class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+            Marcar como Listo para ruta
+        </button>
+    </div>
+</section>
+
+<!-- Script del contador de verificación -->
+<script>
+    // Seleccionamos los elementos que vamos a usar
+    const casillas = document.querySelectorAll('.verificado');
+    const contador = document.getElementById('contador');
+    const botonListo = document.getElementById('btn-listo');
+
+    // Cuenta las casillas marcadas y actualiza la pantalla
+    function actualizarContador() {
+        let marcadas = 0;
+
+        casillas.forEach(function (casilla) {
+            if (casilla.checked) {
+                marcadas++;
+            }
+        });
+
+        // Mostramos "X de Y"
+        contador.textContent = marcadas + ' de ' + casillas.length;
+
+        // El botón solo se habilita cuando todas están marcadas
+        botonListo.disabled = marcadas !== casillas.length;
+    }
+
+    // Cada vez que se marca o desmarca una casilla, se vuelve a contar
+    casillas.forEach(function (casilla) {
+        casilla.addEventListener('change', actualizarContador);
+    });
+
+    // Al hacer clic en el botón, avisamos que el pedido salió a ruta
+    botonListo.addEventListener('click', function () {
+        alert('Pedido #PED-1022 marcado como listo para ruta');
+    });
+</script>

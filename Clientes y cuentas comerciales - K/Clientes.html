@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes y cuentas comerciales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-black antialiased">
+    <header class="border-b border-gray-200 bg-white shadow-sm">
+        <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
+            <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+
+            <!-- Menú con scroll horizontal para pantallas chicas -->
+            <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
+                <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
+                <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
+                <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
+                <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
+                <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
+                <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
+                <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
+                <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
+
+<!-- Título del módulo -->
+<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h1 class="text-3xl font-bold">Clientes y Cuentas Comerciales</h1>
+    <a href="registrar%20nueva%20cuenta%20comercial.html"
+        class="w-fit rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
+        Registrar Nueva Cuenta
+    </a>
+</div>
+
+<!-- Directorio de clientes mayoristas -->
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Encabezado de la tarjeta con buscador -->
+    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-xl font-bold">Directorio de Clientes</h2>
+            <p id="total-clientes" class="text-sm text-gray-500">4 clientes registrados</p>
+        </div>
+        <input id="buscador" type="text" placeholder="Buscar por nombre o RFC"
+            class="w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none sm:w-64">
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <tr>
+                    <th class="p-4 font-semibold">Cliente</th>
+                    <th class="p-4 font-semibold">RFC</th>
+                    <th class="p-4 font-semibold">Contacto</th>
+                    <th class="p-4 font-semibold">Teléfono</th>
+                    <th class="p-4 font-semibold">Estatus</th>
+                    <th class="p-4 font-semibold">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-clientes" class="divide-y divide-gray-100">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mensaje cuando la búsqueda no encuentra resultados -->
+    <p id="sin-resultados" class="hidden p-4 text-center text-sm text-gray-500">No se encontraron clientes.</p>
+</section>
+
+    </main>
+
+    <!-- Script del directorio de clientes (conectado a la API) -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const tabla = document.getElementById('tabla-clientes');
+        const buscador = document.getElementById('buscador');
+        const mensajeVacio = document.getElementById('sin-resultados');
+        const textoTotal = document.getElementById('total-clientes');
+
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
+
+        let esAdmin = false;
+        let temporizador = null;
+
+        // Crea una celda <td> con texto (textContent evita que se interprete HTML)
+        function crearCelda(texto, clases) {
+            const celda = document.createElement('td');
+            celda.className = clases;
+            celda.textContent = texto;
+            return celda;
+        }
+
+        // Crea la fila de un cliente
+        function crearFila(cliente) {
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-gray-50';
+
+            // Celda del cliente con su dirección debajo
+            const celdaCliente = document.createElement('td');
+            celdaCliente.className = 'p-4';
+            const nombre = document.createElement('p');
+            nombre.className = 'font-medium';
+            nombre.textContent = cliente.tienda;
+            const direccion = document.createElement('p');
+            direccion.className = 'text-xs text-gray-500';
+            direccion.textContent = cliente.direccion || 'Sin dirección registrada';
+            celdaCliente.append(nombre, direccion);
+            fila.appendChild(celdaCliente);
+
+            fila.appendChild(crearCelda(cliente.rfc, 'p-4 font-mono text-gray-500'));
+            fila.appendChild(crearCelda(cliente.contacto || '—', 'p-4'));
+
+            // Teléfono con formato 418 100 2345
+            const telefono = (cliente.telefono || '').replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+            fila.appendChild(crearCelda(telefono || '—', 'p-4 text-gray-500'));
+
+            // Badge de estatus
+            const celdaEstatus = document.createElement('td');
+            celdaEstatus.className = 'p-4';
+            const badge = document.createElement('span');
+            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.textContent = cliente.estatus;
+            celdaEstatus.appendChild(badge);
+            fila.appendChild(celdaEstatus);
+
+            // Botón de acción: solo lo ve el administrador
+            const celdaAccion = document.createElement('td');
+            celdaAccion.className = 'p-4';
+            if (esAdmin) {
+                const boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'btn-estatus text-sm font-medium text-orange-600 hover:text-orange-700';
+                boton.dataset.id = cliente.id;
+                boton.dataset.nuevo = cliente.estatus === 'Activo' ? 'Suspendido' : 'Activo';
+                boton.textContent = cliente.estatus === 'Activo' ? 'Suspender' : 'Activar';
+                celdaAccion.appendChild(boton);
+            }
+            fila.appendChild(celdaAccion);
+
+            return fila;
+        }
+
+        // Muestra un mensaje en lugar de la tabla
+        function mostrarMensaje(texto) {
+            tabla.replaceChildren();
+            mensajeVacio.textContent = texto;
+            mensajeVacio.classList.remove('hidden');
+        }
+
+        // Pide los clientes al servidor y dibuja la tabla
+        async function cargarClientes() {
+            const busqueda = buscador.value.trim();
+
+            try {
+                const respuesta = await fetch('/api/clientes?q=' + encodeURIComponent(busqueda));
+
+                if (respuesta.status === 401) {
+                    window.location.href = paginaLogin;
+                    return;
+                }
+                if (respuesta.status === 403) {
+                    mostrarMensaje('Tu rol no tiene permiso para ver los clientes.');
+                    return;
+                }
+
+                const clientes = await respuesta.json();
+
+                tabla.replaceChildren();
+                clientes.forEach(function (cliente) {
+                    tabla.appendChild(crearFila(cliente));
+                });
+
+                textoTotal.textContent = clientes.length + ' clientes';
+                mensajeVacio.textContent = 'No se encontraron clientes.';
+                mensajeVacio.classList.toggle('hidden', clientes.length > 0);
+            } catch (error) {
+                mostrarMensaje('No se pudo conectar con el servidor.');
+            }
+        }
+
+        // Buscador: espera 300 ms después de la última tecla para no saturar al servidor
+        buscador.addEventListener('input', function () {
+            clearTimeout(temporizador);
+            temporizador = setTimeout(cargarClientes, 300);
+        });
+
+        // Botón Suspender / Activar de cada fila
+        tabla.addEventListener('click', async function (evento) {
+            const boton = evento.target.closest('.btn-estatus');
+            if (!boton) {
+                return;
+            }
+
+            const respuesta = await fetch('/api/clientes/' + boton.dataset.id + '/estatus', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estatus: boton.dataset.nuevo })
+            });
+
+            if (!respuesta.ok) {
+                const datos = await respuesta.json();
+                alert(datos.error);
+                return;
+            }
+
+            // Se vuelve a pedir la lista para mostrar el dato real de la base
+            cargarClientes();
+        });
+
+        // Al abrir la página: se consulta quién es el usuario y luego se cargan los clientes
+        async function iniciar() {
+            const respuesta = await fetch('/api/sesion');
+            if (!respuesta.ok) {
+                window.location.href = paginaLogin;
+                return;
+            }
+            const usuario = await respuesta.json();
+            esAdmin = usuario.rol === 'Administrador';
+            cargarClientes();
+        }
+
+        iniciar();
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

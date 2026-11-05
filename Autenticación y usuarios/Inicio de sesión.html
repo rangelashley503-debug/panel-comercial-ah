@@ -109,7 +109,7 @@
     });
 
     // Validar y simular el inicio de sesión
-    formLogin.addEventListener('submit', function (evento) {
+    formLogin.addEventListener('submit', async function (evento) {
         evento.preventDefault();
 
         const rol = document.getElementById('rol').value;
@@ -117,44 +117,43 @@
         const password = inputPasswordLogin.value;
 
         if (!formatoCorreo.test(correo)) {
-            mostrarMensaje(
-                mensajeLogin,
-                'Escribe un correo electrónico válido.'
-            );
+            mostrarMensaje(mensajeLogin, 'Escribe un correo electrónico válido.');
             return;
         }
-
         if (password === '') {
-            mostrarMensaje(
-                mensajeLogin,
-                'Escribe tu contraseña.'
-            );
+            mostrarMensaje(mensajeLogin, 'Escribe tu contraseña.');
             return;
         }
 
-        // Solo es una simulación; aquí iría la petición al servidor.
-        mostrarMensaje(
-            mensajeLogin,
-            'Sesión iniciada como ' + rol + ' (' + correo + '). Redirigiendo...'
-        );
+    // Página de destino según el rol
+    const destinos = {
+        'Vendedor': '../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html',
+        'Almacén': '../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html',
+        'Administrador': '../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html',
+        'Cliente': '../Catalogo%20de%20productos-%20H/catalogo.html'
+    };
 
-        // Página de destino según el rol elegido (rutas relativas a esta carpeta)
-        const destinos = {
-            'Vendedor': '../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html',
-            'Almacén': '../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html',
-            'Administrador': '../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html',
-            'Cliente': '../Catalogo%20de%20productos-%20H/catalogo.html'
-        };
+    try {
+        const respuesta = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo: correo, password: password, rol: rol })
+        });
+        const datos = await respuesta.json();
 
-        formLogin.reset();
+        if (!respuesta.ok) {
+            mostrarMensaje(mensajeLogin, datos.error);
+            return;
+        }
 
-        // Restaurar también la visibilidad y el texto del botón
-        inputPasswordLogin.type = 'password';
-        botonMostrar.textContent = 'Mostrar';
-
+        mostrarMensaje(mensajeLogin, 'Sesión iniciada como ' + datos.rol + '. Redirigiendo...');
+        window.location.href = destinos[datos.rol];
+    } catch (error) {
+        mostrarMensaje(mensajeLogin, 'No se pudo conectar con el servidor.');
+    }
+});
         // Esperamos un momento para que se alcance a leer el mensaje y luego cambiamos de página
     setTimeout(function () {
         window.location.href = destinos[rol];
     }, 800);
-    });
 </script>

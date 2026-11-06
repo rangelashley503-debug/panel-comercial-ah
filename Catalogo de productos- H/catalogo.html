@@ -258,6 +258,11 @@
             <div class="space-y-2 pt-2">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Componentes</span>
                 <div id="drawerComponents" class="flex flex-wrap gap-1.5"></div>
+            </div>    
+            <!-- Sabores -->
+            <div class="space-y-2 pt-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Sabores</span>
+                <div id="drawerSabores" class="flex flex-wrap gap-1.5"></div>
             </div>
         </div>
 
@@ -307,7 +312,8 @@
                     piezasPorPresentacion: 60,
                     precioPresentacion: 180.00,
                     precioVentaSugeridoPza: 5.00,
-                    componentes: ["Azúcar", "Goma base", "Jarabe de glucosa", "Saborizantes naturales y artificiales", "Colorantes"]
+                    componentes: ["Azúcar", "Goma base", "Jarabe de glucosa", "Saborizantes naturales y artificiales", "Colorantes"],
+                    sabores: ["Vanilla", "Chocolate"]
                 },
                 {
                     nombre: "Paleta ChupaChups",
@@ -571,6 +577,21 @@
                 } else {
                     compContainer.innerHTML = '<span class="text-xs text-gray-400 italic">No especificados</span>';
                 }
+                // Sabores
+                const saboresContainer = document.getElementById('drawerSabores');
+                saboresContainer.innerHTML = '';
+
+                if (item.sabores && item.sabores.length > 0) {
+                    item.sabores.forEach(sabor => {
+                        const tag = document.createElement('span');
+                        tag.className = 'px-2.5 py-1 bg-gray-50 text-gray-600 text-xs rounded-md border border-gray-200/80';
+                        tag.textContent = sabor;
+                        saboresContainer.appendChild(tag);
+                    });
+                } else {
+                    saboresContainer.innerHTML = '<span class="text-xs text-gray-400 italic">No especificados</span>';
+                }
+            
 
                 // Abrir drawer
                 drawer.classList.remove('translate-x-full');

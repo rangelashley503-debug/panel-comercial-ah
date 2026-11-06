@@ -60,9 +60,9 @@
             opacity: 1;
         }
 
-        /* Animación suave para el panel de detalles */
+        /* Animación fluida de la tarjeta lateral */
         #productDrawer {
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
     </style>
 </head>
@@ -164,7 +164,7 @@
                     Catálogo de Productos
                 </h1>
                 <p class="text-sm text-content-muted">
-                    Haz clic sobre cualquier producto para ver sus detalles, componentes y precio sugerido.
+                    Haz clic en un producto para consultar sus precios, porcentaje de utilidad y componentes.
                 </p>
             </header>
 
@@ -179,26 +179,26 @@
         </main>
     </div>
 
-    <!-- FONDO OSCURO (BACKDROP) -->
+    <!-- BACKDROP OSCURECIDO -->
     <div
         id="drawerBackdrop"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"
     ></div>
 
-    <!-- TARJETA LATERAL (DRAWER CARD) -->
+    <!-- TARJETA LATERAL (DRAWER) -->
     <aside
         id="productDrawer"
-        class="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white shadow-2xl translate-x-full flex flex-col border-l border-gray-200"
+        class="fixed top-0 right-0 z-50 h-full w-full max-w-lg bg-white shadow-2xl translate-x-full flex flex-col border-l border-gray-100"
         aria-hidden="true"
     >
-        <!-- Encabezado de la tarjeta -->
-        <div class="flex items-center justify-between p-5 border-b border-gray-100">
-            <h2 class="text-lg font-bold text-gray-800">Detalles del Producto</h2>
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <span class="text-xs font-bold text-gray-400 tracking-wider uppercase">Información del Producto</span>
             <button
                 type="button"
                 id="closeDrawer"
                 class="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                aria-label="Cerrar detalles"
+                aria-label="Cerrar"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -206,41 +206,69 @@
             </button>
         </div>
 
-        <!-- Contenido desplazable -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
-            <div class="aspect-square w-full rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-inner flex items-center justify-center">
-                <img id="drawerImage" src="" alt="" class="h-full w-full object-contain p-4">
-            </div>
-
-            <div class="space-y-1">
-                <h3 id="drawerTitle" class="text-2xl font-bold text-gray-900 leading-snug"></h3>
-                <p id="drawerPresentation" class="text-sm text-gray-500 font-medium"></p>
-            </div>
-
-            <!-- Precio sugerido -->
-            <div class="bg-amber-50/80 border border-amber-200/60 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                    <span class="block text-xs uppercase tracking-wider font-semibold text-amber-800">Precio Sugerido</span>
-                    <span id="drawerPrice" class="text-2xl font-black text-amber-900"></span>
+        <!-- Contenido principal scrolleable -->
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+            <!-- Imagen y título -->
+            <div class="flex items-center gap-4">
+                <div class="w-20 h-20 rounded-xl bg-gray-50 border border-gray-100 shrink-0 overflow-hidden flex items-center justify-center p-2">
+                    <img id="drawerImage" src="" alt="" class="max-h-full max-w-full object-contain">
                 </div>
-                <span class="text-xs px-2.5 py-1 bg-amber-200/60 text-amber-900 rounded-full font-semibold">Al público</span>
+                <div>
+                    <h3 id="drawerTitle" class="text-xl font-bold text-gray-900 leading-tight"></h3>
+                    <p id="drawerPresentation" class="text-xs text-gray-500 font-medium mt-1"></p>
+                </div>
+            </div>
+
+            <!-- RECTÁNGULOS DE PRECIOS Y UTILIDAD EN FILA (UNO AL LADO DEL OTRO) -->
+            <div class="space-y-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Precios y Rendimiento</span>
+                
+                <div class="grid grid-cols-4 gap-2">
+                    <!-- Rectángulo 1: Presentación -->
+                    <div class="bg-gray-50 border border-gray-200/80 rounded-xl p-3 flex flex-col justify-between text-center min-h-[90px]">
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-tight leading-3">Presentación</span>
+                        <span id="drawerPrecioPaquete" class="text-base font-extrabold text-gray-800">$0</span>
+                        <span id="drawerPiezasCount" class="text-[9px] text-gray-400 leading-none">0 pzas</span>
+                    </div>
+
+                    <!-- Rectángulo 2: Costo Unidad -->
+                    <div class="bg-blue-50/60 border border-blue-200/70 rounded-xl p-3 flex flex-col justify-between text-center min-h-[90px]">
+                        <span class="text-[10px] font-semibold text-blue-700 uppercase tracking-tight leading-3">Costo Unidad</span>
+                        <span id="drawerCostoUnitario" class="text-base font-extrabold text-blue-900">$0</span>
+                        <span class="text-[9px] text-blue-600/70 leading-none">por pieza</span>
+                    </div>
+
+                    <!-- Rectángulo 3: Venta Sugerida -->
+                    <div class="bg-amber-50/60 border border-amber-200/70 rounded-xl p-3 flex flex-col justify-between text-center min-h-[90px]">
+                        <span class="text-[10px] font-semibold text-amber-800 uppercase tracking-tight leading-3">Venta Sugerida</span>
+                        <span id="drawerPrecioVentaPza" class="text-base font-extrabold text-amber-900">$0</span>
+                        <span class="text-[9px] text-amber-700/70 leading-none">público</span>
+                    </div>
+
+                    <!-- Rectángulo 4: Utilidad % -->
+                    <div class="bg-emerald-50 border border-emerald-300 rounded-xl p-3 flex flex-col justify-between text-center min-h-[90px] shadow-sm">
+                        <span class="text-[10px] font-semibold text-emerald-800 uppercase tracking-tight leading-3">Utilidad</span>
+                        <span id="drawerMargenPorcentaje" class="text-base font-black text-emerald-700">0%</span>
+                        <span class="text-[9px] text-emerald-600 font-semibold leading-none">margen</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Componentes / Ingredientes -->
-            <div class="space-y-2">
-                <h4 class="text-xs uppercase font-bold tracking-wider text-gray-400">Componentes e Ingredientes</h4>
+            <div class="space-y-2 pt-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Componentes</span>
                 <div id="drawerComponents" class="flex flex-wrap gap-1.5"></div>
             </div>
         </div>
 
-        <!-- Pie de tarjeta -->
-        <div class="p-5 border-t border-gray-100 bg-gray-50/70">
+        <!-- Footer -->
+        <div class="p-4 border-t border-gray-100 bg-gray-50/50">
             <button
                 type="button"
                 onclick="cerrarDetalles()"
-                class="w-full py-2.5 px-4 rounded-xl font-medium text-sm text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 transition-all shadow-sm"
+                class="w-full py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-colors"
             >
-                Cerrar vista
+                Cerrar
             </button>
         </div>
     </aside>
@@ -252,7 +280,7 @@
             const toggleBtn = document.getElementById('toggleSidebar');
             const navButtons = document.querySelectorAll('.sidebar-nav-btn');
 
-            // Sidebar
+            // Toggle Sidebar
             toggleBtn.addEventListener('click', () => {
                 sidebar.classList.toggle('is-collapsed');
             });
@@ -270,151 +298,191 @@
                 });
             });
 
-            // Catálogo con datos extendidos (componentes y precio sugerido)
+            // Catálogo de productos
             const productos = [
                 {
                     nombre: "Canels Celofan",
                     imagen: "../Imagenes/Catalogo/2.png",
-                    precioSugerido: "$15.00",
-                    presentacion: "Paquete con 4 pastillas surtidas",
+                    presentacion: "Caja con 60 paquetes (4 pastillas c/u)",
+                    piezasPorPresentacion: 60,
+                    precioPresentacion: 180.00,
+                    precioVentaSugeridoPza: 5.00,
                     componentes: ["Azúcar", "Goma base", "Jarabe de glucosa", "Saborizantes naturales y artificiales", "Colorantes"]
                 },
                 {
                     nombre: "Paleta ChupaChups",
                     imagen: "../Imagenes/Catalogo/3.png",
-                    precioSugerido: "$8.50",
-                    presentacion: "Pieza individual 12g",
+                    presentacion: "Bolsa con 40 piezas",
+                    piezasPorPresentacion: 40,
+                    precioPresentacion: 220.00,
+                    precioVentaSugeridoPza: 8.50,
                     componentes: ["Azúcar", "Jarabe de maíz", "Pulpa de fruta", "Ácido cítrico", "Lactato de sodio"]
                 },
                 {
                     nombre: "Gomitas Frutas",
                     imagen: "../Imagenes/Catalogo/4.png",
-                    precioSugerido: "$18.00",
-                    presentacion: "Bolsa 80g",
+                    presentacion: "Display con 12 bolsitas (80g c/u)",
+                    piezasPorPresentacion: 12,
+                    precioPresentacion: 135.00,
+                    precioVentaSugeridoPza: 18.00,
                     componentes: ["Grenetina", "Jarabe de glucosa", "Azúcar", "Ácido málico", "Cera de carnauba"]
                 },
                 {
                     nombre: "Chocolate Carlos V",
                     imagen: "../Imagenes/Catalogo/5.png",
-                    precioSugerido: "$12.00",
-                    presentacion: "Barra 18g",
+                    presentacion: "Caja con 24 barras de 18g",
+                    piezasPorPresentacion: 24,
+                    precioPresentacion: 195.00,
+                    precioVentaSugeridoPza: 12.00,
                     componentes: ["Manteca de cacao", "Leche entera en polvo", "Pasta de cacao", "Lecitina de soya"]
                 },
                 {
                     nombre: "Caramelo JollyRancher",
                     imagen: "../Imagenes/Catalogo/6.png",
-                    precioSugerido: "$5.00",
-                    presentacion: "Caramelo macizo individual",
-                    componentes: ["Jarabe de maíz", "Azúcar", "Ácido málico", "Aceite mineral", "Saborizante artificial"]
+                    presentacion: "Bolsa con 100 caramelos macizos",
+                    piezasPorPresentacion: 100,
+                    precioPresentacion: 280.00,
+                    precioVentaSugeridoPza: 4.50,
+                    componentes: ["Jarabe de maíz", "Azúcar", "Ácido málico", "Aceite mineral", "Saborizante"]
                 },
                 {
                     nombre: "Paleta PintaColores",
                     imagen: "../Imagenes/Catalogo/7.png",
-                    precioSugerido: "$7.00",
-                    presentacion: "Pieza con polvo acidulado",
+                    presentacion: "Bolsa con 30 piezas",
+                    piezasPorPresentacion: 30,
+                    precioPresentacion: 125.00,
+                    precioVentaSugeridoPza: 7.00,
                     componentes: ["Azúcar", "Dextrosa", "Ácido cítrico", "Colorante Azul 1", "Dióxido de titanio"]
                 },
                 {
                     nombre: "Paleta Pachicleta",
                     imagen: "../Imagenes/Catalogo/8.png",
-                    precioSugerido: "$9.00",
-                    presentacion: "Paleta con centro suave y chile",
+                    presentacion: "Bolsa con 25 piezas",
+                    piezasPorPresentacion: 25,
+                    precioPresentacion: 140.00,
+                    precioVentaSugeridoPza: 9.00,
                     componentes: ["Chile en polvo", "Sal yodada", "Azúcar", "Goma de mascar", "Harina de maíz"]
                 },
                 {
                     nombre: "Paleta Manita",
                     imagen: "../Imagenes/Catalogo/9.png",
-                    precioSugerido: "$6.50",
-                    presentacion: "Paleta sabor fresa y cereza",
-                    componentes: ["Azúcar", "Glucosa", "Ácido cítrico", "Rojo Allura AC", "Saborizante"]
+                    presentacion: "Bolsa con 40 piezas surtidas",
+                    piezasPorPresentacion: 40,
+                    precioPresentacion: 160.00,
+                    precioVentaSugeridoPza: 6.50,
+                    componentes: ["Azúcar", "Glucosa", "Ácido cítrico", "Rojo Allura AC", "Saborizantes"]
                 },
                 {
                     nombre: "Paleta Pinta Azul",
                     imagen: "../Imagenes/Catalogo/10.png",
-                    precioSugerido: "$7.00",
-                    presentacion: "Caramelo macizo pinta-lengua",
-                    componentes: ["Azúcar", "Jarabe de maíz", "Colorante Azul brillante FCF", "Aromatizante"]
+                    presentacion: "Bolsa con 40 piezas",
+                    piezasPorPresentacion: 40,
+                    precioPresentacion: 170.00,
+                    precioVentaSugeridoPza: 7.00,
+                    componentes: ["Azúcar", "Jarabe de maíz", "Colorante Azul brillante FCF", "Aromatizantes"]
                 },
                 {
                     nombre: "Wafer Kalu",
                     imagen: "../Imagenes/Catalogo/11.png",
-                    precioSugerido: "$14.00",
-                    presentacion: "Galleta crujiente rellena",
+                    presentacion: "Caja con 18 paquetes",
+                    piezasPorPresentacion: 18,
+                    precioPresentacion: 165.00,
+                    precioVentaSugeridoPza: 14.00,
                     componentes: ["Harina de trigo", "Grasa vegetal", "Cacao en polvo", "Suero de leche"]
                 },
                 {
                     nombre: "Gomitas Gummy Chirión",
                     imagen: "../Imagenes/Catalogo/12.png",
-                    precioSugerido: "$16.50",
-                    presentacion: "Gomitas enchiladas 65g",
+                    presentacion: "Display con 16 bolsitas",
+                    piezasPorPresentacion: 16,
+                    precioPresentacion: 175.00,
+                    precioVentaSugeridoPza: 16.50,
                     componentes: ["Grenetina", "Mezcla de chiles secos", "Sal yodada", "Ácido cítrico"]
                 },
                 {
                     nombre: "Gomitas Icee Mango",
                     imagen: "../Imagenes/Catalogo/13.png",
-                    precioSugerido: "$20.00",
-                    presentacion: "Bolsa sellada 90g",
+                    presentacion: "Caja con 12 bolsitas (90g c/u)",
+                    piezasPorPresentacion: 12,
+                    precioPresentacion: 155.00,
+                    precioVentaSugeridoPza: 20.00,
                     componentes: ["Azúcar", "Jarabe de alta fructosa", "Pectina", "Saborizante a Mango", "Tartrazina"]
                 },
                 {
                     nombre: "Caramelo Icee Cereza",
                     imagen: "../Imagenes/Catalogo/14.png",
-                    precioSugerido: "$6.00",
-                    presentacion: "Caramelo macizo sabor cereza",
+                    presentacion: "Bolsa con 50 piezas",
+                    piezasPorPresentacion: 50,
+                    precioPresentacion: 180.00,
+                    precioVentaSugeridoPza: 6.00,
                     componentes: ["Azúcar", "Jarabe de maíz", "Ácido láctico", "Saborizante artificial cereza"]
                 },
                 {
                     nombre: "Caramelo Icee Mora",
                     imagen: "../Imagenes/Catalogo/15.png",
-                    precioSugerido: "$6.00",
-                    presentacion: "Caramelo macizo mora azul",
+                    presentacion: "Bolsa con 50 piezas",
+                    piezasPorPresentacion: 50,
+                    precioPresentacion: 180.00,
+                    precioVentaSugeridoPza: 6.00,
                     componentes: ["Azúcar", "Glucosa", "Saborizante mora azul", "Colorante Azul 1"]
                 },
                 {
                     nombre: "Pastillas Halls",
                     imagen: "../Imagenes/Catalogo/16.png",
-                    precioSugerido: "$13.00",
-                    presentacion: "Tira con 9 pastillas",
+                    presentacion: "Caja con 18 rollos",
+                    piezasPorPresentacion: 18,
+                    precioPresentacion: 150.00,
+                    precioVentaSugeridoPza: 13.00,
                     componentes: ["Mentol", "Eucaliptol", "Azúcar", "Jarabe de glucosa", "Saborizantes"]
                 },
                 {
                     nombre: "Trufas Surtidas",
                     imagen: "../Imagenes/Catalogo/17.png",
-                    precioSugerido: "$28.00",
-                    presentacion: "Caja pequeña 3 pzas",
+                    presentacion: "Caja con 10 paquetes pequeños",
+                    piezasPorPresentacion: 10,
+                    precioPresentacion: 190.00,
+                    precioVentaSugeridoPza: 28.00,
                     componentes: ["Pasta de cacao", "Crema de leche", "Avellana", "Mantequilla", "Vainilla"]
                 },
                 {
                     nombre: "Paleta Jumbo Cereza",
                     imagen: "../Imagenes/Catalogo/18.png",
-                    precioSugerido: "$10.00",
-                    presentacion: "Paleta extra grande con chicle",
+                    presentacion: "Bolsa con 30 piezas",
+                    piezasPorPresentacion: 30,
+                    precioPresentacion: 190.00,
+                    precioVentaSugeridoPza: 10.00,
                     componentes: ["Azúcar", "Base de goma", "Jarabe de maíz", "Ácido cítrico"]
                 },
                 {
                     nombre: "Chicle Orbit",
                     imagen: "../Imagenes/Catalogo/19.png",
-                    precioSugerido: "$16.00",
-                    presentacion: "Empaque con 14 láminas",
+                    presentacion: "Caja con 12 cajitas de 14 láminas",
+                    piezasPorPresentacion: 12,
+                    precioPresentacion: 130.00,
+                    precioVentaSugeridoPza: 16.00,
                     componentes: ["Sorbitol", "Goma base", "Xilitol", "Glicerol", "Aspartame", "Acesulfame K"]
                 },
                 {
                     nombre: "Paleta Pelon Peloneta",
                     imagen: "../Imagenes/Catalogo/20.png",
-                    precioSugerido: "$11.00",
-                    presentacion: "Paleta sabor tamarindo con mango",
+                    presentacion: "Bolsa con 30 piezas",
+                    piezasPorPresentacion: 30,
+                    precioPresentacion: 210.00,
+                    precioVentaSugeridoPza: 11.00,
                     componentes: ["Pulpa de tamarindo", "Chile en polvo", "Azúcar", "Sal yodada", "Ácido cítrico"]
                 },
                 {
                     nombre: "Chiclosos Café",
                     imagen: "../Imagenes/Catalogo/21.png",
-                    precioSugerido: "$8.00",
-                    presentacion: "Paquete de chiclosos sabor café",
+                    presentacion: "Bolsa con 65 piezas",
+                    piezasPorPresentacion: 65,
+                    precioPresentacion: 290.00,
+                    precioVentaSugeridoPza: 7.50,
                     componentes: ["Leche condensada", "Azúcar", "Mantequilla", "Extracto natural de café"]
                 }
             ];
 
-            // Renderizado del catálogo
+            // Renderizar catálogo
             const catalogo = document.getElementById('catalogo');
 
             productos.forEach((producto) => {
@@ -438,12 +506,11 @@
                             ${producto.nombre}
                         </p>
                         <span class="mt-1 text-xs text-amber-300 font-medium tracking-wide">
-                            Clic para ver detalles →
+                            Ver detalles y utilidad →
                         </span>
                     </div>
                 `;
 
-                // Al hacer clic abre la tarjeta lateral
                 card.addEventListener('click', () => {
                     abrirDetalles(producto);
                 });
@@ -456,31 +523,56 @@
             const backdrop = document.getElementById('drawerBackdrop');
             const closeBtn = document.getElementById('closeDrawer');
 
-            window.abrirDetalles = function(item) {
-                document.getElementById('drawerTitle').textContent = item.nombre;
-                document.getElementById('drawerPresentation').textContent = item.presentacion || 'Presentación estándar';
-                document.getElementById('drawerPrice').textContent = item.precioSugerido || 'Consultar';
+            // Formateador de moneda
+            const formatoMoneda = new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 2
+            });
 
+            window.abrirDetalles = function(item) {
+                const piezas = Number(item.piezasPorPresentacion) || 1;
+                const precioPresentacion = Number(item.precioPresentacion) || 0;
+                const costoUnitario = precioPresentacion / piezas;
+                const ventaPza = Number(item.precioVentaSugeridoPza) || 0;
+                
+                // Cálculo de utilidad porcentual sobre costo
+                const utilidadPct = costoUnitario > 0 
+                    ? (((ventaPza - costoUnitario) / costoUnitario) * 100) 
+                    : 0;
+
+                // Información textual
+                document.getElementById('drawerTitle').textContent = item.nombre;
+                document.getElementById('drawerPresentation').textContent = item.presentacion || 'Presentación regular';
+
+                // Rectángulos: Precios y Utilidad %
+                document.getElementById('drawerPrecioPaquete').textContent = formatoMoneda.format(precioPresentacion);
+                document.getElementById('drawerPiezasCount').textContent = `${piezas} pzas`;
+                document.getElementById('drawerCostoUnitario').textContent = formatoMoneda.format(costoUnitario);
+                document.getElementById('drawerPrecioVentaPza').textContent = formatoMoneda.format(ventaPza);
+                document.getElementById('drawerMargenPorcentaje').textContent = `+${Math.round(utilidadPct)}%`;
+
+                // Imagen
                 const imgEl = document.getElementById('drawerImage');
                 imgEl.src = item.imagen;
                 imgEl.alt = item.nombre;
 
-                // Contenedor de componentes/ingredientes
+                // Componentes
                 const compContainer = document.getElementById('drawerComponents');
                 compContainer.innerHTML = '';
 
                 if (item.componentes && item.componentes.length > 0) {
                     item.componentes.forEach(comp => {
                         const tag = document.createElement('span');
-                        tag.className = 'px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg border border-gray-200';
+                        tag.className = 'px-2.5 py-1 bg-gray-50 text-gray-600 text-xs rounded-md border border-gray-200/80';
                         tag.textContent = comp;
                         compContainer.appendChild(tag);
                     });
                 } else {
-                    compContainer.innerHTML = '<span class="text-xs text-gray-400 italic">No se especificaron componentes.</span>';
+                    compContainer.innerHTML = '<span class="text-xs text-gray-400 italic">No especificados</span>';
                 }
 
-                // Mostrar el panel lateral
+                // Abrir drawer
                 drawer.classList.remove('translate-x-full');
                 drawer.setAttribute('aria-hidden', 'false');
 
@@ -499,7 +591,6 @@
             closeBtn.addEventListener('click', cerrarDetalles);
             backdrop.addEventListener('click', cerrarDetalles);
 
-            // Cerrar con la tecla Escape
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') cerrarDetalles();
             });

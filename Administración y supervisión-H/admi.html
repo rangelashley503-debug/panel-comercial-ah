@@ -1,11 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Admin</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tu archivo de colores centralizado -->
+    <script src="../Paletadecolores.js"></script>
+
+    <style>
+        /* Transición del sidebar y contenido */
+        #sidebar,
+        #main-wrapper {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Sidebar colapsado */
+        #sidebar.is-collapsed {
+            width: 5rem;
+        }
+
+        #sidebar.is-collapsed .sidebar-label,
+        #sidebar.is-collapsed .brand-name {
+            display: none;
+        }
+
+        #sidebar.is-collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        @media (min-width: 1024px) {
+            #main-wrapper {
+                margin-left: 16rem;
+            }
+
+            #sidebar.is-collapsed ~ #main-wrapper {
+                margin-left: 5rem;
+            }
+        }
+
+        /* Efecto del catálogo */
+        .catalogo-card img {
+            transition: transform 0.35s ease;
+        }
+
+        .catalogo-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .catalogo-overlay {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .catalogo-card:hover .catalogo-overlay {
+            opacity: 1;
+        }
+
+        /* Animación fluida de la tarjeta lateral */
+        #productDrawer {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
 </head>
-<body>
-    
-</body>
-</html>
+
+<body class="bg-surface-app text-content-body antialiased min-h-screen flex flex-col lg:flex-row">
+
+    <!-- SIDEBAR -->
+    <aside
+        id="sidebar"
+        class="fixed top-0 left-0 z-40 h-screen w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
+        aria-label="Navegación principal"
+    >
+        <div>
+            <!-- Header del Sidebar -->
+            <div class="flex items-center justify-between p-5 border-b border-white/10 h-20">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="h-10 w-10 shrink-0 rounded-xl bg-brand-terracotta flex items-center justify-center font-bold text-lg shadow-md">
+                        C
+                    </div>
+                    <span class="brand-name font-bold text-lg tracking-wide whitespace-nowrap">
+                        Administrador
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    id="toggleSidebar"
+                    class="p-2 rounded-lg text-content-muted hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Colapsar menú"
+                >
+                    <svg
+                        class="w-5 h-5 toggle-icon transition-transform duration-300"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="p-4 space-y-1.5">
+                <button
+                    type="button"
+                    class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
+                    aria-label="Catálogo"
+                    aria-current="page"
+                    data-section="catalogo"
+                >
+                    <span class="shrink-0">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 11V7a4 4 0 0 0-8 0v4" />
+                            <path d="M5 9h14l1 12H4L5 9Z" />
+                        </svg>
+                    </span>
+                    <span class="sidebar-label whitespace-nowrap">Catálogo</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
+                    aria-label="Inventario"
+                    data-section="inventario"
+                >
+                    <span class="shrink-0">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                            <rect x="9" y="3" width="6" height="4" rx="2" />
+                            <path d="M9 14h6M9 18h6" />
+                        </svg>
+                    </span>
+                    <span class="sidebar-label whitespace-nowrap">Inventario</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Usuario -->
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="h-9 w-9 shrink-0 rounded-full bg-brand-cream/20 text-brand-amber flex items-center justify-center font-bold text-xs uppercase border border-white/10">
+                    RV
+                </div>
+                <div class="sidebar-label leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
+                    <p class="text-xs font-semibold text-white">Ray Vázquez</p>
+                    <p class="text-[11px] text-content-muted">Administrador</p>
+                </div>
+            </div>
+        </div>
+    </aside>

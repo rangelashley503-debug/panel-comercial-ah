@@ -159,13 +159,73 @@
     <div id="main-wrapper" class="flex-1 w-full min-h-screen">
         <main class="mx-auto max-w-6xl space-y-8 p-6 lg:p-10">
 
-            <header class="space-y-2">
-                <h1 class="text-3xl font-bold text-content-heading">
-                    Catálogo de Productos
-                </h1>
-                <p class="text-sm text-content-muted">
-                    Haz clic en un producto para consultar sus precios, porcentaje de utilidad y componentes.
-                </p>
+            <!-- ENCABEZADO CON BÚSQUEDA Y CATEGORÍAS -->
+            <header class="space-y-5">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="space-y-1">
+                        <h1 class="text-3xl font-bold text-content-heading">
+                            Catálogo de Productos
+                        </h1>
+                        <p class="text-sm text-content-muted">
+                            Explora y filtra por categoría o utiliza el buscador para localizar productos.
+                        </p>
+                    </div>
+
+                    <!-- Barra de Búsqueda -->
+                    <div class="relative w-full md:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            id="inputBusqueda"
+                            placeholder="Buscar producto o sabor..."
+                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-terracotta/40 focus:border-brand-terracotta shadow-sm transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Botones de Filtro por Categoría -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters">
+                    <button
+                        type="button"
+                        class="btn-categoria active-cat px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-brand-navy text-white shadow-sm"
+                        data-category="todos"
+                    >
+                        Todos
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Dulces"
+                    >
+                        Dulces
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Energizantes"
+                    >
+                        Energizantes
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Abarrotes"
+                    >
+                        Abarrotes
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Jugos"
+                    >
+                        Jugos
+                    </button>
+                    
+                </div>
             </header>
 
             <!-- CATÁLOGO -->
@@ -307,6 +367,7 @@
             const productos = [
                 {
                     nombre: "Canels Celofan",
+                    categoria: "Dulces",
                     imagen: "../Imagenes/Catalogo/2.png",
                     presentacion: "Caja con 60 paquetes (4 pastillas c/u)",
                     piezasPorPresentacion: 60,

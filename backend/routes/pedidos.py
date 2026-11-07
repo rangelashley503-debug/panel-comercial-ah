@@ -71,17 +71,49 @@ def listar():
     return jsonify(filas)
 
 
+def armar_resumen(donde='', params=()):
+    """Cuenta los pedidos por estatus. 'donde' es siempre texto fijo del programa, nunca datos del usuario."""
+    filas = consultar('SELECT estatus, COUNT(*) AS total FROM pedidos ' + donde + ' GROUP BY estatus', params)
+    conteo = {fila['estatus']: fila['total'] for fila in filas}
+    return {
+        'nuevos': conteo.get('Registrado', 0),
+        'en_preparacion': conteo.get('En preparación', 0),
+        'en_ruta': conteo.get('Listo / En ruta', 0),
+        'entregados': conteo.get('Entregado', 0),
+    }
+
+
 @bp.get('/resumen')
 @rol_requerido('Administrador', 'Vendedor', 'Almacén')
 def resumen():
-    filas = consultar('SELECT estatus, COUNT(*) AS total FROM pedidos GROUP BY estatus')
-    conteo = {fila['estatus']: fila['total'] for fila in filas}
-    return jsonify(
-        nuevos=conteo.get('Registrado', 0),
-        en_preparacion=conteo.get('En preparación', 0),
-        en_ruta=conteo.get('Listo / En ruta', 0),
-        entregados=conteo.get('Entregado', 0),
-    )
+    return jsonify(armar_resumen())
+
+
+# --- Pedidos del propio cliente (solo lectura) -------------------------------
+# El cliente se toma de la sesión del servidor, nunca de datos que envíe el navegador:
+# así nadie puede ver los pedidos de otra tienda cambiando un número en la URL.
+
+@bp.get('/mios')
+@rol_requerido('Cliente')
+def mis_pedidos():
+    cliente_id = usuario_actual()['cliente_id']
+    if not cliente_id:
+        return jsonify([])
+
+    filas = consultar(
+        'SELECT p.id, p.folio, c.tienda AS cliente, p.volumen, p.total, p.estatus, p.fecha_entrega '
+        'FROM pedidos p JOIN clientes c ON c.id = p.cliente_id '
+        'WHERE p.cliente_id = %s ORDER BY p.id DESC', (cliente_id,))
+    return jsonify(filas)
+
+
+@bp.get('/mios/resumen')
+@rol_requerido('Cliente')
+def mi_resumen():
+    cliente_id = usuario_actual()['cliente_id']
+    if not cliente_id:
+        return jsonify(armar_resumen('WHERE 1 = 0'))
+    return jsonify(armar_resumen('WHERE cliente_id = %s', (cliente_id,)))
 
 
 @bp.post('/cotizar')

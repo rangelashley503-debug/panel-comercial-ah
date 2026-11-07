@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos y Cotizaciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
-        }
-
-        const carpetaActual = carpetaDe(window.location.pathname);
-
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
-
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
-
 </head>
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
@@ -54,25 +28,25 @@
     <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
 
 <!-- Título del módulo -->
-<h1 class="text-3xl font-bold">Gestión de Pedidos y Cotizaciones</h1>
+<h1 id="titulo-pagina" class="text-3xl font-bold">Gestión de Pedidos y Cotizaciones</h1>
 
 <!-- Tarjetas resumen: 1 columna en móvil, 2 en tablet, 4 en pantalla grande -->
 <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">Nuevos</p>
-        <p id="resumen-nuevos" class="mt-1 text-3xl font-bold">2</p>
+        <p id="resumen-nuevos" class="mt-1 text-3xl font-bold">0</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">En Preparación</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
+        <p id="resumen-preparacion" class="mt-1 text-3xl font-bold">0</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">En Ruta</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
+        <p id="resumen-ruta" class="mt-1 text-3xl font-bold">0</p>
     </article>
     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm font-medium text-gray-500">Entregados</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
+        <p id="resumen-entregados" class="mt-1 text-3xl font-bold">0</p>
     </article>
 </section>
 
@@ -81,7 +55,7 @@
     <!-- Encabezado de la tarjeta -->
     <div class="flex items-center justify-between p-4">
         <h2 class="text-xl font-bold">Pedidos Recientes</h2>
-        <span id="total-registros" class="text-sm text-gray-500">5 registros</span>
+        <span id="total-registros" class="text-sm text-gray-500">0 registros</span>
     </div>
 
     <div class="overflow-x-auto">
@@ -93,105 +67,58 @@
                     <th class="p-4 font-semibold">Volumen</th>
                     <th class="p-4 font-semibold">Total</th>
                     <th class="p-4 font-semibold">Estatus</th>
+                    <th id="columna-accion" class="p-4 font-semibold">Acción</th>
                 </tr>
             </thead>
+            <!-- Las filas se llenan con los datos de MySQL -->
             <tbody id="tabla-pedidos" class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1021</td>
-                    <td class="p-4 font-medium">Miscelánea La Esperanza</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$3,450.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1022</td>
-                    <td class="p-4 font-medium">Abarrotes Don Chuy</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4">$48,900.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1023</td>
-                    <td class="p-4 font-medium">Tienda El Güero</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$6,200.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Listo / En ruta</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1024</td>
-                    <td class="p-4 font-medium">Miscelánea Los Pinos</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$2,780.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Entregado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1025</td>
-                    <td class="p-4 font-medium">Super Mayoreo del Centro</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4">$72,350.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
+                <tr>
+                    <td colspan="6" class="p-4 text-center text-sm text-gray-500">Cargando pedidos...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </section>
 
-<!-- Formulario para registrar o cotizar pedido -->
-<section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+<!-- Formulario para registrar o cotizar pedido (solo Administrador y Vendedor) -->
+<section id="seccion-formulario" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
     <h2 class="text-xl font-bold">Registrar / Cotizar Pedido</h2>
     <p class="mt-1 text-sm text-gray-500">Captura los datos del cliente y los productos solicitados.</p>
 
     <form id="form-pedido" class="mt-4 grid gap-4 sm:grid-cols-2">
-        <!-- Cliente -->
+        <!-- Cliente (se llena con los clientes activos) -->
         <div class="sm:col-span-2">
             <label for="cliente" class="block text-sm font-medium">Cliente</label>
-            <input id="cliente" type="text" placeholder="Nombre de la miscelánea o tienda"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+            <select id="cliente"
+                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
+                <option value="">Cargando clientes...</option>
+            </select>
         </div>
 
-        <!-- Producto (el data-precio es el precio por pieza) -->
+        <!-- Producto (se llena con el catálogo) -->
         <div>
             <label for="producto" class="block text-sm font-medium">Producto</label>
             <select id="producto"
                 class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <optgroup label="Energizantes e isotónicas">
-                    <option data-precio="38">Monster Energy 473 ml</option>
-                    <option data-precio="35">Red Bull 250 ml</option>
-                    <option data-precio="22">Electrolit 600 ml</option>
-                </optgroup>
-                <optgroup label="Confitería">
-                    <option data-precio="4">Panditas (bolsa)</option>
-                    <option data-precio="5">Paletas Payaso</option>
-                    <option data-precio="12">Chocolate en barra</option>
-                </optgroup>
+                <option value="">Cargando productos...</option>
             </select>
         </div>
 
-        <!-- Escala de venta (el value es cuántas piezas trae cada escala) -->
+        <!-- Escala de venta (el texto de Caja y Tarima cambia según el producto) -->
         <div>
             <label for="escala" class="block text-sm font-medium">Escala de venta</label>
             <select id="escala"
                 class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <option value="1">Pieza</option>
-                <option value="24">Caja (24 pzs)</option>
-                <option value="960">Tarima / Mayoreo (40 cajas)</option>
+                <option value="Pieza">Pieza</option>
+                <option value="Caja">Caja</option>
+                <option value="Tarima">Tarima / Mayoreo</option>
             </select>
         </div>
 
         <!-- Cantidad -->
         <div>
             <label for="cantidad" class="block text-sm font-medium">Cantidad</label>
-            <input id="cantidad" type="number" min="1" placeholder="0"
+            <input id="cantidad" type="number" min="1" step="1" placeholder="0"
                 class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
         </div>
 
@@ -216,110 +143,475 @@
             <p class="mt-2 text-lg font-bold">Total: <span id="cotizacion-total">$0.00</span></p>
         </div>
 
+        <!-- Mensajes de error o de éxito -->
+        <p id="mensaje-pedido" role="status" aria-live="polite"
+            class="hidden rounded-lg border p-3 text-sm sm:col-span-2"></p>
+
         <!-- Botones de acción -->
         <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-end">
             <button type="button" id="btn-cotizar"
-                class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
+                class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
                 Generar Cotización
             </button>
-            <button type="submit"
-                class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
+            <button type="submit" id="btn-registrar"
+                class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
                 Registrar Pedido
             </button>
         </div>
     </form>
 </section>
 
-<!-- Script del módulo de pedidos -->
-<script>
-    // Seleccionamos los elementos que vamos a usar
-    const formulario = document.getElementById('form-pedido');
-    const inputCliente = document.getElementById('cliente');
-    const selectProducto = document.getElementById('producto');
-    const selectEscala = document.getElementById('escala');
-    const inputCantidad = document.getElementById('cantidad');
-    const cajaCotizacion = document.getElementById('cotizacion');
-    const tablaPedidos = document.getElementById('tabla-pedidos');
-    const resumenNuevos = document.getElementById('resumen-nuevos');
-    const totalRegistros = document.getElementById('total-registros');
+    </main>
 
-    // Contadores para el folio, los pedidos nuevos y los registros
-    let siguienteFolio = 1026;
-    let nuevos = 2;
-    let registros = 5;
+    <!-- Script del módulo de pedidos (conectado a la API) -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const formulario = document.getElementById('form-pedido');
+        const selectCliente = document.getElementById('cliente');
+        const selectProducto = document.getElementById('producto');
+        const selectEscala = document.getElementById('escala');
+        const inputCantidad = document.getElementById('cantidad');
+        const inputFecha = document.getElementById('fecha');
+        const inputNotas = document.getElementById('notas');
+        const cajaCotizacion = document.getElementById('cotizacion');
+        const mensajePedido = document.getElementById('mensaje-pedido');
+        const botonCotizar = document.getElementById('btn-cotizar');
+        const botonRegistrar = document.getElementById('btn-registrar');
+        const tablaPedidos = document.getElementById('tabla-pedidos');
+        const totalRegistros = document.getElementById('total-registros');
+        const seccionFormulario = document.getElementById('seccion-formulario');
 
-    // Convierte un número a pesos mexicanos (ej. $3,450.00)
-    function aPesos(numero) {
-        return numero.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
-    }
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
 
-    // Calcula el total: precio por pieza x piezas por escala x cantidad
-    function calcularTotal() {
-        const precioPieza = Number(selectProducto.selectedOptions[0].dataset.precio);
-        const piezasPorEscala = Number(selectEscala.value);
-        const cantidad = Number(inputCantidad.value);
+        let rol = '';
+        let productos = [];
 
-        return precioPieza * piezasPorEscala * cantidad;
-    }
+        // Rutas de la API para pedidos y resumen (el rol Cliente usa las suyas)
+        let rutaPedidos = '/api/pedidos';
+        let rutaResumen = '/api/pedidos/resumen';
 
-    // Revisa que el formulario tenga datos válidos
-    function datosValidos() {
-        if (inputCliente.value.trim() === '' || Number(inputCantidad.value) <= 0) {
-            alert('Escribe el nombre del cliente y una cantidad mayor a 0.');
-            return false;
-        }
-        return true;
-    }
-
-    // Botón "Generar Cotización": muestra el resumen sin guardar el pedido
-    document.getElementById('btn-cotizar').addEventListener('click', function () {
-        if (!datosValidos()) {
-            return;
+        // Convierte un número a pesos mexicanos (ej. $3,450.00)
+        function aPesos(numero) {
+            return Number(numero).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
         }
 
-        const escalaTexto = selectEscala.selectedOptions[0].text;
-
-        document.getElementById('cotizacion-detalle').textContent =
-            inputCantidad.value + ' x ' + escalaTexto + ' de ' + selectProducto.value +
-            ' para ' + inputCliente.value.trim();
-        document.getElementById('cotizacion-total').textContent = aPesos(calcularTotal());
-
-        cajaCotizacion.classList.remove('hidden');
-    });
-
-    // Botón "Registrar Pedido": agrega una fila nueva a la tabla
-    formulario.addEventListener('submit', function (evento) {
-        // Evitamos que la página se recargue
-        evento.preventDefault();
-
-        if (!datosValidos()) {
-            return;
+        // Muestra un mensaje en el formulario (rojo si es error, azul si es éxito)
+        function mostrarMensaje(texto, esError = true) {
+            mensajePedido.textContent = texto;
+            mensajePedido.className =
+                'rounded-lg border p-3 text-sm sm:col-span-2 ' +
+                (esError
+                    ? 'border-red-300 bg-red-50 text-red-700'
+                    : 'border-blue-300 bg-blue-50 text-blue-800');
         }
 
-        // Nombre corto de la escala: Pieza, Caja o Tarima
-        const volumen = selectEscala.selectedOptions[0].text.split(' ')[0];
+        function ocultarMensaje() {
+            mensajePedido.textContent = '';
+            mensajePedido.classList.add('hidden');
+        }
 
-        const fila = document.createElement('tr');
-        fila.className = 'hover:bg-gray-50';
-        fila.innerHTML =
-            '<td class="p-4 font-mono font-medium">#PED-' + siguienteFolio + '</td>' +
-            '<td class="p-4 font-medium">' + inputCliente.value.trim() + '</td>' +
-            '<td class="p-4 text-gray-500">' + volumen + '</td>' +
-            '<td class="p-4">' + aPesos(calcularTotal()) + '</td>' +
-            '<td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span></td>';
+        // Llama a la API. Si no hay sesión (401), manda al login.
+        async function llamarApi(url, opciones) {
+            const respuesta = await fetch(url, opciones);
 
-        // Insertamos la fila al principio de la tabla
-        tablaPedidos.prepend(fila);
+            if (respuesta.status === 401) {
+                window.location.href = paginaLogin;
+                throw new Error('Sin sesión');
+            }
 
-        // Actualizamos los contadores
-        siguienteFolio++;
-        nuevos++;
-        registros++;
-        resumenNuevos.textContent = nuevos;
-        totalRegistros.textContent = registros + ' registros';
+            // Si el servidor no devuelve JSON, se usa un objeto vacío
+            const datos = await respuesta.json().catch(function () { return {}; });
+            return { ok: respuesta.ok, datos: datos };
+        }
 
-        // Limpiamos el formulario y ocultamos la cotización
-        formulario.reset();
-        cajaCotizacion.classList.add('hidden');
-    });
-</script>
+        // Opciones para enviar JSON
+        function enviarJson(metodo, cuerpo) {
+            return {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cuerpo)
+            };
+        }
+
+        // Fila de la tabla con un solo mensaje (cargando, vacío o error)
+        function filaMensaje(texto) {
+            const fila = document.createElement('tr');
+            const celda = document.createElement('td');
+            celda.colSpan = rol === 'Cliente' ? 5 : 6;
+            celda.className = 'p-4 text-center text-sm text-gray-500';
+            celda.textContent = texto;
+            fila.appendChild(celda);
+            return fila;
+        }
+
+        // Crea una celda <td> con texto (textContent evita que se interprete HTML)
+        function crearCelda(texto, clases) {
+            const celda = document.createElement('td');
+            celda.className = clases;
+            celda.textContent = texto;
+            return celda;
+        }
+
+        // Qué botón de acción corresponde a cada estatus (según el rol)
+        function accionPara(estatus) {
+            if (estatus === 'Registrado') {
+                return { nuevo: 'En preparación', texto: 'Iniciar preparación' };
+            }
+            if (estatus === 'Listo / En ruta' && rol !== 'Almacén') {
+                return { nuevo: 'Entregado', texto: 'Marcar entregado' };
+            }
+            return null;
+        }
+
+        // Crea la fila de un pedido
+        function crearFila(pedido) {
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-gray-50';
+
+            fila.appendChild(crearCelda(pedido.folio || '—', 'p-4 font-mono font-medium'));
+            fila.appendChild(crearCelda(pedido.cliente, 'p-4 font-medium'));
+            fila.appendChild(crearCelda(pedido.volumen, 'p-4 text-gray-500'));
+            fila.appendChild(crearCelda(aPesos(pedido.total), 'p-4'));
+
+            // Badge de estatus
+            const celdaEstatus = document.createElement('td');
+            celdaEstatus.className = 'p-4';
+            const badge = document.createElement('span');
+            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.textContent = pedido.estatus;
+            celdaEstatus.appendChild(badge);
+            fila.appendChild(celdaEstatus);
+
+            // Botón de acción (si el pedido puede avanzar). El Cliente solo consulta.
+            if (rol !== 'Cliente') {
+                const celdaAccion = document.createElement('td');
+                celdaAccion.className = 'p-4';
+                const accion = accionPara(pedido.estatus);
+                if (accion) {
+                    const boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.className = 'btn-estatus text-sm font-medium text-orange-600 hover:text-orange-700';
+                    boton.dataset.id = pedido.id;
+                    boton.dataset.nuevo = accion.nuevo;
+                    boton.textContent = accion.texto;
+                    celdaAccion.appendChild(boton);
+                }
+                fila.appendChild(celdaAccion);
+            }
+
+            return fila;
+        }
+
+        // Pide el resumen por estatus y actualiza las tarjetas
+        async function cargarResumen() {
+            const resultado = await llamarApi(rutaResumen);
+            if (!resultado.ok) {
+                return;
+            }
+            document.getElementById('resumen-nuevos').textContent = resultado.datos.nuevos;
+            document.getElementById('resumen-preparacion').textContent = resultado.datos.en_preparacion;
+            document.getElementById('resumen-ruta').textContent = resultado.datos.en_ruta;
+            document.getElementById('resumen-entregados').textContent = resultado.datos.entregados;
+        }
+
+        // Pide los pedidos y dibuja la tabla
+        async function cargarPedidos() {
+            const resultado = await llamarApi(rutaPedidos);
+
+            tablaPedidos.replaceChildren();
+
+            if (!resultado.ok) {
+                tablaPedidos.appendChild(filaMensaje(resultado.datos.error || 'No se pudieron cargar los pedidos.'));
+                return;
+            }
+
+            resultado.datos.forEach(function (pedido) {
+                tablaPedidos.appendChild(crearFila(pedido));
+            });
+
+            if (resultado.datos.length === 0) {
+                tablaPedidos.appendChild(filaMensaje('Aún no hay pedidos registrados.'));
+            }
+            totalRegistros.textContent = resultado.datos.length + ' registros';
+        }
+
+        // Llena la lista de clientes (solo los activos pueden hacer pedidos)
+        async function cargarClientes() {
+            const resultado = await llamarApi('/api/clientes');
+            selectCliente.replaceChildren();
+
+            const activos = resultado.ok
+                ? resultado.datos.filter(function (cliente) { return cliente.estatus === 'Activo'; })
+                : [];
+
+            const primera = document.createElement('option');
+            primera.value = '';
+            primera.textContent = activos.length > 0 ? 'Selecciona un cliente' : 'No hay clientes activos';
+            selectCliente.appendChild(primera);
+
+            activos.forEach(function (cliente) {
+                const opcion = document.createElement('option');
+                opcion.value = cliente.id;
+                opcion.textContent = cliente.tienda;
+                selectCliente.appendChild(opcion);
+            });
+        }
+
+        // Llena la lista de productos agrupados por categoría
+        async function cargarProductos() {
+            const resultado = await llamarApi('/api/productos');
+            selectProducto.replaceChildren();
+
+            productos = resultado.ok ? resultado.datos : [];
+
+            if (productos.length === 0) {
+                const vacia = document.createElement('option');
+                vacia.value = '';
+                vacia.textContent = 'No hay productos';
+                selectProducto.appendChild(vacia);
+                return;
+            }
+
+            const grupos = {};
+            productos.forEach(function (producto) {
+                if (!grupos[producto.categoria]) {
+                    grupos[producto.categoria] = document.createElement('optgroup');
+                    grupos[producto.categoria].label = producto.categoria;
+                    selectProducto.appendChild(grupos[producto.categoria]);
+                }
+                const opcion = document.createElement('option');
+                opcion.value = producto.id;
+                opcion.textContent = producto.nombre;
+                grupos[producto.categoria].appendChild(opcion);
+            });
+
+            actualizarEscalas();
+        }
+
+        // Ajusta el texto de Caja y Tarima según el producto elegido
+        function actualizarEscalas() {
+            const producto = productos.find(function (p) {
+                return String(p.id) === selectProducto.value;
+            });
+            if (!producto) {
+                return;
+            }
+            selectEscala.querySelector('option[value="Caja"]').textContent =
+                'Caja (' + producto.piezas_por_caja + ' pzs)';
+            selectEscala.querySelector('option[value="Tarima"]').textContent =
+                'Tarima / Mayoreo (' + producto.cajas_por_tarima + ' cajas)';
+        }
+
+        // Lee y valida el formulario. Devuelve los datos o null si hay un error.
+        function leerFormulario() {
+            const clienteId = Number(selectCliente.value);
+            const productoId = Number(selectProducto.value);
+            const cantidad = Number(inputCantidad.value);
+
+            if (!clienteId) {
+                mostrarMensaje('Selecciona un cliente.');
+                return null;
+            }
+            if (!productoId) {
+                mostrarMensaje('Selecciona un producto.');
+                return null;
+            }
+            if (!Number.isInteger(cantidad) || cantidad < 1) {
+                mostrarMensaje('Escribe una cantidad entera mayor a 0.');
+                return null;
+            }
+
+            return {
+                cliente_id: clienteId,
+                fecha_entrega: inputFecha.value,
+                observaciones: inputNotas.value.trim(),
+                items: [{ producto_id: productoId, escala: selectEscala.value, cantidad: cantidad }]
+            };
+        }
+
+        // Si el error es de sesión ya se redirigió al login; si no, se avisa
+        function manejarError(error) {
+            if (error.message !== 'Sin sesión') {
+                mostrarMensaje('No se pudo conectar con el servidor.');
+            }
+        }
+
+        selectProducto.addEventListener('change', actualizarEscalas);
+
+        // Botón "Generar Cotización": el servidor calcula el total sin guardar nada
+        botonCotizar.addEventListener('click', async function () {
+            ocultarMensaje();
+            const pedido = leerFormulario();
+            if (!pedido) {
+                return;
+            }
+
+            botonCotizar.disabled = true;
+            try {
+                const resultado = await llamarApi('/api/pedidos/cotizar', enviarJson('POST', { items: pedido.items }));
+
+                if (!resultado.ok) {
+                    mostrarMensaje(resultado.datos.error || 'No se pudo generar la cotización.');
+                    return;
+                }
+
+                document.getElementById('cotizacion-detalle').textContent =
+                    inputCantidad.value + ' x ' + selectEscala.selectedOptions[0].text +
+                    ' de ' + selectProducto.selectedOptions[0].text +
+                    ' para ' + selectCliente.selectedOptions[0].text;
+                document.getElementById('cotizacion-total').textContent = aPesos(resultado.datos.total);
+
+                cajaCotizacion.classList.remove('hidden');
+            } catch (error) {
+                manejarError(error);
+            } finally {
+                botonCotizar.disabled = false;
+            }
+        });
+
+        // Botón "Registrar Pedido": guarda el pedido en la base de datos
+        formulario.addEventListener('submit', async function (evento) {
+            // Evitamos que la página se recargue
+            evento.preventDefault();
+            ocultarMensaje();
+
+            const pedido = leerFormulario();
+            if (!pedido) {
+                return;
+            }
+
+            // Se bloquean los botones mientras se envía para no duplicar el pedido
+            botonRegistrar.disabled = true;
+            botonCotizar.disabled = true;
+            try {
+                const resultado = await llamarApi('/api/pedidos', enviarJson('POST', pedido));
+
+                if (!resultado.ok) {
+                    mostrarMensaje(resultado.datos.error || 'No se pudo registrar el pedido.');
+                    return;
+                }
+
+                // Limpiamos el formulario y ocultamos la cotización
+                formulario.reset();
+                actualizarEscalas();
+                cajaCotizacion.classList.add('hidden');
+
+                mostrarMensaje(
+                    'Pedido ' + resultado.datos.folio + ' registrado por ' + aPesos(resultado.datos.total) + '.',
+                    false
+                );
+
+                // Se vuelve a pedir la lista y el resumen para mostrar los datos reales
+                cargarPedidos();
+                cargarResumen();
+            } catch (error) {
+                manejarError(error);
+            } finally {
+                botonRegistrar.disabled = false;
+                botonCotizar.disabled = false;
+            }
+        });
+
+        // Botón de acción de cada fila: avanza el pedido al siguiente estatus
+        tablaPedidos.addEventListener('click', async function (evento) {
+            const boton = evento.target.closest('.btn-estatus');
+            if (!boton) {
+                return;
+            }
+
+            boton.disabled = true;
+            try {
+                const resultado = await llamarApi(
+                    '/api/pedidos/' + boton.dataset.id + '/estatus',
+                    enviarJson('PATCH', { estatus: boton.dataset.nuevo })
+                );
+
+                if (!resultado.ok) {
+                    alert(resultado.datos.error || 'No se pudo cambiar el estatus.');
+                    boton.disabled = false;
+                    return;
+                }
+
+                cargarPedidos();
+                cargarResumen();
+            } catch (error) {
+                boton.disabled = false;
+                if (error.message !== 'Sin sesión') {
+                    alert('No se pudo conectar con el servidor.');
+                }
+            }
+        });
+
+        // Al abrir la página: se consulta quién es el usuario y se cargan los datos
+        async function iniciar() {
+            // La fecha de entrega no puede ser anterior a hoy
+            inputFecha.min = new Date().toLocaleDateString('en-CA');
+
+            try {
+                const sesion = await llamarApi('/api/sesion');
+                rol = sesion.datos.rol;
+
+                // Solo estos roles pueden ver pedidos (el Cliente, únicamente los suyos)
+                if (['Administrador', 'Vendedor', 'Almacén', 'Cliente'].indexOf(rol) === -1) {
+                    tablaPedidos.replaceChildren(filaMensaje('Tu rol no tiene permiso para ver los pedidos.'));
+                    seccionFormulario.classList.add('hidden');
+                    return;
+                }
+
+                // El Cliente usa rutas propias: el servidor solo le devuelve los pedidos de su tienda
+                if (rol === 'Cliente') {
+                    rutaPedidos = '/api/pedidos/mios';
+                    rutaResumen = '/api/pedidos/mios/resumen';
+                    document.getElementById('titulo-pagina').textContent = 'Mis Pedidos';
+                    document.getElementById('columna-accion').classList.add('hidden');
+                }
+
+                // Solo Administrador y Vendedor registran o cotizan pedidos
+                const puedeRegistrar = rol === 'Administrador' || rol === 'Vendedor';
+                seccionFormulario.classList.toggle('hidden', !puedeRegistrar);
+
+                cargarResumen();
+                cargarPedidos();
+
+                if (puedeRegistrar) {
+                    await cargarClientes();
+                    await cargarProductos();
+                }
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    tablaPedidos.replaceChildren(filaMensaje('No se pudo conectar con el servidor.'));
+                }
+            }
+        }
+
+        iniciar();
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

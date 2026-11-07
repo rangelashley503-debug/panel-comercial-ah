@@ -176,32 +176,33 @@
                     </div>
 
                     <!-- Barra de Búsqueda Dinámica / Expandible -->
-    <div class="flex items-center justify-end">
-        <div
-            id="searchContainer"
-            class="relative flex items-center h-11 w-11 rounded-full bg-white border border-gray-200 shadow-sm overflow-hidden transition-all duration-300"
+<div class="flex items-center justify-end">
+    <div
+        id="searchContainer"
+        style="background-color: #1A3A68;"
+        class="relative flex items-center h-11 w-11 rounded-full shadow-sm overflow-hidden transition-all duration-300"
+    >
+        <!-- Botón con la Lupa Blanca -->
+        <button
+            type="button"
+            id="btnToggleSearch"
+            class="h-11 w-11 shrink-0 flex items-center justify-center text-white focus:outline-none transition-colors"
+            aria-label="Abrir buscador"
         >
-            <!-- Botón con la Lupa -->
-            <button
-                type="button"
-                id="btnToggleSearch"
-                class="h-11 w-11 shrink-0 flex items-center justify-center text-gray-500 hover:text-brand-terracotta focus:outline-none transition-colors"
-                aria-label="Abrir buscador"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-                </svg>
-            </button>
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+            </svg>
+        </button>
 
-            <!-- Input de texto -->
-            <input
-                type="text"
-                id="inputBusqueda"
-                placeholder="Buscar producto o sabor..."
-                class="w-full pr-4 py-2 text-sm text-gray-800 placeholder-gray-400 bg-transparent focus:outline-none opacity-0 transition-opacity duration-200"
-            >
-        </div>
+        <!-- Input de texto en blanco -->
+        <input
+            type="text"
+            id="inputBusqueda"
+            placeholder="Buscar producto o sabor..."
+            class="w-full pr-4 py-2 text-sm text-white placeholder-white/60 bg-transparent focus:outline-none opacity-0 transition-opacity duration-200"
+        >
     </div>
+</div>
                 </div>
 
                 <!-- Botones de Filtro por Categoría -->
@@ -668,21 +669,23 @@
             const btnToggleSearch = document.getElementById('btnToggleSearch');
 
             function abrirBuscador() {
-                searchContainer.classList.remove('w-11', 'rounded-full');
-                searchContainer.classList.add('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-brand-terracotta/30', 'border-brand-terracotta');
-                inputBusqueda.classList.remove('opacity-0');
-                inputBusqueda.classList.add('opacity-100');
-                inputBusqueda.focus();
-            }
+            searchContainer.classList.remove('w-11', 'rounded-full');
+            searchContainer.classList.add('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+    
+            inputBusqueda.classList.remove('opacity-0');
+            inputBusqueda.classList.add('opacity-100');
+            inputBusqueda.focus();
+        }
 
             function cerrarBuscador() {
-                if (!inputBusqueda.value.trim()) {
-                    searchContainer.classList.remove('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-brand-terracotta/30', 'border-brand-terracotta');
-                    searchContainer.classList.add('w-11', 'rounded-full');
-                    inputBusqueda.classList.remove('opacity-100');
-                    inputBusqueda.classList.add('opacity-0');
-                }
+            if (!inputBusqueda.value.trim()) {
+                searchContainer.classList.remove('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+                searchContainer.classList.add('w-11', 'rounded-full');
+                
+                inputBusqueda.classList.remove('opacity-100');
+                inputBusqueda.classList.add('opacity-0');
             }
+        }
 
             if (btnToggleSearch) {
                 btnToggleSearch.addEventListener('click', (e) => {

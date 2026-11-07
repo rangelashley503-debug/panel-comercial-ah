@@ -175,20 +175,33 @@
                         </p>
                     </div>
 
-                    <!-- Barra de Búsqueda -->
-                    <div class="relative w-full md:w-80">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
-                            </svg>
-                        </span>
-                        <input
-                            type="text"
-                            id="inputBusqueda"
-                            placeholder="Buscar producto o sabor..."
-                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-terracotta/40 focus:border-brand-terracotta shadow-sm transition-all"
-                        >
-                    </div>
+                    <!-- Barra de Búsqueda Dinámica / Expandible -->
+    <div class="flex items-center justify-end">
+        <div
+            id="searchContainer"
+            class="relative flex items-center h-11 w-11 rounded-full bg-white border border-gray-200 shadow-sm overflow-hidden transition-all duration-300"
+        >
+            <!-- Botón con la Lupa -->
+            <button
+                type="button"
+                id="btnToggleSearch"
+                class="h-11 w-11 shrink-0 flex items-center justify-center text-gray-500 hover:text-brand-terracotta focus:outline-none transition-colors"
+                aria-label="Abrir buscador"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                </svg>
+            </button>
+
+            <!-- Input de texto -->
+            <input
+                type="text"
+                id="inputBusqueda"
+                placeholder="Buscar producto o sabor..."
+                class="w-full pr-4 py-2 text-sm text-gray-800 placeholder-gray-400 bg-transparent focus:outline-none opacity-0 transition-opacity duration-200"
+            >
+        </div>
+    </div>
                 </div>
 
                 <!-- Botones de Filtro por Categoría -->

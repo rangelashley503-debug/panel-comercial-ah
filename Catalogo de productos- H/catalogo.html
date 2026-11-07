@@ -663,6 +663,58 @@
                     renderizarCatalogo();
                 });
             }
+            // Control dinámico de apertura / cierre del buscador
+            const searchContainer = document.getElementById('searchContainer');
+            const btnToggleSearch = document.getElementById('btnToggleSearch');
+
+            function abrirBuscador() {
+                searchContainer.classList.remove('w-11', 'rounded-full');
+                searchContainer.classList.add('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-brand-terracotta/30', 'border-brand-terracotta');
+                inputBusqueda.classList.remove('opacity-0');
+                inputBusqueda.classList.add('opacity-100');
+                inputBusqueda.focus();
+            }
+
+            function cerrarBuscador() {
+                if (!inputBusqueda.value.trim()) {
+                    searchContainer.classList.remove('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-brand-terracotta/30', 'border-brand-terracotta');
+                    searchContainer.classList.add('w-11', 'rounded-full');
+                    inputBusqueda.classList.remove('opacity-100');
+                    inputBusqueda.classList.add('opacity-0');
+                }
+            }
+
+            if (btnToggleSearch) {
+                btnToggleSearch.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirBuscador();
+                });
+            }
+
+            if (searchContainer) {
+                searchContainer.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirBuscador();
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (searchContainer && !searchContainer.contains(e.target)) {
+                    cerrarBuscador();
+                }
+            });
+
+            if (inputBusqueda) {
+                inputBusqueda.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        inputBusqueda.value = '';
+                        textoBusqueda = '';
+                        renderizarCatalogo();
+                        cerrarBuscador();
+                        inputBusqueda.blur();
+                    }
+                });
+            }
 
             // Escuchar botones de categorías
             categoryBtns.forEach(btn => {

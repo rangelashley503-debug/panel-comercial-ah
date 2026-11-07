@@ -677,6 +677,7 @@
             });
 
             window.abrirDetalles = function(item) {
+                document.getElementById('drawerCategoria').textContent = item.categoria || 'General';
                 const piezas = Number(item.piezasPorPresentacion) || 1;
                 const precioPresentacion = Number(item.precioPresentacion) || 0;
                 const costoUnitario = precioPresentacion / piezas;

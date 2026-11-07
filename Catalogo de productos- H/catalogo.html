@@ -274,6 +274,7 @@
                     <img id="drawerImage" src="" alt="" class="max-h-full max-w-full object-contain">
                 </div>
                 <div>
+                    <span id="drawerCategoria" class="inline-block px-2.5 py-0.5 mb-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-brand-terracotta/10 text-brand-terracotta"></span>
                     <h3 id="drawerTitle" class="text-xl font-bold text-gray-900 leading-tight"></h3>
                     <p id="drawerPresentation" class="text-xs text-gray-500 font-medium mt-1"></p>
                 </div>
@@ -569,40 +570,99 @@
             ];
 
             // Renderizar catálogo
+            // Lógica de Renderizado y Filtrado Dinámico (Buscador y Categorías)
             const catalogo = document.getElementById('catalogo');
+            const inputBusqueda = document.getElementById('inputBusqueda');
+            const categoryBtns = document.querySelectorAll('.btn-categoria');
 
-            productos.forEach((producto) => {
-                const card = document.createElement('article');
+            let categoriaActiva = 'todos';
+            let textoBusqueda = '';
 
-                card.className =
-                    'catalogo-card relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm cursor-pointer hover:shadow-lg transition-all duration-200';
+            function renderizarCatalogo() {
+                catalogo.innerHTML = '';
 
-                card.innerHTML = `
-                    <div class="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
-                        <img
-                            src="${producto.imagen}"
-                            alt="${producto.nombre}"
-                            loading="lazy"
-                            class="h-full w-full object-cover"
-                        >
-                    </div>
+                const filtrados = productos.filter(producto => {
+                    const coincideCategoria = (categoriaActiva === 'todos') || (producto.categoria === categoriaActiva);
+                    
+                    const query = textoBusqueda.toLowerCase().trim();
+                    const coincideTexto = producto.nombre.toLowerCase().includes(query) ||
+                                          (producto.categoria && producto.categoria.toLowerCase().includes(query)) ||
+                                          (producto.sabores && producto.sabores.some(s => s.toLowerCase().includes(query)));
 
-                    <div class="catalogo-overlay absolute inset-0 flex flex-col items-center justify-end bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 text-center">
-                        <p class="text-base font-semibold text-white drop-shadow">
-                            ${producto.nombre}
-                        </p>
-                        <span class="mt-1 text-xs text-amber-300 font-medium tracking-wide">
-                            Ver detalles y utilidad →
-                        </span>
-                    </div>
-                `;
-
-                card.addEventListener('click', () => {
-                    abrirDetalles(producto);
+                    return coincideCategoria && coincideTexto;
                 });
 
-                catalogo.appendChild(card);
+                if (filtrados.length === 0) {
+                    catalogo.innerHTML = `
+                        <div class="col-span-full py-16 text-center">
+                            <p class="text-base font-semibold text-gray-500">No se encontraron productos</p>
+                            <p class="text-xs text-gray-400 mt-1">Prueba con otra palabra clave o selecciona otra categoría.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filtrados.forEach((producto) => {
+                    const card = document.createElement('article');
+                    card.className =
+                        'catalogo-card relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm cursor-pointer hover:shadow-lg transition-all duration-200';
+
+                    card.innerHTML = `
+                        <span class="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm">
+                            ${producto.categoria || 'General'}
+                        </span>
+
+                        <div class="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
+                            <img
+                                src="${producto.imagen}"
+                                alt="${producto.nombre}"
+                                loading="lazy"
+                                class="h-full w-full object-cover"
+                            >
+                        </div>
+
+                        <div class="catalogo-overlay absolute inset-0 flex flex-col items-center justify-end bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 text-center">
+                            <p class="text-base font-semibold text-white drop-shadow">
+                                ${producto.nombre}
+                            </p>
+                            <span class="mt-1 text-xs text-amber-300 font-medium tracking-wide">
+                                Ver detalles y utilidad →
+                            </span>
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        abrirDetalles(producto);
+                    });
+
+                    catalogo.appendChild(card);
+                });
+            }
+
+            // Escuchar barra de búsqueda
+            if (inputBusqueda) {
+                inputBusqueda.addEventListener('input', (e) => {
+                    textoBusqueda = e.target.value;
+                    renderizarCatalogo();
+                });
+            }
+
+            // Escuchar botones de categorías
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    categoryBtns.forEach(b => {
+                        b.className = 'btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+                    });
+
+                    btn.className = 'btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-brand-navy text-white shadow-sm';
+                    
+                    categoriaActiva = btn.getAttribute('data-category');
+                    renderizarCatalogo();
+                });
             });
+
+            // Primer renderizado
+            renderizarCatalogo();
 
             // Elementos del Drawer
             const drawer = document.getElementById('productDrawer');

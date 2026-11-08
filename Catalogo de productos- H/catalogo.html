@@ -218,6 +218,22 @@
     <div id="main-wrapper" class="flex-1 w-full min-h-screen">
         <main class="mx-auto max-w-6xl space-y-8 p-6 lg:p-10">
 
+        <!-- Barra superior solo visible en móvil -->
+            <div class="flex items-center justify-between lg:hidden pb-4 border-b border-gray-100">
+                <button
+                    type="button"
+                    id="openMobileSidebar"
+                    class="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold"
+                >
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>Menú</span>
+                </button>
+
+                <span class="text-sm font-bold text-gray-800">Cliente</span>
+            </div>
+
             <!-- ENCABEZADO CON BÚSQUEDA Y CATEGORÍAS -->
             <header class="space-y-5">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

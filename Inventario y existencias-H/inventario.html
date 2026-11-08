@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario</title>
+    <title>Inventario - Control de Stock</title>
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,28 +13,31 @@
 
     <style>
         /* Transición del sidebar y contenido */
-        #sidebar,
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         #main-wrapper {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Sidebar colapsado */
-        #sidebar.is-collapsed {
-            width: 5rem;
-        }
-
-        #sidebar.is-collapsed .sidebar-label,
-        #sidebar.is-collapsed .brand-name {
-            display: none;
-        }
-
-        #sidebar.is-collapsed .toggle-icon {
-            transform: rotate(180deg);
-        }
-
+        /* En escritorio (>= 1024px) */
         @media (min-width: 1024px) {
             #main-wrapper {
                 margin-left: 16rem;
+            }
+
+            #sidebar.is-collapsed {
+                width: 5rem;
+            }
+
+            #sidebar.is-collapsed .sidebar-label,
+            #sidebar.is-collapsed .brand-name {
+                display: none;
+            }
+
+            #sidebar.is-collapsed .toggle-icon {
+                transform: rotate(180deg);
             }
 
             #sidebar.is-collapsed ~ #main-wrapper {
@@ -42,83 +45,86 @@
             }
         }
 
-        /* Efecto del catálogo */
-        .catalogo-card img {
+        /* En móviles (< 1024px) */
+        @media (max-width: 1023px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #main-wrapper {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Animación suave para la barra de búsqueda expandible */
+        #searchContainer {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animación hover de las tarjetas */
+        .inventario-card img {
             transition: transform 0.35s ease;
         }
 
-        .catalogo-card:hover img {
-            transform: scale(1.08);
+        .inventario-card:hover img {
+            transform: scale(1.06);
         }
 
-        .catalogo-overlay {
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .catalogo-card:hover .catalogo-overlay {
-            opacity: 1;
-        }
-
-        /* Animación fluida de la tarjeta lateral */
-        #productDrawer {
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        /* Personalización de la barra de desplazamiento */
+        /* Personalización de scrollbar en tonos azules */
         nav::-webkit-scrollbar,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar,
         body::-webkit-scrollbar {
             width: 8px;
         }
 
-        /* Fondo del recuadro / carril del scroll (Azul) */
         nav::-webkit-scrollbar-track,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-track,
         body::-webkit-scrollbar-track {
-            background-color: #1A3A68; /* Azul base */
+            background-color: #1A3A68;
             border-radius: 9999px;
         }
 
-        /* Barra deslizante (Thumb) */
         nav::-webkit-scrollbar-thumb,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb,
         body::-webkit-scrollbar-thumb {
-            background-color: #07A6D8; /* Tono azul cyan de contraste */
+            background-color: #07A6D8;
             border-radius: 9999px;
-            border: 2px solid #1A3A68; /* Espacio para que luzca estilizado */
+            border: 2px solid #1A3A68;
         }
 
-        /* Color al pasar el cursor sobre la barra */
         nav::-webkit-scrollbar-thumb:hover,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb:hover,
         body::-webkit-scrollbar-thumb:hover {
-            background-color: #F09D25; /* Tono ámbar activo */
+            background-color: #F09D25;
         }
 
-        /* Compatibilidad para navegadores modernos (Firefox) */
-        nav,
-        #productDrawer .overflow-y-auto,
-        body {
+        nav, body {
             scrollbar-width: thin;
-            scrollbar-color: #07A6D8 #1A3A68; /* color deslizador - color fondo */
+            scrollbar-color: #07A6D8 #1A3A68;
         }
     </style>
 </head>
 
-<body class="bg-surface-app text-content-body antialiased min-h-screen flex flex-col lg:flex-row">
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col lg:flex-row">
+
+    <!-- Backdrop solo para móvil -->
+    <div
+        id="sidebarBackdrop"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-300"
+    ></div>
 
     <!-- SIDEBAR -->
     <aside
         id="sidebar"
-        class="fixed top-0 left-0 z-40 h-screen w-69 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
+        class="fixed top-0 left-0 z-40 h-screen w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
         aria-label="Navegación principal"
     >
         <div>
             <!-- Header del Sidebar -->
-            <div class="flex items-center justify-between p-6 border-b border-white/10 h-20">
+            <div class="flex items-center justify-between p-5 border-b border-white/10 h-20">
                 <div class="flex items-center gap-3 overflow-hidden">
                     <div class="h-10 w-10 shrink-0 rounded-xl bg-brand-terracotta flex items-center justify-center font-bold text-lg shadow-md">
-                        A
+                        C
                     </div>
                     <span class="brand-name font-bold text-lg tracking-wide whitespace-nowrap">
                         Administrador
@@ -128,30 +134,21 @@
                 <button
                     type="button"
                     id="toggleSidebar"
-                    class="p-2 rounded-lg text-content-muted hover:text-white hover:bg-white/10 transition-colors"
+                    class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                     aria-label="Colapsar menú"
                 >
-                    <svg
-                        class="w-5 h-5 toggle-icon transition-transform duration-300"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg class="w-5 h-5 toggle-icon transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
             </div>
 
-<!-- Navegación -->
+            <!-- Navegación con enlaces href -->
             <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-10rem)]">
-                <!-- Catálogo -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
-                    aria-label="Catálogo"
-                    aria-current="page"
-                    data-section="catalogo"
+                <!-- Enlace a Catálogo -->
+                <a
+                    href="catalogo.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -160,14 +157,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Catálogo</span>
-                </button>
+                </a>
 
-                <!-- Inventario -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Inventario"
-                    data-section="inventario"
+                <!-- Inventario (Página Activa) -->
+                <a
+                    href="inventario.html"
+                    class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
+                    aria-current="page"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -177,13 +173,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Inventario</span>
-                </button>
+                </a>
 
                 <!-- Administración -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Administración"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="administracion"
                 >
                     <span class="shrink-0">
@@ -198,8 +193,7 @@
                 <!-- Clientes -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Clientes"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="clientes"
                 >
                     <span class="shrink-0">
@@ -216,8 +210,7 @@
                 <!-- Pedidos -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Pedidos"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="pedidos"
                 >
                     <span class="shrink-0">
@@ -233,8 +226,7 @@
                 <!-- Pagos -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Pagos"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="pagos"
                 >
                     <span class="shrink-0">
@@ -250,14 +242,13 @@
                 <!-- Surtido -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Surtido"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="surtido"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="1" y="3" width="15" height="13" rx="1" />
-                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
                             <circle cx="5.5" cy="18.5" r="2.5" />
                             <circle cx="18.5" cy="18.5" r="2.5" />
                         </svg>
@@ -268,8 +259,7 @@
                 <!-- Mostrador -->
                 <button
                     type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Mostrador"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                     data-section="mostrador"
                 >
                     <span class="shrink-0">
@@ -293,8 +283,470 @@
                 </div>
                 <div class="sidebar-label leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
                     <p class="text-xs font-semibold text-white">Ray Vázquez</p>
-                    <p class="text-[11px] text-content-muted">Administrador</p>
+                    <p class="text-[11px] text-gray-300">Administrador</p>
                 </div>
             </div>
         </div>
     </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-wrapper" class="flex-1 w-full min-h-screen">
+        <main class="mx-auto max-w-6xl space-y-8 p-6 lg:p-10">
+
+            <!-- Barra móvil superior -->
+            <div class="flex items-center justify-between lg:hidden pb-4 border-b border-gray-100">
+                <button
+                    type="button"
+                    id="openMobileSidebar"
+                    class="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold"
+                >
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>Menú</span>
+                </button>
+                <span class="text-sm font-bold text-gray-800">Inventario</span>
+            </div>
+
+            <!-- ENCABEZADO CON BOTÓN AGREGAR Y BÚSQUEDA -->
+            <header class="space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="space-y-1">
+                        <h1 class="text-3xl font-bold text-gray-900">
+                            Inventario y Existencias
+                        </h1>
+                        <p class="text-sm text-gray-500">
+                            Monitoreo de existencias por caja/bolsa y control de reposición de producto.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <!-- Botón Agregar a Inventario -->
+                        <button
+                            type="button"
+                            id="btnAgregarInventario"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-brand-terracotta hover:bg-brand-terracotta/90 shadow-md shadow-brand-terracotta/20 transition-all active:scale-95"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Agregar a inventario</span>
+                        </button>
+
+                        <!-- Buscador Dinámico Expandible -->
+                        <div class="flex items-center justify-end">
+                            <div
+                                id="searchContainer"
+                                style="background-color: #1A3A68;"
+                                class="relative flex items-center h-11 w-11 rounded-full shadow-sm overflow-hidden transition-all duration-300"
+                            >
+                                <button
+                                    type="button"
+                                    id="btnToggleSearch"
+                                    class="h-11 w-11 shrink-0 flex items-center justify-center text-white focus:outline-none transition-colors"
+                                    aria-label="Abrir buscador"
+                                >
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                                    </svg>
+                                </button>
+                                <input
+                                    type="text"
+                                    id="inputBusqueda"
+                                    placeholder="Buscar producto o empaque..."
+                                    class="w-full pr-4 py-2 text-sm text-white placeholder-white/60 bg-transparent focus:outline-none opacity-0 transition-opacity duration-200"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DE 3 ALERTAS DE STOCK CRÍTICO -->
+                <section class="space-y-3 pt-1">
+                    <div class="flex items-center gap-2">
+                        <span class="flex h-2.5 w-2.5 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                        </span>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500">
+                            Alertas de Reabastecimiento Urgente (Menor Stock)
+                        </h2>
+                    </div>
+
+                    <div id="alertasContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                        <!-- Las 3 tarjetas de stock crítico se generan solas con JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Filtros por Categoría -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2" id="categoryFilters">
+                    <button
+                        type="button"
+                        class="btn-categoria active-cat px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-brand-navy text-white shadow-sm"
+                        data-category="todos"
+                    >
+                        Todos
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Dulces"
+                    >
+                        Dulces
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Chocolates"
+                    >
+                        Chocolates
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        data-category="Galletas"
+                    >
+                        Galletas
+                    </button>
+                </div>
+            </header>
+
+            <!-- GRILLA DEL CATÁLOGO DE INVENTARIO -->
+            <section>
+                <div
+                    id="inventarioGrid"
+                    class="grid gap-5 grid-cols-2 sm:grid-cols-3 xl:grid-cols-4"
+                ></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Control del Sidebar responsivo (Móvil / Escritorio)
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const openMobileBtn = document.getElementById('openMobileSidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            function cerrarSidebarMovil() {
+                sidebar.classList.remove('mobile-open');
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                    sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+
+            if (openMobileBtn) {
+                openMobileBtn.addEventListener('click', () => {
+                    sidebar.classList.add('mobile-open');
+                    if (sidebarBackdrop) {
+                        sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                        sidebarBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+                    }
+                });
+            }
+
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', cerrarSidebarMovil);
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) {
+                        cerrarSidebarMovil();
+                    } else {
+                        sidebar.classList.toggle('is-collapsed');
+                    }
+                });
+            }
+
+            // Botón Agregar a Inventario
+            const btnAgregarInventario = document.getElementById('btnAgregarInventario');
+            if (btnAgregarInventario) {
+                btnAgregarInventario.addEventListener('click', () => {
+                    console.log('Abrir pantalla de Agregar a Inventario');
+                });
+            }
+
+            // Datos de productos en inventario
+            const productosInventario = [
+                {
+                    id: 1,
+                    nombre: "Canels Celofan",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Cajas",
+                    piezasPorEmpaque: 60,
+                    existencia: 3,
+                    stockMinimo: 8,
+                    imagen: "../Imagenes/Catalogo/2.png"
+                },
+                {
+                    id: 2,
+                    nombre: "Paleta ChupaChups",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Bolsas",
+                    piezasPorEmpaque: 40,
+                    existencia: 18,
+                    stockMinimo: 10,
+                    imagen: "../Imagenes/Catalogo/3.png"
+                },
+                {
+                    id: 3,
+                    nombre: "Gomitas Frutas",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Displays",
+                    piezasPorEmpaque: 12,
+                    existencia: 1,
+                    stockMinimo: 6,
+                    imagen: "../Imagenes/Catalogo/4.png"
+                },
+                {
+                    id: 4,
+                    nombre: "Chocolate Carlos V",
+                    categoria: "Chocolates",
+                    tipoEmpaque: "Cajas",
+                    piezasPorEmpaque: 24,
+                    existencia: 2,
+                    stockMinimo: 10,
+                    imagen: "../Imagenes/Catalogo/5.png"
+                },
+                {
+                    id: 5,
+                    nombre: "Caramelo JollyRancher",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Bolsas",
+                    piezasPorEmpaque: 100,
+                    existencia: 12,
+                    stockMinimo: 5,
+                    imagen: "../Imagenes/Catalogo/6.png"
+                },
+                {
+                    id: 6,
+                    nombre: "Paleta PintaColores",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Bolsas",
+                    piezasPorEmpaque: 30,
+                    existencia: 14,
+                    stockMinimo: 6,
+                    imagen: "../Imagenes/Catalogo/7.png"
+                },
+                {
+                    id: 7,
+                    nombre: "Wafer Kalu",
+                    categoria: "Galletas",
+                    tipoEmpaque: "Cajas",
+                    piezasPorEmpaque: 18,
+                    existencia: 7,
+                    stockMinimo: 5,
+                    imagen: "../Imagenes/Catalogo/11.png"
+                },
+                {
+                    id: 8,
+                    nombre: "Pastillas Halls",
+                    categoria: "Dulces",
+                    tipoEmpaque: "Cajas",
+                    piezasPorEmpaque: 18,
+                    existencia: 22,
+                    stockMinimo: 8,
+                    imagen: "../Imagenes/Catalogo/16.png"
+                }
+            ];
+
+            // Renderizar las 3 alertas de menor stock
+            function renderizarAlertasStock() {
+                const alertasContainer = document.getElementById('alertasContainer');
+                if (!alertasContainer) return;
+
+                const criticos = [...productosInventario]
+                    .sort((a, b) => a.existencia - b.existencia)
+                    .slice(0, 3);
+
+                alertasContainer.innerHTML = '';
+
+                criticos.forEach((prod) => {
+                    const cardAlerta = document.createElement('div');
+                    cardAlerta.className = 'flex items-center gap-3.5 p-3.5 rounded-2xl bg-white border border-red-200 shadow-sm relative overflow-hidden';
+
+                    cardAlerta.innerHTML = `
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
+                        <div class="w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 shrink-0 overflow-hidden flex items-center justify-center p-1">
+                            <img src="${prod.imagen}" alt="${prod.nombre}" class="max-h-full max-w-full object-contain">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <h3 class="text-xs font-bold text-gray-900 truncate">${prod.nombre}</h3>
+                                <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase rounded-full bg-red-100 text-red-700">
+                                    Crítico
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-0.5">Stock actual: <strong class="text-red-600 font-bold">${prod.existencia} ${prod.tipoEmpaque.toLowerCase()}</strong></p>
+                            <p class="text-[10px] text-gray-400">Mínimo sugerido: ${prod.stockMinimo} ${prod.tipoEmpaque.toLowerCase()}</p>
+                        </div>
+                    `;
+                    alertasContainer.appendChild(cardAlerta);
+                });
+            }
+
+            // Renderizado y filtrado de la grilla
+            const inventarioGrid = document.getElementById('inventarioGrid');
+            const inputBusqueda = document.getElementById('inputBusqueda');
+            const categoryBtns = document.querySelectorAll('.btn-categoria');
+
+            let categoriaActiva = 'todos';
+            let textoBusqueda = '';
+
+            function renderizarInventario() {
+                inventarioGrid.innerHTML = '';
+
+                const filtrados = productosInventario.filter(prod => {
+                    const coincideCat = (categoriaActiva === 'todos') || (prod.categoria === categoriaActiva);
+                    const query = textoBusqueda.toLowerCase().trim();
+                    const coincideQuery = prod.nombre.toLowerCase().includes(query) ||
+                                          prod.categoria.toLowerCase().includes(query) ||
+                                          prod.tipoEmpaque.toLowerCase().includes(query);
+
+                    return coincideCat && coincideQuery;
+                });
+
+                if (filtrados.length === 0) {
+                    inventarioGrid.innerHTML = `
+                        <div class="col-span-full py-16 text-center">
+                            <p class="text-base font-semibold text-gray-500">No hay productos en inventario que coincidan</p>
+                            <p class="text-xs text-gray-400 mt-1">Verifica la búsqueda o selecciona otra categoría.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filtrados.forEach((prod) => {
+                    const card = document.createElement('article');
+                    card.className = 'inventario-card relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm flex flex-col justify-between';
+
+                    let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                    let badgeText = 'Stock óptimo';
+                    if (prod.existencia <= 3) {
+                        badgeColor = 'bg-red-50 text-red-700 border-red-200';
+                        badgeText = 'Stock crítico';
+                    } else if (prod.existencia <= prod.stockMinimo) {
+                        badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                        badgeText = 'Stock regular';
+                    }
+
+                    card.innerHTML = `
+                        <span class="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm">
+                            ${prod.categoria}
+                        </span>
+
+                        <div class="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-4 border-b border-gray-100">
+                            <img
+                                src="${prod.imagen}"
+                                alt="${prod.nombre}"
+                                loading="lazy"
+                                class="h-full w-full object-contain"
+                            >
+                        </div>
+
+                        <div class="p-4 space-y-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 leading-snug truncate">${prod.nombre}</h3>
+                                <p class="text-[11px] text-gray-400 font-medium">${prod.piezasPorEmpaque} pzas por ${prod.tipoEmpaque.slice(0, -1).toLowerCase()}</p>
+                            </div>
+
+                            <div class="p-3 bg-gray-50 border border-gray-200/80 rounded-xl flex items-center justify-between">
+                                <div>
+                                    <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Existencias</span>
+                                    <span class="text-xl font-black text-brand-navy">${prod.existencia}</span>
+                                    <span class="text-xs text-gray-500 font-medium"> ${prod.tipoEmpaque}</span>
+                                </div>
+                                <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-md border ${badgeColor}">
+                                    ${badgeText}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+
+                    inventarioGrid.appendChild(card);
+                });
+            }
+
+            // Buscador expandible
+            const searchContainer = document.getElementById('searchContainer');
+            const btnToggleSearch = document.getElementById('btnToggleSearch');
+
+            function abrirBuscador() {
+                searchContainer.classList.remove('w-11', 'rounded-full');
+                searchContainer.classList.add('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+                inputBusqueda.classList.remove('opacity-0');
+                inputBusqueda.classList.add('opacity-100');
+                inputBusqueda.focus();
+            }
+
+            function cerrarBuscador() {
+                if (!inputBusqueda.value.trim()) {
+                    searchContainer.classList.remove('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+                    searchContainer.classList.add('w-11', 'rounded-full');
+                    inputBusqueda.classList.remove('opacity-100');
+                    inputBusqueda.classList.add('opacity-0');
+                }
+            }
+
+            if (btnToggleSearch) {
+                btnToggleSearch.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirBuscador();
+                });
+            }
+
+            if (searchContainer) {
+                searchContainer.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirBuscador();
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (searchContainer && !searchContainer.contains(e.target)) {
+                    cerrarBuscador();
+                }
+            });
+
+            if (inputBusqueda) {
+                inputBusqueda.addEventListener('input', (e) => {
+                    textoBusqueda = e.target.value;
+                    renderizarInventario();
+                });
+
+                inputBusqueda.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        inputBusqueda.value = '';
+                        textoBusqueda = '';
+                        renderizarInventario();
+                        cerrarBuscador();
+                        inputBusqueda.blur();
+                    }
+                });
+            }
+
+            // Botones de filtro
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    categoryBtns.forEach(b => {
+                        b.className = 'btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+                    });
+
+                    btn.className = 'btn-categoria px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all bg-brand-navy text-white shadow-sm';
+                    categoriaActiva = btn.getAttribute('data-category');
+                    renderizarInventario();
+                });
+            });
+
+            // Cargas iniciales
+            renderizarAlertasStock();
+            renderizarInventario();
+        });
+    </script>
+</body>
+</html>

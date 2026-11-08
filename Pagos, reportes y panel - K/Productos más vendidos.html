@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagos, Reportes y Panel Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
-        }
-
-        const carpetaActual = carpetaDe(window.location.pathname);
-
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
-
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
-
 </head>
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
@@ -58,7 +32,7 @@
     <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-xl font-bold">Productos Más Vendidos</h2>
-            <p class="text-sm text-gray-500">Semana actual</p>
+            <p class="text-sm text-gray-500">Todos los pedidos registrados</p>
         </div>
         <select id="filtro-categoria"
             class="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none sm:w-56">
@@ -79,60 +53,138 @@
                     <th class="p-4 text-right font-semibold">Ingresos</th>
                 </tr>
             </thead>
+            <!-- Las filas se llenan con los datos de MySQL -->
             <tbody id="tabla-ventas" class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50" data-categoria="Energizantes">
-                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Energizantes</span></td>
-                    <td class="p-4 text-gray-500">120</td>
-                    <td class="p-4 text-right">$27,600.00</td>
-                </tr>
-                <tr class="hover:bg-gray-50" data-categoria="Isotónicas">
-                    <td class="p-4 font-medium">Electrolit 600 ml</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Isotónicas</span></td>
-                    <td class="p-4 text-gray-500">95</td>
-                    <td class="p-4 text-right">$19,000.00</td>
-                </tr>
-                <tr class="hover:bg-gray-50" data-categoria="Confitería">
-                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Confitería</span></td>
-                    <td class="p-4 text-gray-500">80</td>
-                    <td class="p-4 text-right">$9,600.00</td>
-                </tr>
-                <tr class="hover:bg-gray-50" data-categoria="Energizantes">
-                    <td class="p-4 font-medium">Red Bull 250 ml (paquete 24 pzs)</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Energizantes</span></td>
-                    <td class="p-4 text-gray-500">64</td>
-                    <td class="p-4 text-right">$20,480.00</td>
-                </tr>
-                <tr class="hover:bg-gray-50" data-categoria="Confitería">
-                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Confitería</span></td>
-                    <td class="p-4 text-gray-500">58</td>
-                    <td class="p-4 text-right">$5,220.00</td>
+                <tr>
+                    <td colspan="4" class="p-4 text-center text-sm text-gray-500">Cargando reporte...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </section>
 
-<!-- Script del reporte: filtro por categoría -->
+    </main>
+
+    <!-- Script del reporte (conectado a la API) -->
     <script>
         // Seleccionamos los elementos que vamos a usar
         const filtroCategoria = document.getElementById('filtro-categoria');
         const tablaVentas = document.getElementById('tabla-ventas');
 
-        // Filtro del reporte: muestra solo la categoría elegida
-        filtroCategoria.addEventListener('change', function () {
-            const categoria = filtroCategoria.value;
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
 
-            for (const fila of tablaVentas.rows) {
-                const coincide = categoria === 'todas' || fila.dataset.categoria === categoria;
-                fila.classList.toggle('hidden', !coincide);
+        // Convierte un número a pesos mexicanos (ej. $3,450.00)
+        function aPesos(numero) {
+            return Number(numero).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+        }
+
+        // Llama a la API. Si no hay sesión (401), manda al login.
+        async function llamarApi(url) {
+            const respuesta = await fetch(url);
+
+            if (respuesta.status === 401) {
+                window.location.href = paginaLogin;
+                throw new Error('Sin sesión');
             }
-        });
-    </script>
 
-    </main>
+            // Si el servidor no devuelve JSON, se usa un objeto vacío
+            const datos = await respuesta.json().catch(function () { return {}; });
+            return { ok: respuesta.ok, datos: datos };
+        }
+
+        // Fila con un solo mensaje (vacío o error)
+        function filaMensaje(texto) {
+            const fila = document.createElement('tr');
+            const celda = document.createElement('td');
+            celda.colSpan = 4;
+            celda.className = 'p-4 text-center text-sm text-gray-500';
+            celda.textContent = texto;
+            fila.appendChild(celda);
+            return fila;
+        }
+
+        // Crea una celda <td> con texto (textContent evita que se interprete HTML)
+        function crearCelda(texto, clases) {
+            const celda = document.createElement('td');
+            celda.className = clases;
+            celda.textContent = texto;
+            return celda;
+        }
+
+        // Crea la fila de un producto del reporte
+        function crearFila(producto) {
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-gray-50';
+
+            fila.appendChild(crearCelda(producto.producto, 'p-4 font-medium'));
+
+            const celdaCategoria = document.createElement('td');
+            celdaCategoria.className = 'p-4';
+            const badge = document.createElement('span');
+            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.textContent = producto.categoria;
+            celdaCategoria.appendChild(badge);
+            fila.appendChild(celdaCategoria);
+
+            fila.appendChild(crearCelda(producto.cajas, 'p-4 text-gray-500'));
+            fila.appendChild(crearCelda(aPesos(producto.ingresos), 'p-4 text-right'));
+
+            return fila;
+        }
+
+        // Pide el reporte al servidor (con la categoría elegida) y dibuja la tabla
+        async function cargarReporte() {
+            try {
+                const categoria = filtroCategoria.value;
+                const resultado = await llamarApi('/api/reportes/mas-vendidos?categoria=' + encodeURIComponent(categoria));
+
+                tablaVentas.replaceChildren();
+
+                if (!resultado.ok) {
+                    tablaVentas.appendChild(filaMensaje(resultado.datos.error || 'No se pudo cargar el reporte.'));
+                    return;
+                }
+
+                resultado.datos.forEach(function (producto) {
+                    tablaVentas.appendChild(crearFila(producto));
+                });
+
+                if (resultado.datos.length === 0) {
+                    tablaVentas.appendChild(filaMensaje('Aún no hay ventas registradas en esta categoría.'));
+                }
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    tablaVentas.replaceChildren(filaMensaje('No se pudo conectar con el servidor.'));
+                }
+            }
+        }
+
+        // Filtro del reporte: vuelve a pedir los datos con la categoría elegida
+        filtroCategoria.addEventListener('change', cargarReporte);
+
+        // Al abrir la página: se consulta quién es el usuario y se carga el reporte
+        async function iniciar() {
+            try {
+                const sesion = await llamarApi('/api/sesion');
+
+                // Solo el administrador y el vendedor ven los reportes
+                if (['Administrador', 'Vendedor'].indexOf(sesion.datos.rol) === -1) {
+                    tablaVentas.replaceChildren(filaMensaje('Tu rol no tiene permiso para ver los reportes.'));
+                    filtroCategoria.disabled = true;
+                    return;
+                }
+
+                await cargarReporte();
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    tablaVentas.replaceChildren(filaMensaje('No se pudo conectar con el servidor.'));
+                }
+            }
+        }
+
+        iniciar();
+    </script>
 
     <!-- Resalta en naranja el módulo en el que estás -->
     <script>

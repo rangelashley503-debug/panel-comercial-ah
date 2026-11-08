@@ -431,14 +431,48 @@
     <!-- SCRIPTS -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.getElementById('toggleSidebar');
-            const navButtons = document.querySelectorAll('.sidebar-nav-btn');
+    // Referencias del sidebar y versión móvil
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const openMobileBtn = document.getElementById('openMobileSidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const navButtons = document.querySelectorAll('.sidebar-nav-btn');
 
-            // Toggle Sidebar
-            toggleBtn.addEventListener('click', () => {
+    // Función para cerrar el sidebar en móviles
+    function cerrarSidebarMovil() {
+        sidebar.classList.remove('mobile-open');
+        if (sidebarBackdrop) {
+            sidebarBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        }
+    }
+
+    // Abrir menú lateral en móvil al pulsar el botón "Menú"
+    if (openMobileBtn) {
+        openMobileBtn.addEventListener('click', () => {
+            sidebar.classList.add('mobile-open');
+            if (sidebarBackdrop) {
+                sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                sidebarBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+            }
+        });
+    }
+
+    // Cerrar al tocar el fondo oscuro (backdrop) en móvil
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', cerrarSidebarMovil);
+    }
+
+    // Botón de alternar (la flecha del sidebar)
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            if (window.innerWidth < 1024) {
+                cerrarSidebarMovil();
+            } else {
                 sidebar.classList.toggle('is-collapsed');
-            });
+            }
+        });
+    }
 
             navButtons.forEach((btn) => {
                 btn.addEventListener('click', () => {

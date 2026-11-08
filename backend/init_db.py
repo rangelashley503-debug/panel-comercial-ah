@@ -26,11 +26,12 @@ PRODUCTOS = [
 ]
 
 # Usuarios de DEMOSTRACIÓN: cambia estas contraseñas antes de usar el sistema de verdad
+# correo, contraseña, rol, cliente asociado (solo el rol Cliente), nombre que se muestra en la barra lateral
 USUARIOS = [
-    ('admin@impulsomexa.com', 'Admin2026', 'Administrador', None),
-    ('vendedor@impulsomexa.com', 'Vende2026', 'Vendedor', None),
-    ('almacen@impulsomexa.com', 'Almacen2026', 'Almacén', None),
-    ('cliente@impulsomexa.com', 'Cliente2026', 'Cliente', 1),
+    ('admin@impulsomexa.com', 'Admin2026', 'Administrador', None, 'Andrea Domínguez'),
+    ('vendedor@impulsomexa.com', 'Vende2026', 'Vendedor', None, 'Víctor Herrera'),
+    ('almacen@impulsomexa.com', 'Almacen2026', 'Almacén', None, 'Alberto Soto'),
+    ('cliente@impulsomexa.com', 'Cliente2026', 'Cliente', 1, 'María Hernández'),
 ]
 
 
@@ -58,14 +59,14 @@ def main():
                 'existencia_cajas, stock_minimo_cajas, lote, caducidad) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
                 PRODUCTOS)
             cursor.executemany(
-                'INSERT INTO usuarios (correo, password_hash, rol, cliente_id) VALUES (%s, %s, %s, %s)',
-                [(correo, generate_password_hash(pw), rol, cid) for correo, pw, rol, cid in USUARIOS])
+                'INSERT INTO usuarios (correo, nombre, password_hash, rol, cliente_id) VALUES (%s, %s, %s, %s, %s)',
+                [(correo, nombre, generate_password_hash(pw), rol, cid) for correo, pw, rol, cid, nombre in USUARIOS])
         conexion.commit()
     finally:
         conexion.close()
 
     print('Base de datos lista. Usuarios de prueba:')
-    for correo, pw, rol, _ in USUARIOS:
+    for correo, pw, rol, _, _ in USUARIOS:
         print('  %-14s %-28s %s' % (rol, correo, pw))
 
 

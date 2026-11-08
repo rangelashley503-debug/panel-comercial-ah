@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagos, Reportes y Panel Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
-        }
-
-        const carpetaActual = carpetaDe(window.location.pathname);
-
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
-
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
-
 </head>
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
@@ -58,7 +32,7 @@
 <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
     <div class="flex items-center justify-between p-4">
         <h2 class="text-xl font-bold">Alertas de Stock Mínimo</h2>
-        <span class="text-sm text-gray-500">Productos por debajo del mínimo</span>
+        <span id="total-alertas" class="text-sm text-gray-500">Productos por debajo del mínimo</span>
     </div>
 
     <div class="overflow-x-auto">
@@ -71,32 +45,142 @@
                     <th class="p-4 font-semibold">Estatus</th>
                 </tr>
             </thead>
+            <!-- Las filas se llenan con los datos de MySQL -->
             <tbody id="tabla-alertas" class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
-                    <td class="p-4">18 cajas</td>
-                    <td class="p-4 text-gray-500">30 cajas</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Electrolit 600 ml</td>
-                    <td class="p-4">12 cajas</td>
-                    <td class="p-4 text-gray-500">25 cajas</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
-                    <td class="p-4">9 cajas</td>
-                    <td class="p-4 text-gray-500">20 cajas</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
-                    <td class="p-4">14 cajas</td>
-                    <td class="p-4 text-gray-500">20 cajas</td>
-                    <td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Reabastecer</span></td>
+                <tr>
+                    <td colspan="4" class="p-4 text-center text-sm text-gray-500">Cargando productos...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </section>
+
+    </main>
+
+    <!-- Script de la lista de stock mínimo (conectado a la API) -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const tablaAlertas = document.getElementById('tabla-alertas');
+        const totalAlertas = document.getElementById('total-alertas');
+
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
+
+        // Llama a la API. Si no hay sesión (401), manda al login.
+        async function llamarApi(url) {
+            const respuesta = await fetch(url);
+
+            if (respuesta.status === 401) {
+                window.location.href = paginaLogin;
+                throw new Error('Sin sesión');
+            }
+
+            // Si el servidor no devuelve JSON, se usa un objeto vacío
+            const datos = await respuesta.json().catch(function () { return {}; });
+            return { ok: respuesta.ok, datos: datos };
+        }
+
+        // Fila con un solo mensaje (vacío o error)
+        function filaMensaje(texto) {
+            const fila = document.createElement('tr');
+            const celda = document.createElement('td');
+            celda.colSpan = 4;
+            celda.className = 'p-4 text-center text-sm text-gray-500';
+            celda.textContent = texto;
+            fila.appendChild(celda);
+            return fila;
+        }
+
+        // Crea una celda <td> con texto (textContent evita que se interprete HTML)
+        function crearCelda(texto, clases) {
+            const celda = document.createElement('td');
+            celda.className = clases;
+            celda.textContent = texto;
+            return celda;
+        }
+
+        // Crea la fila de un producto
+        function crearFila(producto) {
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-gray-50';
+
+            fila.appendChild(crearCelda(producto.nombre, 'p-4 font-medium'));
+            fila.appendChild(crearCelda(producto.existencia + ' cajas', 'p-4'));
+            fila.appendChild(crearCelda(producto.minimo + ' cajas', 'p-4 text-gray-500'));
+
+            const celdaEstatus = document.createElement('td');
+            celdaEstatus.className = 'p-4';
+            const badge = document.createElement('span');
+            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.textContent = 'Reabastecer';
+            celdaEstatus.appendChild(badge);
+            fila.appendChild(celdaEstatus);
+
+            return fila;
+        }
+
+        // Al abrir la página: se consulta quién es el usuario y se cargan las alertas
+        async function iniciar() {
+            try {
+                const sesion = await llamarApi('/api/sesion');
+
+                // Solo el personal puede ver el inventario
+                if (['Administrador', 'Vendedor', 'Almacén'].indexOf(sesion.datos.rol) === -1) {
+                    tablaAlertas.replaceChildren(filaMensaje('Tu rol no tiene permiso para ver el inventario.'));
+                    totalAlertas.textContent = '';
+                    return;
+                }
+
+                const resultado = await llamarApi('/api/productos/stock-minimo');
+                tablaAlertas.replaceChildren();
+
+                if (!resultado.ok) {
+                    tablaAlertas.appendChild(filaMensaje(resultado.datos.error || 'No se pudo cargar la lista.'));
+                    return;
+                }
+
+                resultado.datos.forEach(function (producto) {
+                    tablaAlertas.appendChild(crearFila(producto));
+                });
+
+                if (resultado.datos.length === 0) {
+                    tablaAlertas.appendChild(filaMensaje('No hay productos por debajo del mínimo.'));
+                }
+                totalAlertas.textContent = resultado.datos.length + ' productos por debajo del mínimo';
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    tablaAlertas.replaceChildren(filaMensaje('No se pudo conectar con el servidor.'));
+                }
+            }
+        }
+
+        iniciar();
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

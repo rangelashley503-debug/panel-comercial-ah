@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surtido de Almacén y Logística</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
-        }
-
-        const carpetaActual = carpetaDe(window.location.pathname);
-
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
-
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
-
 </head>
 <body class="bg-white text-black antialiased">
     <header class="border-b border-gray-200 bg-white shadow-sm">
@@ -56,11 +30,11 @@
 <h1 class="text-3xl font-bold">Surtido de Almacén y Logística</h1>
 
 <!-- Cola de pedidos para bodega -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+<section id="seccion-cola" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
     <!-- Encabezado de la tarjeta -->
     <div class="flex items-center justify-between p-4">
         <h2 class="text-xl font-bold">Cola de Surtido</h2>
-        <span class="text-sm text-gray-500">3 pedidos pendientes</span>
+        <span id="total-cola" class="text-sm text-gray-500">0 pedidos pendientes</span>
     </div>
 
     <div class="overflow-x-auto">
@@ -72,35 +46,13 @@
                     <th class="p-4 font-semibold">Volumen</th>
                     <th class="p-4 font-semibold">Entrega</th>
                     <th class="p-4 font-semibold">Estatus</th>
+                    <th class="p-4 font-semibold">Acción</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1022</td>
-                    <td class="p-4 font-medium">Abarrotes Don Chuy</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4 text-gray-500">Hoy, 4:00 pm</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1021</td>
-                    <td class="p-4 font-medium">Miscelánea La Esperanza</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4 text-gray-500">Mañana, 10:00 am</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1025</td>
-                    <td class="p-4 font-medium">Super Mayoreo del Centro</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4 text-gray-500">Mañana, 2:00 pm</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
+            <!-- Las filas se llenan con los pedidos de MySQL -->
+            <tbody id="tabla-cola" class="divide-y divide-gray-100">
+                <tr>
+                    <td colspan="6" class="p-4 text-center text-sm text-gray-500">Cargando pedidos...</td>
                 </tr>
             </tbody>
         </table>
@@ -108,122 +60,404 @@
 </section>
 
 <!-- Hoja de surtido del pedido seleccionado -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-    <!-- Encabezado de la tarjeta -->
-    <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-xl font-bold">Hoja de Surtido</h2>
-            <p class="mt-1 text-sm text-gray-500">
-                Pedido <span class="font-mono font-medium text-black">#PED-1022</span> · Abarrotes Don Chuy
-            </p>
+<section id="seccion-hoja" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <!-- Mensajes de error o de éxito -->
+    <p id="mensaje-surtido" role="status" aria-live="polite"
+        class="mx-4 mt-4 hidden rounded-lg border p-3 text-sm"></p>
+
+    <!-- Se muestra mientras no hay un pedido seleccionado -->
+    <div id="hoja-vacia" class="p-6 text-center text-sm text-gray-500">
+        Selecciona un pedido de la cola para ver su hoja de surtido.
+    </div>
+
+    <div id="hoja-contenido" class="hidden">
+        <!-- Encabezado de la tarjeta -->
+        <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-bold">Hoja de Surtido</h2>
+                <p class="mt-1 text-sm text-gray-500">
+                    Pedido <span id="hoja-folio" class="font-mono font-medium text-black"></span> · <span id="hoja-cliente"></span>
+                </p>
+            </div>
+            <span id="hoja-estatus" class="w-fit rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold"></span>
         </div>
-        <span class="w-fit rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-    </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <tr>
-                    <th class="p-4 font-semibold">Producto</th>
-                    <th class="p-4 font-semibold">Cantidad</th>
-                    <th class="p-4 font-semibold">Lote</th>
-                    <th class="p-4 font-semibold">Caducidad</th>
-                    <th class="p-4 text-center font-semibold">Verificado</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
-                    <td class="p-4">40 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2406-A</td>
-                    <td class="p-4 text-gray-500">15/03/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Red Bull 250 ml (paquete 24 pzs)</td>
-                    <td class="p-4">25 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2407-C</td>
-                    <td class="p-4 text-gray-500">22/04/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Electrolit 600 ml</td>
-                    <td class="p-4">30 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2405-B</td>
-                    <td class="p-4 text-gray-500">10/01/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
-                    <td class="p-4">50 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2408-D</td>
-                    <td class="p-4 text-gray-500">30/06/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
-                    <td class="p-4">35 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2406-F</td>
-                    <td class="p-4 text-gray-500">18/05/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                    <tr>
+                        <th class="p-4 font-semibold">Producto</th>
+                        <th class="p-4 font-semibold">Cantidad</th>
+                        <th class="p-4 font-semibold">Lote</th>
+                        <th class="p-4 font-semibold">Caducidad</th>
+                        <th class="p-4 text-center font-semibold">Verificado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-hoja" class="divide-y divide-gray-100"></tbody>
+            </table>
+        </div>
 
-    <!-- Pie de la hoja: avance y botón de acción -->
-    <div class="flex flex-col gap-3 border-t border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm text-gray-500">
-            Productos verificados: <span id="contador" class="font-medium text-black">0 de 5</span>
-        </p>
-        <button type="button" id="btn-listo" disabled
-            class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-            Marcar como Listo para ruta
-        </button>
+        <!-- Pie de la hoja: avance y botón de acción -->
+        <div class="flex flex-col gap-3 border-t border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-gray-500">
+                Productos verificados: <span id="contador" class="font-medium text-black">0 de 0</span>
+            </p>
+            <button type="button" id="btn-listo" disabled
+                class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
+                Marcar como Listo para ruta
+            </button>
+        </div>
     </div>
 </section>
 
-<!-- Script del contador de verificación -->
-<script>
-    // Seleccionamos los elementos que vamos a usar
-    const casillas = document.querySelectorAll('.verificado');
-    const contador = document.getElementById('contador');
-    const botonListo = document.getElementById('btn-listo');
+    </main>
 
-    // Cuenta las casillas marcadas y actualiza la pantalla
-    function actualizarContador() {
-        let marcadas = 0;
+    <!-- Script del módulo de surtido (conectado a la API) -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const tablaCola = document.getElementById('tabla-cola');
+        const totalCola = document.getElementById('total-cola');
+        const seccionHoja = document.getElementById('seccion-hoja');
+        const hojaVacia = document.getElementById('hoja-vacia');
+        const hojaContenido = document.getElementById('hoja-contenido');
+        const hojaFolio = document.getElementById('hoja-folio');
+        const hojaCliente = document.getElementById('hoja-cliente');
+        const hojaEstatus = document.getElementById('hoja-estatus');
+        const tablaHoja = document.getElementById('tabla-hoja');
+        const contador = document.getElementById('contador');
+        const botonListo = document.getElementById('btn-listo');
+        const mensajeSurtido = document.getElementById('mensaje-surtido');
 
-        casillas.forEach(function (casilla) {
-            if (casilla.checked) {
-                marcadas++;
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
+
+        // Id y folio del pedido que se está surtiendo
+        let pedidoActual = null;
+        let folioActual = '';
+
+        // Convierte una fecha 2027-03-15 en 15/03/2027
+        function formatoFecha(texto) {
+            if (!texto) {
+                return '—';
+            }
+            const partes = texto.slice(0, 10).split('-');
+            return partes[2] + '/' + partes[1] + '/' + partes[0];
+        }
+
+        // Muestra un mensaje (rojo si es error, verde si es éxito)
+        function mostrarMensaje(texto, esError = true) {
+            mensajeSurtido.textContent = texto;
+            mensajeSurtido.className =
+                'mx-4 mt-4 rounded-lg border p-3 text-sm ' +
+                (esError
+                    ? 'border-red-300 bg-red-50 text-red-700'
+                    : 'border-green-300 bg-green-50 text-green-700');
+        }
+
+        function ocultarMensaje() {
+            mensajeSurtido.textContent = '';
+            mensajeSurtido.classList.add('hidden');
+        }
+
+        // Llama a la API. Si no hay sesión (401), manda al login.
+        async function llamarApi(url, opciones) {
+            const respuesta = await fetch(url, opciones);
+
+            if (respuesta.status === 401) {
+                window.location.href = paginaLogin;
+                throw new Error('Sin sesión');
+            }
+
+            // Si el servidor no devuelve JSON, se usa un objeto vacío
+            const datos = await respuesta.json().catch(function () { return {}; });
+            return { ok: respuesta.ok, datos: datos };
+        }
+
+        // Opciones para enviar JSON
+        function enviarJson(metodo, cuerpo) {
+            return {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cuerpo)
+            };
+        }
+
+        // Si el error es de sesión ya se redirigió al login; si no, se avisa
+        function manejarError(error) {
+            if (error.message !== 'Sin sesión') {
+                mostrarMensaje('No se pudo conectar con el servidor.');
+            }
+        }
+
+        // Crea una celda <td> con texto (textContent evita que se interprete HTML)
+        function crearCelda(texto, clases) {
+            const celda = document.createElement('td');
+            celda.className = clases;
+            celda.textContent = texto;
+            return celda;
+        }
+
+        // Fila de la tabla con un solo mensaje (cargando, vacío o error)
+        function filaMensaje(texto) {
+            const fila = document.createElement('tr');
+            const celda = document.createElement('td');
+            celda.colSpan = 6;
+            celda.className = 'p-4 text-center text-sm text-gray-500';
+            celda.textContent = texto;
+            fila.appendChild(celda);
+            return fila;
+        }
+
+        // Crea una fila de la cola de surtido
+        function crearFilaCola(pedido) {
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-gray-50';
+
+            fila.appendChild(crearCelda(pedido.folio || '—', 'p-4 font-mono font-medium'));
+            fila.appendChild(crearCelda(pedido.cliente, 'p-4 font-medium'));
+            fila.appendChild(crearCelda(pedido.volumen, 'p-4 text-gray-500'));
+            fila.appendChild(crearCelda(formatoFecha(pedido.fecha_entrega), 'p-4 text-gray-500'));
+
+            // Badge de estatus
+            const celdaEstatus = document.createElement('td');
+            celdaEstatus.className = 'p-4';
+            const badge = document.createElement('span');
+            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.textContent = pedido.estatus;
+            celdaEstatus.appendChild(badge);
+            fila.appendChild(celdaEstatus);
+
+            // Botón para abrir la hoja de surtido
+            const celdaAccion = document.createElement('td');
+            celdaAccion.className = 'p-4';
+            const boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className = 'btn-surtir text-sm font-medium text-orange-600 hover:text-orange-700';
+            boton.dataset.id = pedido.id;
+            boton.dataset.estatus = pedido.estatus;
+            boton.textContent = 'Surtir';
+            celdaAccion.appendChild(boton);
+            fila.appendChild(celdaAccion);
+
+            return fila;
+        }
+
+        // Pide los pedidos y muestra solo los que faltan por surtir
+        async function cargarCola() {
+            const resultado = await llamarApi('/api/pedidos');
+
+            tablaCola.replaceChildren();
+
+            if (!resultado.ok) {
+                tablaCola.appendChild(filaMensaje(resultado.datos.error || 'No se pudieron cargar los pedidos.'));
+                return;
+            }
+
+            // El servidor los manda del más nuevo al más viejo: se invierte para surtir primero los más antiguos
+            const pendientes = resultado.datos
+                .filter(function (pedido) {
+                    return pedido.estatus === 'Registrado' || pedido.estatus === 'En preparación';
+                })
+                .reverse();
+
+            pendientes.forEach(function (pedido) {
+                tablaCola.appendChild(crearFilaCola(pedido));
+            });
+
+            if (pendientes.length === 0) {
+                tablaCola.appendChild(filaMensaje('No hay pedidos pendientes por surtir.'));
+            }
+            totalCola.textContent = pendientes.length + ' pedidos pendientes';
+        }
+
+        // Cuenta las casillas marcadas y actualiza el contador y el botón
+        function actualizarContador() {
+            const casillas = tablaHoja.querySelectorAll('.verificado');
+            let marcadas = 0;
+
+            casillas.forEach(function (casilla) {
+                if (casilla.checked) {
+                    marcadas++;
+                }
+            });
+
+            contador.textContent = marcadas + ' de ' + casillas.length;
+
+            // El botón solo se habilita cuando todas están marcadas
+            botonListo.disabled = casillas.length === 0 || marcadas !== casillas.length;
+        }
+
+        // Dibuja la hoja de surtido con los datos del servidor
+        function pintarHoja(datos) {
+            pedidoActual = datos.pedido.id;
+            folioActual = datos.pedido.folio || '';
+
+            hojaFolio.textContent = folioActual;
+            hojaCliente.textContent = datos.pedido.cliente;
+            hojaEstatus.textContent = datos.pedido.estatus;
+
+            tablaHoja.replaceChildren();
+            datos.productos.forEach(function (producto) {
+                const fila = document.createElement('tr');
+                fila.className = 'hover:bg-gray-50';
+
+                fila.appendChild(crearCelda(producto.producto, 'p-4 font-medium'));
+
+                // Cantidad en cajas, con las piezas debajo
+                const celdaCantidad = document.createElement('td');
+                celdaCantidad.className = 'p-4';
+                celdaCantidad.textContent = producto.cajas + ' cajas';
+                const piezas = document.createElement('p');
+                piezas.className = 'text-xs text-gray-500';
+                piezas.textContent = producto.piezas + ' pzs';
+                celdaCantidad.appendChild(piezas);
+                fila.appendChild(celdaCantidad);
+
+                fila.appendChild(crearCelda(producto.lote || '—', 'p-4 font-mono text-gray-500'));
+                fila.appendChild(crearCelda(formatoFecha(producto.caducidad), 'p-4 text-gray-500'));
+
+                const celdaCasilla = document.createElement('td');
+                celdaCasilla.className = 'p-4 text-center';
+                const casilla = document.createElement('input');
+                casilla.type = 'checkbox';
+                casilla.className = 'verificado h-4 w-4 accent-orange-600';
+                celdaCasilla.appendChild(casilla);
+                fila.appendChild(celdaCasilla);
+
+                tablaHoja.appendChild(fila);
+            });
+
+            hojaVacia.classList.add('hidden');
+            hojaContenido.classList.remove('hidden');
+            actualizarContador();
+        }
+
+        // Vuelve a mostrar el mensaje de "selecciona un pedido"
+        function cerrarHoja() {
+            pedidoActual = null;
+            folioActual = '';
+            hojaContenido.classList.add('hidden');
+            hojaVacia.classList.remove('hidden');
+        }
+
+        // Abre la hoja de surtido de un pedido
+        async function abrirHoja(id, estatus) {
+            ocultarMensaje();
+
+            // Al empezar a surtir, un pedido nuevo pasa a "En preparación"
+            if (estatus === 'Registrado') {
+                const cambio = await llamarApi(
+                    '/api/pedidos/' + id + '/estatus',
+                    enviarJson('PATCH', { estatus: 'En preparación' })
+                );
+                if (!cambio.ok) {
+                    mostrarMensaje(cambio.datos.error || 'No se pudo iniciar el surtido.');
+                    return;
+                }
+                cargarCola();
+            }
+
+            const hoja = await llamarApi('/api/pedidos/' + id + '/surtido');
+            if (!hoja.ok) {
+                mostrarMensaje(hoja.datos.error || 'No se pudo cargar la hoja de surtido.');
+                return;
+            }
+            pintarHoja(hoja.datos);
+        }
+
+        // Clic en "Surtir" de la cola
+        tablaCola.addEventListener('click', async function (evento) {
+            const boton = evento.target.closest('.btn-surtir');
+            if (!boton) {
+                return;
+            }
+
+            boton.disabled = true;
+            try {
+                await abrirHoja(boton.dataset.id, boton.dataset.estatus);
+            } catch (error) {
+                manejarError(error);
+            } finally {
+                boton.disabled = false;
             }
         });
 
-        // Mostramos "X de Y"
-        contador.textContent = marcadas + ' de ' + casillas.length;
+        // Cada vez que se marca o desmarca una casilla, se vuelve a contar
+        tablaHoja.addEventListener('change', actualizarContador);
 
-        // El botón solo se habilita cuando todas están marcadas
-        botonListo.disabled = marcadas !== casillas.length;
-    }
+        // Botón "Marcar como Listo para ruta": descuenta el inventario y cambia el estatus
+        botonListo.addEventListener('click', async function () {
+            if (pedidoActual === null) {
+                return;
+            }
 
-    // Cada vez que se marca o desmarca una casilla, se vuelve a contar
-    casillas.forEach(function (casilla) {
-        casilla.addEventListener('change', actualizarContador);
-    });
+            botonListo.disabled = true;
+            try {
+                const resultado = await llamarApi('/api/pedidos/' + pedidoActual + '/listo', { method: 'PATCH' });
 
-    // Al hacer clic en el botón, avisamos que el pedido salió a ruta
-    botonListo.addEventListener('click', function () {
-        alert('Pedido #PED-1022 marcado como listo para ruta');
-    });
-</script>
+                if (!resultado.ok) {
+                    mostrarMensaje(resultado.datos.error || 'No se pudo marcar el pedido como listo.');
+                    actualizarContador();
+                    return;
+                }
+
+                mostrarMensaje('Pedido ' + folioActual + ' marcado como Listo / En ruta. El inventario se actualizó.', false);
+                cerrarHoja();
+                cargarCola();
+            } catch (error) {
+                manejarError(error);
+                actualizarContador();
+            }
+        });
+
+        // Al abrir la página: se consulta quién es el usuario y se carga la cola
+        async function iniciar() {
+            try {
+                const sesion = await llamarApi('/api/sesion');
+
+                // Solo el almacén y el administrador surten pedidos
+                if (['Almacén', 'Administrador'].indexOf(sesion.datos.rol) === -1) {
+                    tablaCola.replaceChildren(filaMensaje('Tu rol no tiene permiso para surtir pedidos.'));
+                    totalCola.textContent = '';
+                    seccionHoja.classList.add('hidden');
+                    return;
+                }
+
+                await cargarCola();
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    tablaCola.replaceChildren(filaMensaje('No se pudo conectar con el servidor.'));
+                }
+            }
+        }
+
+        iniciar();
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

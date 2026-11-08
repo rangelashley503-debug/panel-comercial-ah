@@ -12,13 +12,21 @@
     <script src="../Paletadecolores.js"></script>
 
     <style>
-        /* Transición del sidebar y contenido */
-        #sidebar,
+    /* Transición suave de sidebar y contenido */
+    #sidebar {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #main-wrapper {
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reglas para pantallas grandes / Escritorio (1024px o más) */
+    @media (min-width: 1024px) {
         #main-wrapper {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: 16rem;
         }
 
-        /* Sidebar colapsado */
         #sidebar.is-collapsed {
             width: 5rem;
         }
@@ -32,43 +40,90 @@
             transform: rotate(180deg);
         }
 
-        @media (min-width: 1024px) {
-            #main-wrapper {
-                margin-left: 16rem;
-            }
-
-            #sidebar.is-collapsed ~ #main-wrapper {
-                margin-left: 5rem;
-            }
+        #sidebar.is-collapsed ~ #main-wrapper {
+            margin-left: 5rem;
         }
+    }
 
-        /* Efecto del catálogo */
-        .catalogo-card img {
-            transition: transform 0.35s ease;
+    /* Reglas para pantallas móviles y tablets (< 1024px) */
+    @media (max-width: 1023px) {
+        #sidebar {
+            transform: translateX(-100%);
         }
 
-        .catalogo-card:hover img {
-            transform: scale(1.08);
+        #sidebar.mobile-open {
+            transform: translateX(0);
         }
 
-        .catalogo-overlay {
-            opacity: 0;
-            transition: opacity 0.25s ease;
+        #main-wrapper {
+            margin-left: 0 !important;
         }
+    }
 
-        .catalogo-card:hover .catalogo-overlay {
-            opacity: 1;
-        }
+    /* Efecto hover en las tarjetas del catálogo */
+    .catalogo-card img {
+        transition: transform 0.35s ease;
+    }
 
-        /* Animación fluida de la tarjeta lateral */
-        #productDrawer {
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        /* Animación suave para la barra de búsqueda expandible */
-        #searchContainer {
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-    </style>
+    .catalogo-card:hover img {
+        transform: scale(1.08);
+    }
+
+    .catalogo-overlay {
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .catalogo-card:hover .catalogo-overlay {
+        opacity: 1;
+    }
+
+    /* Animación fluida de la tarjeta lateral de producto (Drawer) */
+    #productDrawer {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Animación suave para la barra de búsqueda expandible */
+    #searchContainer {
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Personalización de la barra de desplazamiento (Scrollbar en azul) */
+    nav::-webkit-scrollbar,
+    #productDrawer .overflow-y-auto::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    nav::-webkit-scrollbar-track,
+    #productDrawer .overflow-y-auto::-webkit-scrollbar-track,
+    body::-webkit-scrollbar-track {
+        background-color: #1A3A68;
+        border-radius: 9999px;
+    }
+
+    nav::-webkit-scrollbar-thumb,
+    #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb,
+    body::-webkit-scrollbar-thumb {
+        background-color: #07A6D8;
+        border-radius: 9999px;
+        border: 2px solid #1A3A68;
+    }
+
+    nav::-webkit-scrollbar-thumb:hover,
+    #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+    body::-webkit-scrollbar-thumb:hover {
+        background-color: #F09D25;
+    }
+
+    /* Compatibilidad Firefox */
+    nav,
+    #productDrawer .overflow-y-auto,
+    body {
+        scrollbar-width: thin;
+        scrollbar-color: #07A6D8 #1A3A68;
+    }
+</style>
 </head>
 
 <body class="bg-surface-app text-content-body antialiased min-h-screen flex flex-col lg:flex-row">

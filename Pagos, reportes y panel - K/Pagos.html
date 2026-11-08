@@ -12,31 +12,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
-        }
-
-        const carpetaActual = carpetaDe(window.location.pathname);
-
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
-
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
-
     <style>
         [hidden] {
             display: none !important;
@@ -108,7 +83,7 @@
                 Pagos, Reportes y Panel Administrativo
             </h1>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="mt-4 flex flex-wrap gap-3">
     <a href="Lista%20de%20stock%20minimo.html"
         class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
         Ver stock mínimo
@@ -121,8 +96,16 @@
 
         </div>
 
+        <!-- Aviso cuando el rol no tiene permiso para esta página -->
+        <p
+            id="aviso-permiso"
+            class="mensaje mensaje-error"
+            hidden
+        ></p>
+
         <!-- Indicadores -->
         <section
+            id="seccion-indicadores"
             aria-label="Indicadores del turno"
             class="grid gap-4 sm:grid-cols-3"
         >
@@ -138,7 +121,7 @@
                     id="card-ventas"
                     class="mt-1 text-3xl font-bold"
                 >
-                    $84,520.00
+                    $0.00
                 </p>
             </article>
 
@@ -147,14 +130,14 @@
                        bg-white p-5 shadow-sm"
             >
                 <p class="text-sm font-medium text-gray-500">
-                    Pedidos Completados
+                    Pagos Registrados
                 </p>
 
                 <p
                     id="card-pedidos"
                     class="mt-1 text-3xl font-bold"
                 >
-                    23
+                    0
                 </p>
             </article>
 
@@ -170,13 +153,14 @@
                     id="card-alertas"
                     class="mt-1 text-3xl font-bold"
                 >
-                    4
+                    0
                 </p>
             </article>
         </section>
 
         <!-- Corte de caja -->
         <section
+            id="seccion-corte"
             class="overflow-hidden rounded-xl border
                    border-gray-200 bg-white shadow-sm"
         >
@@ -193,7 +177,7 @@
                     class="w-fit rounded-full border border-gray-200
                            px-3 py-1 text-xs font-semibold"
                 >
-                    Turno abierto
+                    Cargando...
                 </span>
             </div>
 
@@ -226,6 +210,7 @@
                         </tr>
                     </thead>
 
+                    <!-- Las cantidades se llenan con los datos de MySQL -->
                     <tbody
                         id="tabla-corte"
                         class="divide-y divide-gray-100"
@@ -233,57 +218,51 @@
                         <tr
                             class="hover:bg-gray-50"
                             data-metodo="Efectivo"
-                            data-ops="11"
-                            data-monto="32150"
                         >
                             <td class="p-4 font-medium">
                                 Efectivo
                             </td>
 
                             <td class="celda-ops p-4 text-gray-500">
-                                11
+                                0
                             </td>
 
                             <td class="celda-monto p-4 text-right">
-                                $32,150.00
+                                $0.00
                             </td>
                         </tr>
 
                         <tr
                             class="hover:bg-gray-50"
                             data-metodo="Tarjeta"
-                            data-ops="7"
-                            data-monto="21870"
                         >
                             <td class="p-4 font-medium">
                                 Tarjeta
                             </td>
 
                             <td class="celda-ops p-4 text-gray-500">
-                                7
+                                0
                             </td>
 
                             <td class="celda-monto p-4 text-right">
-                                $21,870.00
+                                $0.00
                             </td>
                         </tr>
 
                         <tr
                             class="hover:bg-gray-50"
                             data-metodo="Transferencia"
-                            data-ops="5"
-                            data-monto="30500"
                         >
                             <td class="p-4 font-medium">
                                 Transferencia
                             </td>
 
                             <td class="celda-ops p-4 text-gray-500">
-                                5
+                                0
                             </td>
 
                             <td class="celda-monto p-4 text-right">
-                                $30,500.00
+                                $0.00
                             </td>
                         </tr>
                     </tbody>
@@ -298,14 +277,14 @@
                                 id="total-ops"
                                 class="p-4 font-medium text-gray-500"
                             >
-                                23
+                                0
                             </td>
 
                             <td
                                 id="total-monto"
                                 class="p-4 text-right font-bold"
                             >
-                                $84,520.00
+                                $0.00
                             </td>
                         </tr>
                     </tfoot>
@@ -453,6 +432,7 @@
         </section>
     </main>
 
+    <!-- Script del módulo de pagos (conectado a la API) -->
     <script>
         const formulario = document.getElementById('form-pago');
         const metodo = document.getElementById('metodo');
@@ -470,6 +450,13 @@
         const botonPago = document.getElementById('btn-pago');
         const botonCerrar = document.getElementById('btn-cerrar');
 
+        const seccionIndicadores = document.getElementById('seccion-indicadores');
+        const seccionCorte = document.getElementById('seccion-corte');
+        const avisoPermiso = document.getElementById('aviso-permiso');
+
+        // Ruta del login, por si la sesión no existe o expiró
+        const paginaLogin = '../Autenticaci%C3%B3n%20y%20usuarios/Inicio%20de%20sesi%C3%B3n.html';
+
         const metodosPermitidos = [
             'Efectivo',
             'Tarjeta',
@@ -479,20 +466,41 @@
         const camposRevisados = new Set();
 
         let intentoEnviar = false;
-        let turnoCerrado = false;
 
         const moneda = new Intl.NumberFormat('es-MX', {
             style: 'currency',
             currency: 'MXN'
         });
 
-        // Los importes se acumulan en centavos enteros.
-        const resumen = Array.from(tabla.rows).map((fila) => ({
-            fila: fila,
-            metodo: fila.dataset.metodo,
-            operaciones: Number(fila.dataset.ops),
-            centavos: Math.round(Number(fila.dataset.monto) * 100)
-        }));
+        // Llama a la API. Si no hay sesión (401), manda al login.
+        async function llamarApi(url, opciones) {
+            const respuesta = await fetch(url, opciones);
+
+            if (respuesta.status === 401) {
+                window.location.href = paginaLogin;
+                throw new Error('Sin sesión');
+            }
+
+            // Si el servidor no devuelve JSON, se usa un objeto vacío
+            const datos = await respuesta.json().catch(() => ({}));
+            return { ok: respuesta.ok, datos: datos };
+        }
+
+        // Opciones para enviar JSON
+        function enviarJson(metodoHttp, cuerpo) {
+            return {
+                method: metodoHttp,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cuerpo)
+            };
+        }
+
+        // Si el error es de sesión ya se redirigió al login; si no, se avisa
+        function manejarError(error) {
+            if (error.message !== 'Sin sesión') {
+                mostrarMensaje('No se pudo conectar con el servidor.');
+            }
+        }
 
         function mostrarMensaje(texto, esError = true) {
             mensajePago.textContent = texto;
@@ -561,39 +569,48 @@
             return establecerError(monto, error);
         }
 
-        function actualizarResumen() {
-            let operaciones = 0;
-            let centavos = 0;
+        // Dibuja el corte que devuelve el servidor (tabla, totales y tarjetas)
+        function pintarCorte(corte) {
+            corte.metodos.forEach((registro) => {
+                const fila = tabla.querySelector(
+                    'tr[data-metodo="' + registro.metodo + '"]'
+                );
 
-            resumen.forEach((registro) => {
-                registro.fila.dataset.ops =
-                    String(registro.operaciones);
-
-                registro.fila.dataset.monto =
-                    (registro.centavos / 100).toFixed(2);
-
-                registro.fila
-                    .querySelector('.celda-ops')
-                    .textContent = registro.operaciones;
-
-                registro.fila
-                    .querySelector('.celda-monto')
-                    .textContent = moneda.format(
-                        registro.centavos / 100
-                    );
-
-                operaciones += registro.operaciones;
-                centavos += registro.centavos;
+                if (fila) {
+                    fila.querySelector('.celda-ops').textContent = registro.operaciones;
+                    fila.querySelector('.celda-monto').textContent = moneda.format(registro.monto);
+                }
             });
 
-            totalOperaciones.textContent = operaciones;
-            totalMonto.textContent = moneda.format(centavos / 100);
+            totalOperaciones.textContent = corte.total_operaciones;
+            totalMonto.textContent = moneda.format(corte.total_monto);
 
-            /*
-             * Las tarjetas de ventas, pedidos y stock conservan
-             * sus datos de ejemplo. Registrar un pago no equivale
-             * automáticamente a una nueva venta o pedido completado.
-             */
+            document.getElementById('card-ventas').textContent = moneda.format(corte.total_monto);
+            document.getElementById('card-pedidos').textContent = corte.total_operaciones;
+            document.getElementById('card-alertas').textContent = corte.alertas_stock;
+
+            // Si no hay turno abierto, no hay nada que cerrar
+            const hayTurno = corte.turno_id !== null;
+
+            estadoTurno.textContent = corte.estado;
+            estadoTurno.classList.remove('turno-cerrado');
+            botonCerrar.disabled = !hayTurno;
+
+            mensajeTurno.textContent = hayTurno
+                ? 'Registra los pagos del turno y ciérralo al terminar.'
+                : 'No hay un turno abierto. El primer pago que registres abrirá uno nuevo.';
+        }
+
+        // Pide el corte actual al servidor
+        async function cargarCorte() {
+            const resultado = await llamarApi('/api/corte');
+
+            if (!resultado.ok) {
+                mostrarMensaje(resultado.datos.error || 'No se pudo cargar el corte de caja.');
+                return;
+            }
+
+            pintarCorte(resultado.datos);
         }
 
         // Revisar al salir del campo y al corregir un campo revisado.
@@ -604,10 +621,6 @@
 
         validadores.forEach((validar, campo) => {
             campo.addEventListener('blur', () => {
-                if (turnoCerrado) {
-                    return;
-                }
-
                 camposRevisados.add(campo.id);
                 validar();
             });
@@ -616,10 +629,6 @@
                 campo.tagName === 'SELECT' ? 'change' : 'input';
 
             campo.addEventListener(evento, () => {
-                if (turnoCerrado) {
-                    return;
-                }
-
                 ocultarMensaje();
 
                 if (
@@ -631,17 +640,9 @@
             });
         });
 
-        // Registrar un pago en el resumen local.
-        formulario.addEventListener('submit', (evento) => {
+        // Registrar un pago: se guarda en la base de datos
+        formulario.addEventListener('submit', async (evento) => {
             evento.preventDefault();
-
-            if (turnoCerrado) {
-                mostrarMensaje(
-                    'El turno está cerrado. ' +
-                    'No se pueden registrar más pagos.'
-                );
-                return;
-            }
 
             intentoEnviar = true;
 
@@ -665,98 +666,140 @@
                 return;
             }
 
-            const registro = resumen.find(
-                (item) => item.metodo === metodo.value
-            );
+            // Se guardan antes de limpiar el formulario
+            const importe = monto.valueAsNumber;
+            const nombreMetodo = metodo.value;
 
-            if (!registro) {
-                mostrarMensaje(
-                    'No se encontró el método de pago en el resumen.'
+            botonPago.disabled = true;
+
+            try {
+                // El monto se envía como texto para no perder decimales
+                const resultado = await llamarApi(
+                    '/api/pagos',
+                    enviarJson('POST', { metodo: nombreMetodo, monto: monto.value })
                 );
-                return;
-            }
 
-            const centavos = Math.round(
-                monto.valueAsNumber * 100
-            );
+                if (!resultado.ok) {
+                    mostrarMensaje(resultado.datos.error || 'No se pudo registrar el pago.');
+                    return;
+                }
 
-            const totalActual = resumen.reduce(
-                (total, item) => total + item.centavos,
-                0
-            );
+                formulario.reset();
 
-            if (!Number.isSafeInteger(totalActual + centavos)) {
+                intentoEnviar = false;
+                camposRevisados.clear();
+
+                establecerError(metodo, '');
+                establecerError(monto, '');
+
+                await cargarCorte();
+
                 mostrarMensaje(
-                    'El pago excede el límite de cálculo ' +
-                    'de esta demostración.'
+                    'Pago de ' + moneda.format(importe) +
+                    ' por ' + nombreMetodo + ' registrado correctamente.',
+                    false
                 );
-                return;
+            } catch (error) {
+                manejarError(error);
+            } finally {
+                botonPago.disabled = false;
             }
-
-            registro.operaciones += 1;
-            registro.centavos += centavos;
-
-            actualizarResumen();
-
-            mostrarMensaje(
-                'Pago de ' + moneda.format(centavos / 100) +
-                ' por ' + registro.metodo +
-                ' agregado al resumen local. ' +
-                'No se ha guardado en un servidor ' +
-                'ni procesado un cobro real.',
-                false
-            );
-
-            formulario.reset();
-
-            intentoEnviar = false;
-            camposRevisados.clear();
-
-            establecerError(metodo, '');
-            establecerError(monto, '');
         });
 
-        // Cerrar el turno de la demostración.
-        botonCerrar.addEventListener('click', () => {
-            if (turnoCerrado) {
-                return;
-            }
-
+        // Cerrar el turno: queda guardado en la base de datos
+        botonCerrar.addEventListener('click', async () => {
             const confirmar = window.confirm(
-                '¿Deseas cerrar el turno de esta demostración?\n\n' +
-                'No podrás agregar más pagos hasta recargar la página.\n' +
-                'Los cambios y el cierre no se guardan en un servidor.'
+                '¿Deseas cerrar el turno?\n\n' +
+                'El corte de caja quedará guardado. ' +
+                'El siguiente pago que registres abrirá un turno nuevo.'
             );
 
             if (!confirmar) {
                 return;
             }
 
-            turnoCerrado = true;
-
-            metodo.disabled = true;
-            monto.disabled = true;
-            botonPago.disabled = true;
             botonCerrar.disabled = true;
 
-            establecerError(metodo, '');
-            establecerError(monto, '');
+            try {
+                const resultado = await llamarApi('/api/turno/cerrar', { method: 'POST' });
 
-            estadoTurno.textContent = 'Turno cerrado';
-            estadoTurno.classList.add('turno-cerrado');
+                if (!resultado.ok) {
+                    mostrarMensaje(resultado.datos.error || 'No se pudo cerrar el turno.');
+                    await cargarCorte();
+                    return;
+                }
 
-            mensajeTurno.textContent =
-                'Turno cerrado en esta demostración local. ' +
-                'No se guardó el cierre en un servidor.';
+                const cierre = resultado.datos;
 
-            mostrarMensaje(
-                'El turno se cerró localmente. ' +
-                'El registro de pagos quedó deshabilitado.',
-                false
-            );
+                // Se muestra el nuevo estado (sin turno) y encima el resumen del cierre
+                await cargarCorte();
+
+                estadoTurno.textContent = 'Turno cerrado';
+                estadoTurno.classList.add('turno-cerrado');
+
+                mensajeTurno.textContent =
+                    'Turno #' + cierre.turno_id + ' cerrado el ' +
+                    new Date().toLocaleString('es-MX') + ' con ventas por ' +
+                    moneda.format(cierre.total_monto) + ' en ' +
+                    cierre.total_operaciones + ' operaciones.';
+
+                mostrarMensaje('El turno se cerró y el corte quedó guardado.', false);
+            } catch (error) {
+                botonCerrar.disabled = false;
+                manejarError(error);
+            }
         });
 
-        actualizarResumen();
+        // Al abrir la página: se consulta quién es el usuario y se carga el corte
+        async function iniciar() {
+            try {
+                const sesion = await llamarApi('/api/sesion');
+
+                // Solo el administrador y el vendedor manejan pagos
+                if (['Administrador', 'Vendedor'].indexOf(sesion.datos.rol) === -1) {
+                    avisoPermiso.textContent = 'Tu rol no tiene permiso para ver ni registrar pagos.';
+                    avisoPermiso.hidden = false;
+                    seccionIndicadores.hidden = true;
+                    seccionCorte.hidden = true;
+                    return;
+                }
+
+                await cargarCorte();
+            } catch (error) {
+                if (error.message !== 'Sin sesión') {
+                    avisoPermiso.textContent = 'No se pudo conectar con el servidor.';
+                    avisoPermiso.hidden = false;
+                }
+            }
+        }
+
+        iniciar();
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás -->
+    <script>
+        (function () {
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: naranja y subrayado
+                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                } else {
+                    // Los demás: grises, naranja al pasar el cursor
+                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                }
+            });
+        })();
     </script>
 </body>
 </html>

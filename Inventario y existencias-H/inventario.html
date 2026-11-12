@@ -464,13 +464,12 @@
             }
 
             // Botón Agregar a Inventario
-            const btnAgregarInventario = document.getElementById('btnAgregarInventario');
-            if (btnAgregarInventario) {
+                const btnAgregarInventario = document.getElementById('btnAgregarInventario');
+                if (btnAgregarInventario) {
                 btnAgregarInventario.addEventListener('click', () => {
-                    console.log('Abrir pantalla de Agregar a Inventario');
+                window.location.href = 'agregar-inventario.html';
                 });
             }
-
             // Datos de productos en inventario
             const productosInventario = [
                 {

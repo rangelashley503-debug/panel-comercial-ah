@@ -102,7 +102,7 @@
         class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-300"
     ></div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR CON BOTONES -->
     <aside
         id="sidebar"
         class="fixed top-0 left-0 z-40 h-screen w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
@@ -135,9 +135,10 @@
             <!-- Navegación -->
             <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-10rem)]">
                 <!-- Catálogo -->
-                <a
-                    href="catalogo.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="catalogo"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -146,12 +147,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Catálogo</span>
-                </a>
+                </button>
 
                 <!-- Inventario -->
-                <a
-                    href="inventario.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="inventario"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -161,13 +163,14 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Inventario</span>
-                </a>
+                </button>
 
                 <!-- Administración (Activa) -->
-                <a
-                    href="administracion.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
                     aria-current="page"
+                    data-section="administracion"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -176,12 +179,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Administración</span>
-                </a>
+                </button>
 
                 <!-- Clientes -->
-                <a
-                    href="clientes.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="clientes"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -192,12 +196,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Clientes</span>
-                </a>
+                </button>
 
                 <!-- Pedidos -->
-                <a
-                    href="pedidos.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="pedidos"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -207,12 +212,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Pedidos</span>
-                </a>
+                </button>
 
                 <!-- Pagos -->
-                <a
-                    href="pagos.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="pagos"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -222,12 +228,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Pagos</span>
-                </a>
+                </button>
 
                 <!-- Surtido -->
-                <a
-                    href="surtido.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="surtido"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -238,12 +245,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Surtido</span>
-                </a>
+                </button>
 
                 <!-- Mostrador -->
-                <a
-                    href="mostrador.html"
+                <button
+                    type="button"
                     class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
+                    data-section="mostrador"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -254,7 +262,7 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Mostrador</span>
-                </a>
+                </button>
             </nav>
         </div>
 
@@ -836,7 +844,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // ==========================================
-            // 1. SIDEBAR RESPONSIVO Y MÓVIL
+            // 1. SIDEBAR RESPONSIVO Y NAVEGACIÓN POR JS
             // ==========================================
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('toggleSidebar');
@@ -864,6 +872,27 @@
                     else sidebar.classList.toggle('is-collapsed');
                 });
             }
+
+            // Enlaces de los botones de navegación mediante data-section
+            const rutasPaginas = {
+                catalogo: 'catalogo.html',
+                inventario: 'inventario.html',
+                administracion: 'administracion.html',
+                clientes: 'clientes.html',
+                pedidos: 'pedidos.html',
+                pagos: 'pagos.html',
+                surtido: 'surtido.html',
+                mostrador: 'mostrador.html'
+            };
+
+            document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const seccion = btn.getAttribute('data-section');
+                    if (rutasPaginas[seccion]) {
+                        window.location.href = rutasPaginas[seccion];
+                    }
+                });
+            });
 
             // ==========================================
             // 2. SISTEMA DE ALERTAS EDITABLES
@@ -1218,6 +1247,25 @@
                     toast.classList.add('translate-y-24', 'opacity-0');
                 }, 3500);
             }
+        });
+            const rutasPaginas = {
+            catalogo: 'catalogo.html',
+            inventario: 'inventario.html',
+            administracion: 'administracion.html',
+            clientes: 'clientes.html',
+            pedidos: 'pedidos.html',
+            pagos: 'pagos.html',
+            surtido: 'surtido.html',
+            mostrador: 'mostrador.html'
+        };
+
+        document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const seccion = btn.getAttribute('data-section');
+                if (rutasPaginas[seccion]) {
+                    window.location.href = rutasPaginas[seccion];
+                }
+            });
         });
     </script>
 </body>

@@ -62,7 +62,10 @@
 
         /* Personalización de scrollbar */
         nav::-webkit-scrollbar,
-        body::-webkit-scrollbar {
+        body::-webkit-scrollbar,
+        #listaRendimientoVendedores::-webkit-scrollbar,
+        #listaUsuarios::-webkit-scrollbar,
+        #historialAlertas::-webkit-scrollbar {
             width: 8px;
         }
 
@@ -365,7 +368,7 @@
                     <p class="text-xs text-gray-500">114 pedidos surtidos en noviembre</p>
                 </div>
 
-                <!-- KPI 4 (Sugerencia): Margen Neto Promedio -->
+                <!-- KPI 4: Margen Neto Promedio -->
                 <div class="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Margen Utilidad Prom.</span>
@@ -518,7 +521,7 @@
                         <!-- Se genera dinámicamente con JS -->
                     </div>
 
-                    <!-- Resumen de Crecimiento y Baja Rotación (Sugerencia) -->
+                    <!-- Resumen de Crecimiento y Baja Rotación -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100">
                             <span class="block text-[10px] font-bold uppercase text-brand-navy">Mes con Mayor Venta</span>
@@ -540,19 +543,29 @@
             <!-- ============================================================== -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                <!-- RENDIMIENTO DE VENTAS POR VENDEDOR (7 columnas) -->
+                <!-- RENDIMIENTO DE VENTAS POR VENDEDOR CON BUSCADOR (7 columnas) -->
                 <section class="lg:col-span-7 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-5">
-                    <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
                         <div>
                             <h2 class="text-lg font-bold text-gray-900">Rendimiento por Vendedor</h2>
-                            <p class="text-xs text-gray-500">Avance contra meta mensual ($35,000 MXN por agente).</p>
+                            <p class="text-xs text-gray-500">Toca un vendedor para ver su perfil detallado y métricas.</p>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-brand-navy">
-                            Noviembre 2026
-                        </span>
+
+                        <!-- Barra de búsqueda de vendedores -->
+                        <div class="relative w-full sm:w-56">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                id="inputBuscarVendedor"
+                                placeholder="Buscar vendedor o ruta..."
+                                class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-navy/20 focus:border-brand-navy transition-all"
+                            >
+                        </div>
                     </div>
 
-                    <div id="listaRendimientoVendedores" class="space-y-4">
+                    <div id="listaRendimientoVendedores" class="space-y-3.5 max-h-[340px] overflow-y-auto pr-1">
                         <!-- Renderizado dinámico -->
                     </div>
                 </section>
@@ -562,14 +575,14 @@
                     <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div>
                             <h2 class="text-lg font-bold text-gray-900">Usuarios y Roles</h2>
-                            <p class="text-xs text-gray-500">Personal y clientes con acceso al panel.</p>
+                            <p class="text-xs text-gray-500">Equipo interno con acceso al panel.</p>
                         </div>
                         <span id="contadorUsuarios" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-700">
-                            5 activos
+                            4 activos
                         </span>
                     </div>
 
-                    <div id="listaUsuarios" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                    <div id="listaUsuarios" class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
                         <!-- Renderizado dinámico -->
                     </div>
                 </section>
@@ -579,17 +592,17 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- MODAL: AGREGAR NUEVO USUARIO                                   -->
+    <!-- MODAL: AGREGAR NUEVO USUARIO (SIN OPCIÓN DE CLIENTE)           -->
     <!-- ============================================================== -->
     <div
         id="modalUsuarioBackdrop"
         class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4"
     >
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 lg:p-8 shadow-2xl space-y-6 relative animate-fadeIn">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 lg:p-8 shadow-2xl space-y-6 relative">
             <div class="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div>
                     <h3 class="text-lg font-bold text-gray-900">Registrar Nuevo Usuario</h3>
-                    <p class="text-xs text-gray-500">Asigna credenciales y permisos según su rol.</p>
+                    <p class="text-xs text-gray-500">Asigna credenciales y permisos al personal del equipo.</p>
                 </div>
                 <button
                     type="button"
@@ -604,7 +617,7 @@
 
             <form id="formNuevoUsuario" class="space-y-4">
                 <div>
-                    <label for="usuarioNombre" class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo / Tienda *</label>
+                    <label for="usuarioNombre" class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
                     <input
                         type="text"
                         id="usuarioNombre"
@@ -624,7 +637,6 @@
                         >
                             <option value="vendedor">Vendedor</option>
                             <option value="almacen">Almacén</option>
-                            <option value="cliente">Cliente</option>
                             <option value="admin">Administrador</option>
                         </select>
                     </div>
@@ -681,6 +693,133 @@
             </form>
         </div>
     </div>
+
+    <!-- ============================================================== -->
+    <!-- DRAWER DESLIZABLE: FICHA DETALLADA DEL VENDEDOR                -->
+    <!-- ============================================================== -->
+    <div
+        id="drawerVendedorBackdrop"
+        class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+    ></div>
+
+    <aside
+        id="drawerVendedor"
+        class="fixed top-0 right-0 z-50 h-screen w-full max-w-md bg-white shadow-2xl translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between overflow-y-auto"
+        aria-label="Detalles del vendedor"
+    >
+        <div>
+            <!-- Cabecera del Drawer -->
+            <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Ficha del Agente</span>
+                <button
+                    type="button"
+                    id="btnCerrarDrawerVendedor"
+                    class="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                    aria-label="Cerrar ficha"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Contenido dinámico del perfil -->
+            <div class="p-6 space-y-6">
+                <!-- Fotografía, Nombre y Zona -->
+                <div class="flex flex-col items-center text-center space-y-3">
+                    <div class="relative h-28 w-28 rounded-full p-1 bg-gradient-to-tr from-brand-navy to-brand-terracotta shadow-md">
+                        <img
+                            id="drawerVendedorFoto"
+                            src=""
+                            alt="Foto del vendedor"
+                            class="h-full w-full rounded-full object-cover bg-white"
+                        >
+                    </div>
+                    <div>
+                        <h3 id="drawerVendedorNombre" class="text-xl font-black text-gray-900"></h3>
+                        <p id="drawerVendedorZona" class="text-xs font-semibold text-brand-terracotta mt-0.5"></p>
+                    </div>
+                </div>
+
+                <!-- Datos Personales y Antigüedad -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-1">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">🎂 Cumpleaños</span>
+                        <p id="drawerVendedorCumple" class="text-sm font-bold text-gray-900"></p>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-1">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">⏳ Antigüedad</span>
+                        <p id="drawerVendedorAntiguedad" class="text-sm font-bold text-gray-900"></p>
+                    </div>
+                </div>
+
+                <!-- Rendimiento contra Meta -->
+                <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/70 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-brand-navy">Rendimiento Mensual</span>
+                        <span id="drawerVendedorPorcentaje" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-brand-navy text-white"></span>
+                    </div>
+
+                    <div class="flex items-baseline justify-between">
+                        <div>
+                            <span class="text-[11px] text-gray-500 block">Total Vendido</span>
+                            <span id="drawerVendedorVendido" class="text-2xl font-black text-gray-900"></span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-gray-500 block">Meta Asignada</span>
+                            <span id="drawerVendedorMeta" class="text-sm font-bold text-gray-700"></span>
+                        </div>
+                    </div>
+
+                    <div class="w-full h-3 bg-white rounded-full overflow-hidden border border-blue-100">
+                        <div id="drawerVendedorBarra" class="h-full rounded-full transition-all duration-500"></div>
+                    </div>
+
+                    <p class="text-[11px] text-gray-500 text-right">
+                        Pedidos cerrados en el mes: <strong id="drawerVendedorPedidos" class="text-gray-800"></strong>
+                    </p>
+                </div>
+
+                <!-- Categoría Más Vendida y Menos Vendida -->
+                <div class="space-y-2.5">
+                    <span class="block text-xs font-bold uppercase tracking-wider text-gray-400">Desempeño por Categoría</span>
+                    
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+                        <div class="flex items-center gap-3">
+                            <span class="h-9 w-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base">▲</span>
+                            <div>
+                                <span class="block text-[10px] font-bold uppercase text-emerald-700">Categoría Más Vendida</span>
+                                <p id="drawerVendedorCatMas" class="text-sm font-extrabold text-gray-900"></p>
+                            </div>
+                        </div>
+                        <span id="drawerVendedorCatMasPct" class="text-xs font-black text-emerald-700"></span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200">
+                        <div class="flex items-center gap-3">
+                            <span class="h-9 w-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base">▼</span>
+                            <div>
+                                <span class="block text-[10px] font-bold uppercase text-amber-800">Categoría Menos Vendida</span>
+                                <p id="drawerVendedorCatMenos" class="text-sm font-extrabold text-gray-900"></p>
+                            </div>
+                        </div>
+                        <span id="drawerVendedorCatMenosPct" class="text-xs font-black text-amber-800"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie del Drawer -->
+        <div class="p-4 border-t border-gray-100 bg-gray-50">
+            <button
+                type="button"
+                id="btnCerrarDrawerVendedorFooter"
+                class="w-full py-2.5 rounded-xl text-sm font-bold text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"
+            >
+                Cerrar Ficha
+            </button>
+        </div>
+    </aside>
 
     <!-- TOAST NOTIFICACIÓN -->
     <div
@@ -819,28 +958,146 @@
             }).join('');
 
             // ==========================================
-            // 4. RENDIMIENTO POR VENDEDOR
+            // 4. RENDIMIENTO POR VENDEDOR + BUSCADOR + DRAWER
             // ==========================================
             const vendedores = [
-                { nombre: "Carlos Morales", zona: "Ruta Norte / Centro", vendido: 38400, meta: 35000, pedidos: 48, avatar: "CM" },
-                { nombre: "Andrea López", zona: "Ruta Sur / Comercios", vendido: 31200, meta: 35000, pedidos: 41, avatar: "AL" },
-                { nombre: "Luis Hernández", zona: "Mostrador y Mayoreo", vendido: 16820, meta: 25000, pedidos: 25, avatar: "LH" }
+                {
+                    id: 1,
+                    nombre: "Carlos Morales",
+                    zona: "Ruta Norte / Centro",
+                    vendido: 38400,
+                    meta: 35000,
+                    pedidos: 48,
+                    avatar: "CM",
+                    foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+                    cumpleanos: "14 de Marzo",
+                    antiguedad: "2 años, 4 meses",
+                    categoriaMasVendida: "Dulces y Caramelos",
+                    pctMasVendida: "54% de sus ventas",
+                    categoriaMenosVendida: "Galletas",
+                    pctMenosVendida: "9% de sus ventas"
+                },
+                {
+                    id: 2,
+                    nombre: "Andrea López",
+                    zona: "Ruta Sur / Comercios",
+                    vendido: 31200,
+                    meta: 35000,
+                    pedidos: 41,
+                    avatar: "AL",
+                    foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face",
+                    cumpleanos: "28 de Agosto",
+                    antiguedad: "1 año, 7 meses",
+                    categoriaMasVendida: "Chocolates",
+                    pctMasVendida: "48% de sus ventas",
+                    categoriaMenosVendida: "Bebidas",
+                    pctMenosVendida: "11% de sus ventas"
+                },
+                {
+                    id: 3,
+                    nombre: "Luis Hernández",
+                    zona: "Mostrador y Mayoreo",
+                    vendido: 16820,
+                    meta: 25000,
+                    pedidos: 25,
+                    avatar: "LH",
+                    foto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face",
+                    cumpleanos: "05 de Noviembre",
+                    antiguedad: "8 meses",
+                    categoriaMasVendida: "Bebidas Energéticas",
+                    pctMasVendida: "61% de sus ventas",
+                    categoriaMenosVendida: "Chocolates",
+                    pctMenosVendida: "7% de sus ventas"
+                }
             ];
 
-            const listaVendedores = document.getElementById('listaRendimientoVendedores');
-            listaVendedores.innerHTML = vendedores.map(v => {
-                const porcentaje = Math.min(Math.round((v.vendido / v.meta) * 100), 100);
-                const superoMeta = v.vendido >= v.meta;
+            const listaVendedoresEl = document.getElementById('listaRendimientoVendedores');
+            const inputBuscarVendedor = document.getElementById('inputBuscarVendedor');
 
-                return `
-                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-2.5">
+            // Referencias del Drawer de Vendedor
+            const drawerVendedor = document.getElementById('drawerVendedor');
+            const drawerVendedorBackdrop = document.getElementById('drawerVendedorBackdrop');
+
+            function abrirPerfilVendedor(vendedor) {
+                const porcentaje = Math.round((vendedor.vendido / vendedor.meta) * 100);
+                const superoMeta = vendedor.vendido >= vendedor.meta;
+
+                document.getElementById('drawerVendedorFoto').src = vendedor.foto;
+                document.getElementById('drawerVendedorNombre').textContent = vendedor.nombre;
+                document.getElementById('drawerVendedorZona').textContent = vendedor.zona;
+                document.getElementById('drawerVendedorCumple').textContent = vendedor.cumpleanos;
+                document.getElementById('drawerVendedorAntiguedad').textContent = vendedor.antiguedad;
+
+                document.getElementById('drawerVendedorPorcentaje').textContent = `${porcentaje}% de meta`;
+                document.getElementById('drawerVendedorVendido').textContent = `$${vendedor.vendido.toLocaleString()}`;
+                document.getElementById('drawerVendedorMeta').textContent = `$${vendedor.meta.toLocaleString()}`;
+                document.getElementById('drawerVendedorPedidos').textContent = `${vendedor.pedidos} pedidos`;
+
+                const barra = document.getElementById('drawerVendedorBarra');
+                barra.style.width = `${Math.min(porcentaje, 100)}%`;
+                barra.style.backgroundColor = superoMeta ? '#10B981' : '#1A3A68';
+
+                document.getElementById('drawerVendedorCatMas').textContent = vendedor.categoriaMasVendida;
+                document.getElementById('drawerVendedorCatMasPct').textContent = vendedor.pctMasVendida;
+                document.getElementById('drawerVendedorCatMenos').textContent = vendedor.categoriaMenosVendida;
+                document.getElementById('drawerVendedorCatMenosPct').textContent = vendedor.pctMenosVendida;
+
+                drawerVendedorBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                drawerVendedorBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+                drawerVendedor.classList.remove('translate-x-full');
+            }
+
+            function cerrarPerfilVendedor() {
+                drawerVendedor.classList.add('translate-x-full');
+                drawerVendedorBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                drawerVendedorBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            document.getElementById('btnCerrarDrawerVendedor').addEventListener('click', cerrarPerfilVendedor);
+            document.getElementById('btnCerrarDrawerVendedorFooter').addEventListener('click', cerrarPerfilVendedor);
+            drawerVendedorBackdrop.addEventListener('click', cerrarPerfilVendedor);
+
+            function renderizarVendedores(filtro = '') {
+                const query = filtro.toLowerCase().trim();
+                const filtrados = vendedores.filter(v =>
+                    v.nombre.toLowerCase().includes(query) ||
+                    v.zona.toLowerCase().includes(query)
+                );
+
+                if (filtrados.length === 0) {
+                    listaVendedoresEl.innerHTML = `
+                        <div class="py-8 text-center text-xs text-gray-400">
+                            No se encontraron vendedores que coincidan con "${filtro}".
+                        </div>
+                    `;
+                    return;
+                }
+
+                listaVendedoresEl.innerHTML = '';
+
+                filtrados.forEach(v => {
+                    const porcentaje = Math.min(Math.round((v.vendido / v.meta) * 100), 100);
+                    const superoMeta = v.vendido >= v.meta;
+
+                    const card = document.createElement('button');
+                    card.type = 'button';
+                    card.className = 'w-full text-left p-4 rounded-2xl bg-gray-50 hover:bg-blue-50/50 border border-gray-200/80 hover:border-brand-navy/30 space-y-2.5 transition-all group cursor-pointer';
+
+                    card.innerHTML = `
                         <div class="flex items-center justify-between gap-2">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full bg-brand-navy text-white font-bold text-xs flex items-center justify-center shrink-0">
-                                    ${v.avatar}
-                                </div>
+                                <img
+                                    src="${v.foto}"
+                                    alt="${v.nombre}"
+                                    class="h-10 w-10 rounded-full object-cover border border-gray-200 shrink-0"
+                                >
                                 <div>
-                                    <h3 class="text-sm font-bold text-gray-900">${v.nombre}</h3>
+                                    <h3 class="text-sm font-bold text-gray-900 group-hover:text-brand-navy transition-colors flex items-center gap-1.5">
+                                        <span>${v.nombre}</span>
+                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </h3>
                                     <p class="text-[11px] text-gray-500">${v.zona} • <strong>${v.pedidos} pedidos</strong></p>
                                 </div>
                             </div>
@@ -859,9 +1116,18 @@
                                 class="h-full rounded-full transition-all duration-500"
                             ></div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+
+                    card.addEventListener('click', () => abrirPerfilVendedor(v));
+                    listaVendedoresEl.appendChild(card);
+                });
+            }
+
+            inputBuscarVendedor.addEventListener('input', (e) => {
+                renderizarVendedores(e.target.value);
+            });
+
+            renderizarVendedores();
 
             // ==========================================
             // 5. GESTIÓN DE USUARIOS Y MODAL
@@ -870,15 +1136,13 @@
                 { nombre: "Ray Vázquez", rol: "admin", contacto: "ray.admin@impulso.mx" },
                 { nombre: "Carlos Morales", rol: "vendedor", contacto: "418 102 3344" },
                 { nombre: "Andrea López", rol: "vendedor", contacto: "418 119 8821" },
-                { nombre: "Equipo Bodega 1", rol: "almacen", contacto: "almacen@impulso.mx" },
-                { nombre: "Abarrotes La Esquina", rol: "cliente", contacto: "418 104 9910" }
+                { nombre: "Equipo Bodega 1", rol: "almacen", contacto: "almacen@impulso.mx" }
             ];
 
             const badgesRol = {
                 admin: { texto: "Administrador", clases: "bg-purple-100 text-purple-800" },
                 vendedor: { texto: "Vendedor", clases: "bg-blue-100 text-blue-800" },
-                almacen: { texto: "Almacén", clases: "bg-amber-100 text-amber-800" },
-                cliente: { texto: "Cliente", clases: "bg-emerald-100 text-emerald-800" }
+                almacen: { texto: "Almacén", clases: "bg-amber-100 text-amber-800" }
             };
 
             function renderizarUsuarios() {
@@ -886,7 +1150,7 @@
                 document.getElementById('contadorUsuarios').textContent = `${usuariosSistema.length} activos`;
 
                 lista.innerHTML = usuariosSistema.map(u => {
-                    const badge = badgesRol[u.rol] || badgesRol.cliente;
+                    const badge = badgesRol[u.rol] || badgesRol.vendedor;
                     return `
                         <div class="flex items-center justify-between p-3 rounded-xl border border-gray-100 bg-gray-50/70 hover:bg-gray-50">
                             <div class="min-w-0 pr-2">

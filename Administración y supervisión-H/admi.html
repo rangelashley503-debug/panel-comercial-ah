@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>admin</title>
+    <title>Administración - Panel Ejecutivo</title>
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,28 +13,31 @@
 
     <style>
         /* Transición del sidebar y contenido */
-        #sidebar,
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         #main-wrapper {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Sidebar colapsado */
-        #sidebar.is-collapsed {
-            width: 5rem;
-        }
-
-        #sidebar.is-collapsed .sidebar-label,
-        #sidebar.is-collapsed .brand-name {
-            display: none;
-        }
-
-        #sidebar.is-collapsed .toggle-icon {
-            transform: rotate(180deg);
-        }
-
+        /* En escritorio (>= 1024px) */
         @media (min-width: 1024px) {
             #main-wrapper {
                 margin-left: 16rem;
+            }
+
+            #sidebar.is-collapsed {
+                width: 5rem;
+            }
+
+            #sidebar.is-collapsed .sidebar-label,
+            #sidebar.is-collapsed .brand-name {
+                display: none;
+            }
+
+            #sidebar.is-collapsed .toggle-icon {
+                transform: rotate(180deg);
             }
 
             #sidebar.is-collapsed ~ #main-wrapper {
@@ -42,70 +45,59 @@
             }
         }
 
-        /* Efecto del catálogo */
-        .catalogo-card img {
-            transition: transform 0.35s ease;
+        /* En móviles (< 1024px) */
+        @media (max-width: 1023px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #main-wrapper {
+                margin-left: 0 !important;
+            }
         }
 
-        .catalogo-card:hover img {
-            transform: scale(1.08);
-        }
-
-        .catalogo-overlay {
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .catalogo-card:hover .catalogo-overlay {
-            opacity: 1;
-        }
-
-        /* Animación fluida de la tarjeta lateral */
-        #productDrawer {
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        /* Personalización de la barra de desplazamiento */
+        /* Personalización de scrollbar */
         nav::-webkit-scrollbar,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar,
         body::-webkit-scrollbar {
             width: 8px;
         }
 
-        /* Fondo del recuadro / carril del scroll (Azul) */
         nav::-webkit-scrollbar-track,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-track,
         body::-webkit-scrollbar-track {
-            background-color: #1A3A68; /* Azul base */
+            background-color: #1A3A68;
             border-radius: 9999px;
         }
 
-        /* Barra deslizante (Thumb) */
         nav::-webkit-scrollbar-thumb,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb,
         body::-webkit-scrollbar-thumb {
-            background-color: #07A6D8; /* Tono azul cyan de contraste */
+            background-color: #07A6D8;
             border-radius: 9999px;
-            border: 2px solid #1A3A68; /* Espacio para que luzca estilizado */
+            border: 2px solid #1A3A68;
         }
 
-        /* Color al pasar el cursor sobre la barra */
         nav::-webkit-scrollbar-thumb:hover,
-        #productDrawer .overflow-y-auto::-webkit-scrollbar-thumb:hover,
         body::-webkit-scrollbar-thumb:hover {
-            background-color: #F09D25; /* Tono ámbar activo */
+            background-color: #F09D25;
         }
 
-        /* Compatibilidad para navegadores modernos (Firefox) */
-        nav,
-        #productDrawer .overflow-y-auto,
-        body {
+        nav, body {
             scrollbar-width: thin;
-            scrollbar-color: #07A6D8 #1A3A68; /* color deslizador - color fondo */
+            scrollbar-color: #07A6D8 #1A3A68;
         }
     </style>
 </head>
 
-<body class="bg-surface-app text-content-body antialiased min-h-screen flex flex-col lg:flex-row">
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col lg:flex-row">
+
+    <!-- Backdrop solo para móvil -->
+    <div
+        id="sidebarBackdrop"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-300"
+    ></div>
 
     <!-- SIDEBAR -->
     <aside
@@ -115,7 +107,7 @@
     >
         <div>
             <!-- Header del Sidebar -->
-            <div class="flex items-center justify-between p-6 border-b border-white/10 h-20">
+            <div class="flex items-center justify-between p-5 border-b border-white/10 h-20">
                 <div class="flex items-center gap-3 overflow-hidden">
                     <div class="h-10 w-10 shrink-0 rounded-xl bg-brand-terracotta flex items-center justify-center font-bold text-lg shadow-md">
                         A
@@ -128,30 +120,21 @@
                 <button
                     type="button"
                     id="toggleSidebar"
-                    class="p-2 rounded-lg text-content-muted hover:text-white hover:bg-white/10 transition-colors"
+                    class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                     aria-label="Colapsar menú"
                 >
-                    <svg
-                        class="w-5 h-5 toggle-icon transition-transform duration-300"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg class="w-5 h-5 toggle-icon transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
             </div>
 
-<!-- Navegación -->
+            <!-- Navegación -->
             <nav class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-10rem)]">
                 <!-- Catálogo -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
-                    aria-label="Catálogo"
-                    aria-current="page"
-                    data-section="catalogo"
+                <a
+                    href="catalogo.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -160,14 +143,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Catálogo</span>
-                </button>
+                </a>
 
                 <!-- Inventario -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Inventario"
-                    data-section="inventario"
+                <a
+                    href="inventario.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -177,14 +158,13 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Inventario</span>
-                </button>
+                </a>
 
-                <!-- Administración -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Administración"
-                    data-section="administracion"
+                <!-- Administración (Activa) -->
+                <a
+                    href="administracion.html"
+                    class="sidebar-nav-btn active w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20"
+                    aria-current="page"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -193,14 +173,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Administración</span>
-                </button>
+                </a>
 
                 <!-- Clientes -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Clientes"
-                    data-section="clientes"
+                <a
+                    href="clientes.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -211,14 +189,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Clientes</span>
-                </button>
+                </a>
 
                 <!-- Pedidos -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Pedidos"
-                    data-section="pedidos"
+                <a
+                    href="pedidos.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -228,14 +204,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Pedidos</span>
-                </button>
+                </a>
 
                 <!-- Pagos -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Pagos"
-                    data-section="pagos"
+                <a
+                    href="pagos.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -245,14 +219,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Pagos</span>
-                </button>
+                </a>
 
                 <!-- Surtido -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Surtido"
-                    data-section="surtido"
+                <a
+                    href="surtido.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -263,14 +235,12 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Surtido</span>
-                </button>
+                </a>
 
                 <!-- Mostrador -->
-                <button
-                    type="button"
-                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-content-muted hover:bg-white/10 hover:text-white"
-                    aria-label="Mostrador"
-                    data-section="mostrador"
+                <a
+                    href="mostrador.html"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-gray-300 hover:bg-white/10 hover:text-white"
                 >
                     <span class="shrink-0">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -281,7 +251,7 @@
                         </svg>
                     </span>
                     <span class="sidebar-label whitespace-nowrap">Mostrador</span>
-                </button>
+                </a>
             </nav>
         </div>
 
@@ -293,8 +263,698 @@
                 </div>
                 <div class="sidebar-label leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
                     <p class="text-xs font-semibold text-white">Ray Vázquez</p>
-                    <p class="text-[11px] text-content-muted">Administrador</p>
+                    <p class="text-[11px] text-gray-300">Administrador</p>
                 </div>
             </div>
         </div>
     </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-wrapper" class="flex-1 w-full min-h-screen">
+        <main class="mx-auto max-w-6xl space-y-8 p-6 lg:p-10">
+
+            <!-- Barra móvil superior -->
+            <div class="flex items-center justify-between lg:hidden pb-4 border-b border-gray-100">
+                <button
+                    type="button"
+                    id="openMobileSidebar"
+                    class="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold"
+                >
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>Menú</span>
+                </button>
+                <span class="text-sm font-bold text-gray-800">Administración</span>
+            </div>
+
+            <!-- ENCABEZADO Y BOTÓN DE NUEVO USUARIO -->
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="space-y-1">
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        Panel de Administración
+                    </h1>
+                    <p class="text-sm text-gray-500">
+                        Métricas financieras, difusión de alertas, rendimiento de equipo y control de accesos.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <button
+                        type="button"
+                        id="btnAbrirModalUsuario"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-brand-navy hover:bg-brand-navy/90 shadow-md transition-all active:scale-95"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        <span>Agregar Usuario</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ============================================================== -->
+            <!-- 1. TARJETAS DE KPIs (COSTO INVENTARIO, CRECIMIENTO Y VENTAS)   -->
+            <!-- ============================================================== -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <!-- KPI 1: Costo Total del Inventario -->
+                <div class="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-2 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Costo Total Inventario</span>
+                        <span class="p-2 rounded-xl bg-blue-50 text-brand-navy">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="text-2xl font-black text-gray-900">$148,650.00</p>
+                    <p class="text-xs text-gray-500">Valor estimado de venta: <strong class="text-emerald-600">$194,200</strong></p>
+                </div>
+
+                <!-- KPI 2: Crecimiento del Inventario -->
+                <div class="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Crecimiento Inventario</span>
+                        <span class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-black text-gray-900">+18.4%</p>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700">vs mes pasado</span>
+                    </div>
+                    <p class="text-xs text-gray-500">+64 cajas/bolsas añadidas este mes</p>
+                </div>
+
+                <!-- KPI 3: Ventas del Mes -->
+                <div class="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Ventas del Mes</span>
+                        <span class="p-2 rounded-xl bg-amber-50 text-amber-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-black text-gray-900">$86,420.00</p>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700">+12.1%</span>
+                    </div>
+                    <p class="text-xs text-gray-500">114 pedidos surtidos en noviembre</p>
+                </div>
+
+                <!-- KPI 4 (Sugerencia): Margen Neto Promedio -->
+                <div class="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Margen Utilidad Prom.</span>
+                        <span class="p-2 rounded-xl bg-orange-50 text-brand-terracotta">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="text-2xl font-black text-gray-900">30.6%</p>
+                    <p class="text-xs text-gray-500">Utilidad libre estimada: <strong class="text-brand-navy">$26,440</strong></p>
+                </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- 2. CENTRO DE ALERTAS PERSONALIZABLES Y ESTADÍSTICAS MENSUALES  -->
+            <!-- ============================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- MÓDULO DE ENVÍO Y EDICIÓN DE ALERTAS (5 columnas) -->
+                <section class="lg:col-span-5 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between space-y-5">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-900">Difusión de Alertas</h2>
+                                <p class="text-xs text-gray-500">Personaliza y envía avisos al catálogo o equipo.</p>
+                            </div>
+                            <span class="p-2 rounded-xl bg-red-50 text-brand-terracotta">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </span>
+                        </div>
+
+                        <!-- Plantillas rápidas -->
+                        <div class="space-y-1.5">
+                            <span class="block text-[11px] font-bold uppercase tracking-wider text-gray-400">Plantillas rápidas (clic para cargar)</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    class="btn-plantilla-alerta px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-brand-navy border border-blue-200 hover:bg-blue-100 transition-colors"
+                                    data-tipo="nuevo"
+                                >
+                                    ✨ Llegó producto nuevo
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn-plantilla-alerta px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors"
+                                    data-tipo="escaso"
+                                >
+                                    ⚠️ Productos por terminarse
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn-plantilla-alerta px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                                    data-tipo="promo"
+                                >
+                                    🔥 Oferta de temporada
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Formulario editable de alerta -->
+                        <form id="formEnviarAlerta" class="space-y-3">
+                            <div>
+                                <label for="alertaTitulo" class="block text-xs font-bold text-gray-700 mb-1">Título de la Alerta</label>
+                                <input
+                                    type="text"
+                                    id="alertaTitulo"
+                                    value="¡Mercancía recién llegada!"
+                                    required
+                                    class="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                >
+                            </div>
+
+                            <div>
+                                <label for="alertaMensaje" class="block text-xs font-bold text-gray-700 mb-1">Mensaje personalizable</label>
+                                <textarea
+                                    id="alertaMensaje"
+                                    rows="3"
+                                    required
+                                    class="w-full px-3.5 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                >Ya tenemos disponible nuevo surtido en dulces y chocolates. ¡Haz tu pedido antes de que se agote!</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="alertaDestinatario" class="block text-xs font-bold text-gray-700 mb-1">Enviar a:</label>
+                                    <select
+                                        id="alertaDestinatario"
+                                        class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-semibold bg-white focus:outline-none focus:border-brand-navy"
+                                    >
+                                        <option value="Todos (Clientes y Equipo)">Todos los usuarios</option>
+                                        <option value="Solo Clientes">Solo Clientes</option>
+                                        <option value="Solo Vendedores">Solo Vendedores</option>
+                                        <option value="Almacén">Equipo de Almacén</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-end">
+                                    <button
+                                        type="submit"
+                                        class="w-full py-2 px-4 rounded-xl text-xs font-bold text-white bg-brand-terracotta hover:bg-brand-terracotta/90 shadow-md shadow-brand-terracotta/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 h-[38px]"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                        </svg>
+                                        <span>Enviar Alerta</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Historial reciente de alertas enviadas -->
+                    <div class="pt-3 border-t border-gray-100 space-y-2">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Últimas alertas difundidas</span>
+                        <div id="historialAlertas" class="space-y-2 max-h-32 overflow-y-auto pr-1">
+                            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-200/70 text-xs">
+                                <div class="flex justify-between font-bold text-gray-800">
+                                    <span>⚠️ Quedan pocas cajas de Carlos V</span>
+                                    <span class="text-[10px] text-gray-400 font-normal">Hoy, 10:15 AM</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-0.5">Enviado a: Todos los usuarios</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ESTADÍSTICAS DE VENTAS POR MES Y CRECIMIENTO (7 columnas) -->
+                <section class="lg:col-span-7 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Estadísticas de Ventas vs. Inventario</h2>
+                            <p class="text-xs text-gray-500">Comportamiento mensual de los últimos 6 meses (2026).</p>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-xs font-semibold">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-sm bg-brand-navy"></span> Ventas ($)
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-sm bg-brand-amber"></span> Inversión Stock ($)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica de Barras Comparativa Mensual -->
+                    <div id="graficaMensual" class="grid grid-cols-6 gap-2 sm:gap-4 items-end h-56 pt-6 pb-2 px-2 border-b border-gray-100">
+                        <!-- Se genera dinámicamente con JS -->
+                    </div>
+
+                    <!-- Resumen de Crecimiento y Baja Rotación (Sugerencia) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                        <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100">
+                            <span class="block text-[10px] font-bold uppercase text-brand-navy">Mes con Mayor Venta</span>
+                            <p class="text-sm font-extrabold text-gray-900 mt-0.5">Octubre 2026 — $92,150.00</p>
+                            <p class="text-[11px] text-gray-500">Impulsado por temporada de dulces y chocolates.</p>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/70">
+                            <span class="block text-[10px] font-bold uppercase text-amber-800">Sugerencia: Baja Rotación</span>
+                            <p class="text-sm font-extrabold text-gray-900 mt-0.5">Wafer Kalu (22 días sin movimiento)</p>
+                            <p class="text-[11px] text-gray-600">Considera lanzar una alerta de descuento.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 3. RENDIMIENTO POR VENDEDOR Y EQUIPO REGISTRADO                -->
+            <!-- ============================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- RENDIMIENTO DE VENTAS POR VENDEDOR (7 columnas) -->
+                <section class="lg:col-span-7 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Rendimiento por Vendedor</h2>
+                            <p class="text-xs text-gray-500">Avance contra meta mensual ($35,000 MXN por agente).</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-brand-navy">
+                            Noviembre 2026
+                        </span>
+                    </div>
+
+                    <div id="listaRendimientoVendedores" class="space-y-4">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </section>
+
+                <!-- USUARIOS ACTIVOS DEL SISTEMA (5 columnas) -->
+                <section class="lg:col-span-5 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Usuarios y Roles</h2>
+                            <p class="text-xs text-gray-500">Personal y clientes con acceso al panel.</p>
+                        </div>
+                        <span id="contadorUsuarios" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-700">
+                            5 activos
+                        </span>
+                    </div>
+
+                    <div id="listaUsuarios" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                        <!-- Renderizado dinámico -->
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL: AGREGAR NUEVO USUARIO                                   -->
+    <!-- ============================================================== -->
+    <div
+        id="modalUsuarioBackdrop"
+        class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4"
+    >
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 lg:p-8 shadow-2xl space-y-6 relative animate-fadeIn">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Registrar Nuevo Usuario</h3>
+                    <p class="text-xs text-gray-500">Asigna credenciales y permisos según su rol.</p>
+                </div>
+                <button
+                    type="button"
+                    id="btnCerrarModalUsuario"
+                    class="p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form id="formNuevoUsuario" class="space-y-4">
+                <div>
+                    <label for="usuarioNombre" class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo / Tienda *</label>
+                    <input
+                        type="text"
+                        id="usuarioNombre"
+                        required
+                        placeholder="Ej. Laura Hernández"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                    >
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="usuarioRol" class="block text-xs font-bold text-gray-700 mb-1">Rol en el Sistema *</label>
+                        <select
+                            id="usuarioRol"
+                            required
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:border-brand-navy"
+                        >
+                            <option value="vendedor">Vendedor</option>
+                            <option value="almacen">Almacén</option>
+                            <option value="cliente">Cliente</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="usuarioTelefono" class="block text-xs font-bold text-gray-700 mb-1">Teléfono / WhatsApp *</label>
+                        <input
+                            type="tel"
+                            id="usuarioTelefono"
+                            required
+                            placeholder="Ej. 418 123 4567"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-navy"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label for="usuarioCorreo" class="block text-xs font-bold text-gray-700 mb-1">Usuario o Correo de Acceso *</label>
+                    <input
+                        type="text"
+                        id="usuarioCorreo"
+                        required
+                        placeholder="Ej. laura.ventas@impulso.mx"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-navy"
+                    >
+                </div>
+
+                <div>
+                    <label for="usuarioPassword" class="block text-xs font-bold text-gray-700 mb-1">Contraseña Inicial *</label>
+                    <input
+                        type="password"
+                        id="usuarioPassword"
+                        required
+                        placeholder="••••••••"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-navy"
+                    >
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3">
+                    <button
+                        type="button"
+                        id="btnCancelarModalUsuario"
+                        class="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-terracotta hover:bg-brand-terracotta/90 shadow-md transition-all active:scale-95"
+                    >
+                        Crear Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICACIÓN -->
+    <div
+        id="toastNotificacion"
+        class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-emerald-600 text-white shadow-xl translate-y-24 opacity-0 transition-all duration-300 pointer-events-none"
+    >
+        <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="toastMensaje" class="text-sm font-semibold">Acción completada</span>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // 1. SIDEBAR RESPONSIVO Y MÓVIL
+            // ==========================================
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const openMobileBtn = document.getElementById('openMobileSidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            function cerrarSidebarMovil() {
+                sidebar.classList.remove('mobile-open');
+                sidebarBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            if (openMobileBtn) {
+                openMobileBtn.addEventListener('click', () => {
+                    sidebar.classList.add('mobile-open');
+                    sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                    sidebarBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+                });
+            }
+
+            if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', cerrarSidebarMovil);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) cerrarSidebarMovil();
+                    else sidebar.classList.toggle('is-collapsed');
+                });
+            }
+
+            // ==========================================
+            // 2. SISTEMA DE ALERTAS EDITABLES
+            // ==========================================
+            const plantillasAlertas = {
+                nuevo: {
+                    titulo: "✨ ¡Llegó producto nuevo al catálogo!",
+                    mensaje: "Acabamos de surtir mercancía nueva en bodega. Revisa el catálogo actualizado y asegura tu pedido."
+                },
+                escaso: {
+                    titulo: "⚠️ Productos por terminarse",
+                    mensaje: "Quedan pocas cajas disponibles de nuestros productos estrella. Aparta tu surtido antes de que se agote."
+                },
+                promo: {
+                    titulo: "🔥 Precio especial por volumen",
+                    mensaje: "Durante esta semana obtén precio preferencial llevando 5 cajas o más en líneas seleccionadas."
+                }
+            };
+
+            const alertaTitulo = document.getElementById('alertaTitulo');
+            const alertaMensaje = document.getElementById('alertaMensaje');
+            const alertaDestinatario = document.getElementById('alertaDestinatario');
+            const historialAlertas = document.getElementById('historialAlertas');
+
+            document.querySelectorAll('.btn-plantilla-alerta').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tipo = btn.getAttribute('data-tipo');
+                    if (plantillasAlertas[tipo]) {
+                        alertaTitulo.value = plantillasAlertas[tipo].titulo;
+                        alertaMensaje.value = plantillasAlertas[tipo].mensaje;
+                    }
+                });
+            });
+
+            document.getElementById('formEnviarAlerta').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const titulo = alertaTitulo.value.trim();
+                const dest = alertaDestinatario.value;
+                const ahora = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const item = document.createElement('div');
+                item.className = 'p-2.5 rounded-xl bg-blue-50/60 border border-blue-200 text-xs';
+                item.innerHTML = `
+                    <div class="flex justify-between font-bold text-gray-900">
+                        <span class="truncate pr-2">${titulo}</span>
+                        <span class="text-[10px] text-brand-navy shrink-0">Ahora (${ahora})</span>
+                    </div>
+                    <p class="text-[11px] text-gray-600 mt-0.5">Enviado a: <strong>${dest}</strong></p>
+                `;
+                historialAlertas.prepend(item);
+                mostrarToast(`Alerta enviada a: ${dest}`);
+            });
+
+            // ==========================================
+            // 3. GRÁFICA DE ESTADÍSTICAS MENSUALES
+            // ==========================================
+            const datosMensuales = [
+                { mes: "Jun", ventas: 58000, stock: 42000 },
+                { mes: "Jul", ventas: 64500, stock: 48000 },
+                { mes: "Ago", ventas: 61200, stock: 45000 },
+                { mes: "Sep", ventas: 75800, stock: 54000 },
+                { mes: "Oct", ventas: 92150, stock: 68000 },
+                { mes: "Nov", ventas: 86420, stock: 61500 }
+            ];
+
+            const graficaContainer = document.getElementById('graficaMensual');
+            const maxValor = 100000;
+
+            graficaContainer.innerHTML = datosMensuales.map(d => {
+                const alturaVentas = Math.round((d.ventas / maxValor) * 100);
+                const alturaStock = Math.round((d.stock / maxValor) * 100);
+
+                return `
+                    <div class="flex flex-col items-center gap-2 h-full justify-end group">
+                        <div class="flex items-end gap-1.5 w-full justify-center h-44">
+                            <!-- Barra Ventas -->
+                            <div
+                                style="height: ${alturaVentas}%; background-color: #1A3A68;"
+                                class="w-3.5 sm:w-5 rounded-t-md transition-all duration-300 group-hover:opacity-85 relative"
+                                title="Ventas ${d.mes}: $${d.ventas.toLocaleString()}"
+                            ></div>
+                            <!-- Barra Stock -->
+                            <div
+                                style="height: ${alturaStock}%; background-color: #F09D25;"
+                                class="w-3.5 sm:w-5 rounded-t-md transition-all duration-300 group-hover:opacity-85"
+                                title="Inversión Stock ${d.mes}: $${d.stock.toLocaleString()}"
+                            ></div>
+                        </div>
+                        <span class="text-xs font-bold text-gray-600">${d.mes}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // ==========================================
+            // 4. RENDIMIENTO POR VENDEDOR
+            // ==========================================
+            const vendedores = [
+                { nombre: "Carlos Morales", zona: "Ruta Norte / Centro", vendido: 38400, meta: 35000, pedidos: 48, avatar: "CM" },
+                { nombre: "Andrea López", zona: "Ruta Sur / Comercios", vendido: 31200, meta: 35000, pedidos: 41, avatar: "AL" },
+                { nombre: "Luis Hernández", zona: "Mostrador y Mayoreo", vendido: 16820, meta: 25000, pedidos: 25, avatar: "LH" }
+            ];
+
+            const listaVendedores = document.getElementById('listaRendimientoVendedores');
+            listaVendedores.innerHTML = vendedores.map(v => {
+                const porcentaje = Math.min(Math.round((v.vendido / v.meta) * 100), 100);
+                const superoMeta = v.vendido >= v.meta;
+
+                return `
+                    <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-full bg-brand-navy text-white font-bold text-xs flex items-center justify-center shrink-0">
+                                    ${v.avatar}
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-gray-900">${v.nombre}</h3>
+                                    <p class="text-[11px] text-gray-500">${v.zona} • <strong>${v.pedidos} pedidos</strong></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-sm font-black text-gray-900">$${v.vendido.toLocaleString()}</span>
+                                <span class="text-[10px] font-bold ${superoMeta ? 'text-emerald-600' : 'text-gray-400'}">
+                                    ${superoMeta ? '★ Meta superada' : `Meta: $${v.meta.toLocaleString()}`}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progreso -->
+                        <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                                style="width: ${porcentaje}%; background-color: ${superoMeta ? '#10B981' : '#1A3A68'};"
+                                class="h-full rounded-full transition-all duration-500"
+                            ></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // ==========================================
+            // 5. GESTIÓN DE USUARIOS Y MODAL
+            // ==========================================
+            let usuariosSistema = [
+                { nombre: "Ray Vázquez", rol: "admin", contacto: "ray.admin@impulso.mx" },
+                { nombre: "Carlos Morales", rol: "vendedor", contacto: "418 102 3344" },
+                { nombre: "Andrea López", rol: "vendedor", contacto: "418 119 8821" },
+                { nombre: "Equipo Bodega 1", rol: "almacen", contacto: "almacen@impulso.mx" },
+                { nombre: "Abarrotes La Esquina", rol: "cliente", contacto: "418 104 9910" }
+            ];
+
+            const badgesRol = {
+                admin: { texto: "Administrador", clases: "bg-purple-100 text-purple-800" },
+                vendedor: { texto: "Vendedor", clases: "bg-blue-100 text-blue-800" },
+                almacen: { texto: "Almacén", clases: "bg-amber-100 text-amber-800" },
+                cliente: { texto: "Cliente", clases: "bg-emerald-100 text-emerald-800" }
+            };
+
+            function renderizarUsuarios() {
+                const lista = document.getElementById('listaUsuarios');
+                document.getElementById('contadorUsuarios').textContent = `${usuariosSistema.length} activos`;
+
+                lista.innerHTML = usuariosSistema.map(u => {
+                    const badge = badgesRol[u.rol] || badgesRol.cliente;
+                    return `
+                        <div class="flex items-center justify-between p-3 rounded-xl border border-gray-100 bg-gray-50/70 hover:bg-gray-50">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-xs font-bold text-gray-900 truncate">${u.nombre}</p>
+                                <p class="text-[11px] text-gray-500 truncate">${u.contacto}</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase shrink-0 ${badge.clases}">
+                                ${badge.texto}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            renderizarUsuarios();
+
+            // Control de apertura/cierre del Modal de Nuevo Usuario
+            const modalBackdrop = document.getElementById('modalUsuarioBackdrop');
+            const btnAbrirModal = document.getElementById('btnAbrirModalUsuario');
+            const btnCerrarModal = document.getElementById('btnCerrarModalUsuario');
+            const btnCancelarModal = document.getElementById('btnCancelarModalUsuario');
+
+            function abrirModalUsuario() {
+                modalBackdrop.classList.remove('hidden');
+                modalBackdrop.classList.add('flex');
+            }
+
+            function cerrarModalUsuario() {
+                modalBackdrop.classList.add('hidden');
+                modalBackdrop.classList.remove('flex');
+            }
+
+            btnAbrirModal.addEventListener('click', abrirModalUsuario);
+            btnCerrarModal.addEventListener('click', cerrarModalUsuario);
+            btnCancelarModal.addEventListener('click', cerrarModalUsuario);
+            modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === modalBackdrop) cerrarModalUsuario();
+            });
+
+            document.getElementById('formNuevoUsuario').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nuevo = {
+                    nombre: document.getElementById('usuarioNombre').value.trim(),
+                    rol: document.getElementById('usuarioRol').value,
+                    contacto: document.getElementById('usuarioCorreo').value.trim()
+                };
+
+                usuariosSistema.unshift(nuevo);
+                renderizarUsuarios();
+                e.target.reset();
+                cerrarModalUsuario();
+                mostrarToast(`Usuario "${nuevo.nombre}" creado correctamente.`);
+            });
+
+            // ==========================================
+            // 6. NOTIFICACIÓN TOAST
+            // ==========================================
+            function mostrarToast(mensaje) {
+                const toast = document.getElementById('toastNotificacion');
+                document.getElementById('toastMensaje').textContent = mensaje;
+                toast.classList.remove('translate-y-24', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-24', 'opacity-0');
+                }, 3500);
+            }
+        });
+    </script>
+</body>
+</html>

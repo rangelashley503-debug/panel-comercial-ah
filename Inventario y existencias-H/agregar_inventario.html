@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario - Nuevo / Reabastecer</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tu archivo de colores centralizado -->
+    <script src="../Paletadecolores.js"></script>
+
+    <style>
+        /* Transición del sidebar y contenido */
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #main-wrapper {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* En escritorio (>= 1024px) */
+        @media (min-width: 1024px) {
+            #main-wrapper {
+                margin-left: 16rem;
+            }
+
+            #sidebar.is-collapsed {
+                width: 5rem;
+            }
+
+            #sidebar.is-collapsed .sidebar-label,
+            #sidebar.is-collapsed .brand-name {
+                display: none;
+            }
+
+            #sidebar.is-collapsed .toggle-icon {
+                transform: rotate(180deg);
+            }
+
+            #sidebar.is-collapsed ~ #main-wrapper {
+                margin-left: 5rem;
+            }
+        }
+
+        /* En móviles (< 1024px) */
+        @media (max-width: 1023px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #main-wrapper {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Animación suave para la barra de búsqueda expandible */
+        #searchContainer {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Personalización de scrollbar */
+        nav::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        nav::-webkit-scrollbar-track,
+        body::-webkit-scrollbar-track {
+            background-color: #1A3A68;
+            border-radius: 9999px;
+        }
+
+        nav::-webkit-scrollbar-thumb,
+        body::-webkit-scrollbar-thumb {
+            background-color: #07A6D8;
+            border-radius: 9999px;
+            border: 2px solid #1A3A68;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover,
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: #F09D25;
+        }
+
+        nav, body {
+            scrollbar-width: thin;
+            scrollbar-color: #07A6D8 #1A3A68;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col lg:flex-row">
+
+    <!-- Backdrop solo para móvil -->
+    <div
+        id="sidebarBackdrop"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-300"
+    ></div>
+
+    <!-- SIDEBAR DINÁMICO POR ROL -->
+    <aside
+        id="sidebar"
+        class="fixed top-0 left-0 z-40 h-screen w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
+        aria-label="Navegación principal"
+    >
+        <div>
+            <!-- Header del Sidebar -->
+            <div class="flex items-center justify-between p-5 border-b border-white/10 h-20">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div id="userBadgeIcon" class="h-10 w-10 shrink-0 rounded-xl bg-brand-terracotta flex items-center justify-center font-bold text-lg shadow-md">
+                        A
+                    </div>
+                    <span id="sidebarHeaderTitle" class="brand-name font-bold text-lg tracking-wide whitespace-nowrap">
+                        Administrador
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    id="toggleSidebar"
+                    class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Colapsar menú"
+                >
+                    <svg class="w-5 h-5 toggle-icon transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Navegación dinámica -->
+            <nav id="sidebarNav" class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-10rem)]"></nav>
+        </div>
+
+        <!-- Usuario -->
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div id="userAvatarText" class="h-9 w-9 shrink-0 rounded-full bg-brand-cream/20 text-brand-amber flex items-center justify-center font-bold text-xs uppercase border border-white/10">
+                    RV
+                </div>
+                <div class="sidebar-label leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
+                    <p id="userNameText" class="text-xs font-semibold text-white">Ray Vázquez</p>
+                    <p id="userRoleText" class="text-[11px] text-gray-300">Administrador</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-wrapper" class="flex-1 w-full min-h-screen">
+        <main class="mx-auto max-w-5xl space-y-8 p-6 lg:p-10">
+
+            <!-- Barra móvil superior -->
+            <div class="flex items-center justify-between lg:hidden pb-4 border-b border-gray-100">
+                <button
+                    type="button"
+                    id="openMobileSidebar"
+                    class="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold"
+                >
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>Menú</span>
+                </button>
+                <span class="text-sm font-bold text-gray-800">Gestión de Inventario</span>
+            </div>
+
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-3">
+                            <a
+                                href="inventario.html"
+                                class="p-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-brand-navy hover:bg-gray-50 transition-colors shadow-sm"
+                                title="Volver al inventario"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                            </a>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                                Entrada de Mercancía
+                            </h1>
+                        </div>
+                        <p class="text-sm text-gray-500 pl-12">
+                            Registra un producto nuevo en el catálogo o suma cajas y bolsas al stock existente.
+                        </p>
+                    </div>
+
+                    <!-- Buscador Dinámico Expandible -->
+                    <div class="flex items-center justify-end">
+                        <div
+                            id="searchContainer"
+                            style="background-color: #1A3A68;"
+                            class="relative flex items-center h-11 w-11 rounded-full shadow-sm overflow-hidden transition-all duration-300"
+                        >
+                            <button
+                                type="button"
+                                id="btnToggleSearch"
+                                class="h-11 w-11 shrink-0 flex items-center justify-center text-white focus:outline-none transition-colors"
+                                aria-label="Abrir buscador"
+                            >
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                                </svg>
+                            </button>
+                            <input
+                                type="text"
+                                id="inputBusqueda"
+                                placeholder="Buscar producto existente..."
+                                class="w-full pr-4 py-2 text-sm text-white placeholder-white/60 bg-transparent focus:outline-none opacity-0 transition-opacity duration-200"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOS DOS BOTONES PRINCIPALES DE MODO -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Botón 1: Nuevo Producto -->
+                    <button
+                        type="button"
+                        id="btnTabNuevo"
+                        class="flex items-center gap-4 p-4 rounded-2xl border-2 border-brand-terracotta bg-white shadow-md transition-all text-left"
+                    >
+                        <div class="h-12 w-12 rounded-xl bg-brand-terracotta text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="block text-base font-bold text-gray-900">Nuevo Producto</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">Crear ficha técnica, imagen, precios y stock inicial</span>
+                        </div>
+                    </button>
+
+                    <!-- Botón 2: Agregar a Inventario (Sumar stock) -->
+                    <button
+                        type="button"
+                        id="btnTabSumar"
+                        class="flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-200 bg-white/70 hover:bg-white hover:border-gray-300 transition-all text-left"
+                    >
+                        <div id="iconTabSumar" class="h-12 w-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="block text-base font-bold text-gray-900">Agregar Inventario</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">Sumar cajas o bolsas a un producto registrado</span>
+                        </div>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ============================================================== -->
+            <!-- VISTA 1: FORMULARIO DE NUEVO PRODUCTO                          -->
+            <!-- ============================================================== -->
+            <section id="seccionNuevoProducto" class="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 lg:p-8 space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Registro de Nuevo Producto</h2>
+                        <p class="text-xs text-gray-500">Completa todos los campos para añadirlo al catálogo e inventario.</p>
+                    </div>
+                    <!-- ID Generado Automáticamente -->
+                    <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-blue-50 border border-blue-200">
+                        <span class="text-[11px] font-bold uppercase text-blue-700">ID Automático:</span>
+                        <input
+                            type="text"
+                            id="nuevoIdProducto"
+                            readonly
+                            class="w-24 bg-transparent font-mono text-sm font-black text-brand-navy focus:outline-none text-right"
+                        >
+                    </div>
+                </div>
+
+                <form id="formNuevoProducto" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- Columna Izquierda: Carga y Vista Previa de Imagen -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500">Imagen del Producto</label>
+                            <div
+                                id="dropzoneImagen"
+                                class="relative aspect-square w-full rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100/70 transition-colors flex flex-col items-center justify-center p-4 text-center cursor-pointer overflow-hidden group"
+                            >
+                                <img id="previewImagen" src="" alt="Vista previa" class="hidden absolute inset-0 w-full h-full object-contain p-3 bg-white">
+                                
+                                <div id="placeholderImagen" class="space-y-2">
+                                    <div class="mx-auto w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-brand-terracotta transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs font-semibold text-gray-600">Toca para subir imagen</p>
+                                    <p class="text-[10px] text-gray-400">PNG, JPG o WEBP</p>
+                                </div>
+
+                                <input
+                                    type="file"
+                                    id="inputImagenProducto"
+                                    accept="image/*"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Columnas Central y Derecha: Datos Generales -->
+                        <div class="md:col-span-2 space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Nombre -->
+                                <div>
+                                    <label for="nuevoNombre" class="block text-xs font-bold text-gray-700 mb-1">Nombre del Producto *</label>
+                                    <input
+                                        type="text"
+                                        id="nuevoNombre"
+                                        required
+                                        placeholder="Ej. Paleta Payaso"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                </div>
+
+                                <!-- Categoría -->
+                                <div>
+                                    <label for="nuevaCategoria" class="block text-xs font-bold text-gray-700 mb-1">Categoría *</label>
+                                    <select
+                                        id="nuevaCategoria"
+                                        required
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                        <option value="Dulces">Dulces</option>
+                                        <option value="Chocolates">Chocolates</option>
+                                        <option value="Bebidas">Bebidas</option>
+                                        <option value="Galletas">Galletas</option>
+                                        <option value="Snacks">Snacks y Botanas</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <!-- Tipo de Empaque -->
+                                <div>
+                                    <label for="nuevoTipoEmpaque" class="block text-xs font-bold text-gray-700 mb-1">Tipo de Empaque *</label>
+                                    <select
+                                        id="nuevoTipoEmpaque"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                        <option value="Cajas">Caja</option>
+                                        <option value="Bolsas">Bolsa</option>
+                                        <option value="Displays">Display</option>
+                                        <option value="Paquetes">Paquete</option>
+                                    </select>
+                                </div>
+
+                                <!-- Piezas por presentación -->
+                                <div>
+                                    <label for="nuevasPiezas" class="block text-xs font-bold text-gray-700 mb-1">Piezas por Empaque *</label>
+                                    <input
+                                        type="number"
+                                        id="nuevasPiezas"
+                                        min="1"
+                                        required
+                                        placeholder="Ej. 24"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                </div>
+
+                                <!-- Descripción corta de presentación -->
+                                <div>
+                                    <label for="nuevaPresentacionTexto" class="block text-xs font-bold text-gray-700 mb-1">Descripción Empaque *</label>
+                                    <input
+                                        type="text"
+                                        id="nuevaPresentacionTexto"
+                                        required
+                                        placeholder="Ej. Caja con 24 pzas"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Bloque de Precios y Cálculo Automático -->
+                            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-3">
+                                <span class="block text-[11px] font-bold uppercase tracking-wider text-gray-400">Precios y Utilidad Estimada</span>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div>
+                                        <label for="nuevoPrecioPresentacion" class="block text-[11px] font-bold text-gray-600 mb-1">Costo Presentación ($)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            id="nuevoPrecioPresentacion"
+                                            required
+                                            placeholder="0.00"
+                                            class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold focus:outline-none focus:border-brand-navy"
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <label for="nuevoPrecioVentaPza" class="block text-[11px] font-bold text-amber-800 mb-1">Venta Sugerida Pza ($)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            id="nuevoPrecioVentaPza"
+                                            required
+                                            placeholder="0.00"
+                                            class="w-full px-3 py-2 rounded-xl border border-amber-200 bg-amber-50/40 text-sm font-semibold focus:outline-none focus:border-amber-500"
+                                        >
+                                    </div>
+
+                                    <div class="p-2 rounded-xl bg-blue-50/70 border border-blue-200/60 flex flex-col justify-center text-center">
+                                        <span class="text-[10px] font-bold uppercase text-blue-700">Costo Unitario</span>
+                                        <span id="calcCostoUnitario" class="text-sm font-extrabold text-blue-900">$0.00</span>
+                                    </div>
+
+                                    <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col justify-center text-center">
+                                        <span class="text-[10px] font-bold uppercase text-emerald-700">Utilidad</span>
+                                        <span id="calcUtilidadPct" class="text-sm font-black text-emerald-700">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Existencia Inicial y Stock Mínimo -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="nuevaExistenciaInicial" class="block text-xs font-bold text-gray-700 mb-1">Existencia Inicial (Cajas/Bolsas) *</label>
+                                    <input
+                                        type="number"
+                                        id="nuevaExistenciaInicial"
+                                        min="1"
+                                        required
+                                        placeholder="Ej. 10"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="nuevoStockMinimo" class="block text-xs font-bold text-gray-700 mb-1">Alerta Stock Mínimo *</label>
+                                    <input
+                                        type="number"
+                                        id="nuevoStockMinimo"
+                                        min="1"
+                                        required
+                                        placeholder="Ej. 5"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Componentes y Sabores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                        <div>
+                            <label for="nuevosComponentes" class="block text-xs font-bold text-gray-700 mb-1">Componentes / Ingredientes (separados por coma)</label>
+                            <input
+                                type="text"
+                                id="nuevosComponentes"
+                                placeholder="Ej. Azúcar, Jarabe de glucosa, Ácido cítrico"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="nuevosSabores" class="block text-xs font-bold text-gray-700 mb-1">Sabores Disponibles (separados por coma)</label>
+                            <input
+                                type="text"
+                                id="nuevosSabores"
+                                placeholder="Ej. Fresa, Mango, Cereza, Mora Azul"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Botón Guardar -->
+                    <div class="flex items-center justify-end gap-3 pt-4">
+                        <button
+                            type="reset"
+                            id="btnLimpiarNuevo"
+                            class="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                        >
+                            Limpiar
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-terracotta hover:bg-brand-terracotta/90 shadow-md shadow-brand-terracotta/20 transition-all active:scale-95"
+                        >
+                            Guardar Producto en Catálogo
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- VISTA 2: SUMAR STOCK A UN PRODUCTO EXISTENTE                   -->
+            <!-- ============================================================== -->
+            <section id="seccionSumarStock" class="hidden bg-white rounded-3xl border border-gray-200 shadow-sm p-6 lg:p-8 space-y-6">
+                <div class="border-b border-gray-100 pb-4">
+                    <h2 class="text-lg font-bold text-gray-900">Agregar Existencias al Inventario</h2>
+                    <p class="text-xs text-gray-500">Selecciona un producto de la lista o búscalo arriba para sumar cajas o bolsas.</p>
+                </div>
+
+                <!-- Lista rápida de selección de productos -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-400">1. Selecciona el producto</label>
+                    <div id="listaProductosExistentes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Formulario de suma de cantidades -->
+                <form id="formSumarStock" class="hidden p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-5">
+                    <div class="flex items-center gap-4">
+                        <img id="sumarImg" src="" alt="" class="w-16 h-16 rounded-xl bg-white border border-gray-200 object-contain p-1.5">
+                        <div>
+                            <span id="sumarIdBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800"></span>
+                            <h3 id="sumarNombre" class="text-lg font-bold text-gray-900 mt-0.5"></h3>
+                            <p class="text-xs text-gray-500">Stock actual en bodega: <strong id="sumarStockActual" class="text-brand-navy"></strong></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label for="cantidadASumar" class="block text-xs font-bold text-gray-700 mb-1">
+                                Cantidad a agregar (<span id="sumarTipoEmpaqueLabel">Cajas</span>) *
+                            </label>
+                            <div class="flex items-center">
+                                <button type="button" id="btnMenosCantidad" class="h-11 w-11 rounded-l-xl bg-white border border-gray-200 font-bold text-lg text-gray-600 hover:bg-gray-100">-</button>
+                                <input
+                                    type="number"
+                                    id="cantidadASumar"
+                                    min="1"
+                                    value="1"
+                                    required
+                                    class="h-11 w-full text-center border-y border-gray-200 bg-white font-bold text-base text-gray-900 focus:outline-none"
+                                >
+                                <button type="button" id="btnMasCantidad" class="h-11 w-11 rounded-r-xl bg-white border border-gray-200 font-bold text-lg text-gray-600 hover:bg-gray-100">+</button>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
+                            <span class="block text-[10px] font-bold uppercase text-emerald-700">Nuevo Stock Total</span>
+                            <span id="sumarNuevoTotal" class="text-xl font-black text-emerald-800">0</span>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="h-11 px-6 rounded-xl text-sm font-semibold text-white bg-brand-navy hover:bg-brand-navy/90 shadow-md transition-all active:scale-95"
+                        >
+                            Confirmar Entrada
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- NOTIFICACIÓN FLOTANTE DE ÉXITO (TOAST) -->
+            <div
+                id="toastNotificacion"
+                class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-emerald-600 text-white shadow-xl translate-y-24 opacity-0 transition-all duration-300 pointer-events-none"
+            >
+                <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span id="toastMensaje" class="text-sm font-semibold">Operación realizada con éxito</span>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // 1. CONFIGURACIÓN DE ROLES Y SIDEBAR
+            // ==========================================
+            const params = new URLSearchParams(window.location.search);
+            const rolActual = params.get('rol') || localStorage.getItem('userRole') || 'admin';
+            localStorage.setItem('userRole', rolActual);
+
+            const iconos = {
+                catalogo: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 11V7a4 4 0 0 0-8 0v4"/><path d="M5 9h14l1 12H4L5 9Z"/></svg>`,
+                inventario: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14h6M9 18h6"/></svg>`,
+                administracion: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93z"/><circle cx="12" cy="12" r="2"/></svg>`,
+                clientes: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+                pedidos: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+                pagos: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="7" cy="15" r="1"/></svg>`,
+                surtido: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+                mostrador: `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v4H3z"/><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7"/><path d="M10 11h4"/><path d="M9 15h6"/></svg>`
+            };
+
+            const configuracionRoles = {
+                cliente: {
+                    tituloHeader: "Cliente", badgeHeader: "C", avatar: "CL", nombreUsuario: "Nombre Cliente", cargo: "Tienda Local",
+                    menu: [
+                        { nombre: "Catálogo", href: "catalogo.html?rol=cliente", activo: false, icon: "catalogo" },
+                        { nombre: "Pedidos", href: "pedidos.html?rol=cliente", activo: false, icon: "pedidos" }
+                    ]
+                },
+                vendedor: {
+                    tituloHeader: "Ventas", badgeHeader: "V", avatar: "VN", nombreUsuario: "Carlos Morales", cargo: "Agente de Ventas",
+                    menu: [
+                        { nombre: "Catálogo", href: "catalogo.html?rol=vendedor", activo: false, icon: "catalogo" },
+                        { nombre: "Clientes", href: "clientes.html?rol=vendedor", activo: false, icon: "clientes" },
+                        { nombre: "Pedidos", href: "pedidos.html?rol=vendedor", activo: false, icon: "pedidos" },
+                        { nombre: "Mostrador", href: "mostrador.html?rol=vendedor", activo: false, icon: "mostrador" }
+                    ]
+                },
+                almacen: {
+                    tituloHeader: "Almacén", badgeHeader: "AL", avatar: "AL", nombreUsuario: "Equipo Almacén", cargo: "Logística y Stock",
+                    menu: [
+                        { nombre: "Catálogo", href: "catalogo.html?rol=almacen", activo: false, icon: "catalogo" },
+                        { nombre: "Inventario", href: "inventario.html?rol=almacen", activo: true, icon: "inventario" },
+                        { nombre: "Surtido", href: "surtido.html?rol=almacen", activo: false, icon: "surtido" }
+                    ]
+                },
+                admin: {
+                    tituloHeader: "Administrador", badgeHeader: "A", avatar: "RV", nombreUsuario: "Ray Vázquez", cargo: "Administrador",
+                    menu: [
+                        { nombre: "Catálogo", href: "catalogo.html?rol=admin", activo: false, icon: "catalogo" },
+                        { nombre: "Inventario", href: "inventario.html?rol=admin", activo: true, icon: "inventario" },
+                        { nombre: "Administración", href: "administracion.html?rol=admin", activo: false, icon: "administracion" },
+                        { nombre: "Clientes", href: "clientes.html?rol=admin", activo: false, icon: "clientes" },
+                        { nombre: "Pedidos", href: "pedidos.html?rol=admin", activo: false, icon: "pedidos" },
+                        { nombre: "Pagos", href: "pagos.html?rol=admin", activo: false, icon: "pagos" },
+                        { nombre: "Surtido", href: "surtido.html?rol=admin", activo: false, icon: "surtido" },
+                        { nombre: "Mostrador", href: "mostrador.html?rol=admin", activo: false, icon: "mostrador" }
+                    ]
+                }
+            };
+
+            const rolData = configuracionRoles[rolActual] || configuracionRoles.admin;
+            document.getElementById('sidebarHeaderTitle').textContent = rolData.tituloHeader;
+            document.getElementById('userBadgeIcon').textContent = rolData.badgeHeader;
+            document.getElementById('userAvatarText').textContent = rolData.avatar;
+            document.getElementById('userNameText').textContent = rolData.nombreUsuario;
+            document.getElementById('userRoleText').textContent = rolData.cargo;
+
+            const sidebarNav = document.getElementById('sidebarNav');
+            sidebarNav.innerHTML = rolData.menu.map(opcion => `
+                <a
+                    href="${opcion.href}"
+                    class="sidebar-nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                        opcion.activo
+                            ? 'bg-brand-terracotta text-white shadow-md shadow-brand-terracotta/20'
+                            : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }"
+                    ${opcion.activo ? 'aria-current="page"' : ''}
+                >
+                    <span class="shrink-0">${iconos[opcion.icon] || ''}</span>
+                    <span class="sidebar-label whitespace-nowrap">${opcion.nombre}</span>
+                </a>
+            `).join('');
+
+            // Sidebar colapsable y móvil
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const openMobileBtn = document.getElementById('openMobileSidebar');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            function cerrarSidebarMovil() {
+                sidebar.classList.remove('mobile-open');
+                sidebarBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            if (openMobileBtn) {
+                openMobileBtn.addEventListener('click', () => {
+                    sidebar.classList.add('mobile-open');
+                    sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+                    sidebarBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+                });
+            }
+            if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', cerrarSidebarMovil);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) cerrarSidebarMovil();
+                    else sidebar.classList.toggle('is-collapsed');
+                });
+            }
+
+            // ==========================================
+            // 2. BASE DE DATOS SIMULADA E ID AUTOMÁTICO
+            // ==========================================
+            let inventarioDB = [
+                { id: "PROD-001", nombre: "Canels Celofan", categoria: "Dulces", tipoEmpaque: "Cajas", existencia: 3, imagen: "../Imagenes/Catalogo/2.png" },
+                { id: "PROD-002", nombre: "Paleta ChupaChups", categoria: "Dulces", tipoEmpaque: "Bolsas", existencia: 18, imagen: "../Imagenes/Catalogo/3.png" },
+                { id: "PROD-003", nombre: "Gomitas Frutas", categoria: "Dulces", tipoEmpaque: "Displays", existencia: 1, imagen: "../Imagenes/Catalogo/4.png" },
+                { id: "PROD-004", nombre: "Chocolate Carlos V", categoria: "Chocolates", tipoEmpaque: "Cajas", existencia: 2, imagen: "../Imagenes/Catalogo/5.png" },
+                { id: "PROD-005", nombre: "Caramelo JollyRancher", categoria: "Dulces", tipoEmpaque: "Bolsas", existencia: 12, imagen: "../Imagenes/Catalogo/6.png" },
+                { id: "PROD-006", nombre: "Paleta PintaColores", categoria: "Dulces", tipoEmpaque: "Bolsas", existencia: 14, imagen: "../Imagenes/Catalogo/7.png" },
+                { id: "PROD-007", nombre: "Wafer Kalu", categoria: "Galletas", tipoEmpaque: "Cajas", existencia: 7, imagen: "../Imagenes/Catalogo/11.png" },
+                { id: "PROD-008", nombre: "Pastillas Halls", categoria: "Dulces", tipoEmpaque: "Cajas", existencia: 22, imagen: "../Imagenes/Catalogo/16.png" }
+            ];
+
+            function generarSiguienteID() {
+                const siguienteNumero = inventarioDB.length + 1;
+                const idFormateado = `PROD-${String(siguienteNumero).padStart(3, '0')}`;
+                document.getElementById('nuevoIdProducto').value = idFormateado;
+            }
+            generarSiguienteID();
+
+            // ==========================================
+            // 3. ALTERNAR ENTRE NUEVO PRODUCTO Y SUMAR STOCK
+            // ==========================================
+            const btnTabNuevo = document.getElementById('btnTabNuevo');
+            const btnTabSumar = document.getElementById('btnTabSumar');
+            const iconTabSumar = document.getElementById('iconTabSumar');
+            const seccionNuevoProducto = document.getElementById('seccionNuevoProducto');
+            const seccionSumarStock = document.getElementById('seccionSumarStock');
+
+            function activarModoNuevo() {
+                seccionNuevoProducto.classList.remove('hidden');
+                seccionSumarStock.classList.add('hidden');
+
+                btnTabNuevo.className = 'flex items-center gap-4 p-4 rounded-2xl border-2 border-brand-terracotta bg-white shadow-md transition-all text-left';
+                btnTabSumar.className = 'flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-200 bg-white/70 hover:bg-white hover:border-gray-300 transition-all text-left';
+                iconTabSumar.className = 'h-12 w-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 transition-colors';
+            }
+
+            function activarModoSumar() {
+                seccionNuevoProducto.classList.add('hidden');
+                seccionSumarStock.classList.remove('hidden');
+
+                btnTabSumar.className = 'flex items-center gap-4 p-4 rounded-2xl border-2 border-brand-navy bg-white shadow-md transition-all text-left';
+                iconTabSumar.className = 'h-12 w-12 rounded-xl bg-brand-navy text-white flex items-center justify-center shrink-0 transition-colors';
+                btnTabNuevo.className = 'flex items-center gap-4 p-4 rounded-2xl border-2 border-gray-200 bg-white/70 hover:bg-white hover:border-gray-300 transition-all text-left';
+                
+                renderizarListaExistentes();
+            }
+
+            btnTabNuevo.addEventListener('click', activarModoNuevo);
+            btnTabSumar.addEventListener('click', activarModoSumar);
+
+            // ==========================================
+            // 4. LÓGICA DE NUEVO PRODUCTO (IMAGEN Y CÁLCULOS)
+            // ==========================================
+            const inputImagen = document.getElementById('inputImagenProducto');
+            const previewImagen = document.getElementById('previewImagen');
+            const placeholderImagen = document.getElementById('placeholderImagen');
+            let imagenBase64Actual = '';
+
+            inputImagen.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagenBase64Actual = event.target.result;
+                        previewImagen.src = imagenBase64Actual;
+                        previewImagen.classList.remove('hidden');
+                        placeholderImagen.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Cálculo automático de costo unitario y utilidad en tiempo real
+            const inputPiezas = document.getElementById('nuevasPiezas');
+            const inputCostoPres = document.getElementById('nuevoPrecioPresentacion');
+            const inputVentaPza = document.getElementById('nuevoPrecioVentaPza');
+            const calcCostoUnitario = document.getElementById('calcCostoUnitario');
+            const calcUtilidadPct = document.getElementById('calcUtilidadPct');
+
+            function actualizarCalculosPrecios() {
+                const piezas = parseFloat(inputPiezas.value) || 0;
+                const costoPres = parseFloat(inputCostoPres.value) || 0;
+                const ventaPza = parseFloat(inputVentaPza.value) || 0;
+
+                if (piezas > 0 && costoPres > 0) {
+                    const unitario = costoPres / piezas;
+                    calcCostoUnitario.textContent = `$${unitario.toFixed(2)}`;
+
+                    if (ventaPza > 0) {
+                        const utilidad = ((ventaPza - unitario) / unitario) * 100;
+                        calcUtilidadPct.textContent = `${utilidad >= 0 ? '+' : ''}${Math.round(utilidad)}%`;
+                    } else {
+                        calcUtilidadPct.textContent = '0%';
+                    }
+                } else {
+                    calcCostoUnitario.textContent = '$0.00';
+                    calcUtilidadPct.textContent = '0%';
+                }
+            }
+
+            [inputPiezas, inputCostoPres, inputVentaPza].forEach(el => {
+                el.addEventListener('input', actualizarCalculosPrecios);
+            });
+
+            // Guardar nuevo producto
+            const formNuevoProducto = document.getElementById('formNuevoProducto');
+            formNuevoProducto.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const nuevoProd = {
+                    id: document.getElementById('nuevoIdProducto').value,
+                    nombre: document.getElementById('nuevoNombre').value,
+                    categoria: document.getElementById('nuevaCategoria').value,
+                    tipoEmpaque: document.getElementById('nuevoTipoEmpaque').value,
+                    piezasPorPresentacion: Number(inputPiezas.value),
+                    presentacion: document.getElementById('nuevaPresentacionTexto').value,
+                    precioPresentacion: Number(inputCostoPres.value),
+                    precioVentaSugeridoPza: Number(inputVentaPza.value),
+                    existencia: Number(document.getElementById('nuevaExistenciaInicial').value),
+                    stockMinimo: Number(document.getElementById('nuevoStockMinimo').value),
+                    componentes: document.getElementById('nuevosComponentes').value.split(',').map(s => s.trim()).filter(Boolean),
+                    sabores: document.getElementById('nuevosSabores').value.split(',').map(s => s.trim()).filter(Boolean),
+                    imagen: imagenBase64Actual || "../Imagenes/Catalogo/2.png"
+                };
+
+                inventarioDB.push(nuevoProd);
+                mostrarToast(`Producto "${nuevoProd.nombre}" (${nuevoProd.id}) registrado correctamente.`);
+
+                // Resetear formulario y generar el siguiente ID
+                formNuevoProducto.reset();
+                previewImagen.classList.add('hidden');
+                placeholderImagen.classList.remove('hidden');
+                imagenBase64Actual = '';
+                actualizarCalculosPrecios();
+                generarSiguienteID();
+            });
+
+            document.getElementById('btnLimpiarNuevo').addEventListener('click', () => {
+                previewImagen.classList.add('hidden');
+                placeholderImagen.classList.remove('hidden');
+                imagenBase64Actual = '';
+                setTimeout(actualizarCalculosPrecios, 50);
+            });
+
+            // ==========================================
+            // 5. LÓGICA DE SUMAR STOCK A EXISTENTES
+            // ==========================================
+            const listaProductosExistentes = document.getElementById('listaProductosExistentes');
+            const formSumarStock = document.getElementById('formSumarStock');
+            const cantidadASumar = document.getElementById('cantidadASumar');
+            let productoSeleccionado = null;
+            let filtroBusqueda = '';
+
+            function renderizarListaExistentes() {
+                listaProductosExistentes.innerHTML = '';
+
+                const filtrados = inventarioDB.filter(p =>
+                    p.nombre.toLowerCase().includes(filtroBusqueda.toLowerCase().trim()) ||
+                    p.id.toLowerCase().includes(filtroBusqueda.toLowerCase().trim())
+                );
+
+                if (filtrados.length === 0) {
+                    listaProductosExistentes.innerHTML = `<p class="col-span-full text-xs text-gray-400 py-4 text-center">No se encontraron productos.</p>`;
+                    return;
+                }
+
+                filtrados.forEach(prod => {
+                    const isSelected = productoSeleccionado && productoSeleccionado.id === prod.id;
+                    const itemBtn = document.createElement('button');
+                    itemBtn.type = 'button';
+                    itemBtn.className = `flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                        isSelected
+                            ? 'border-brand-navy bg-blue-50/60 ring-2 ring-brand-navy/20'
+                            : 'border-gray-200 bg-white hover:bg-gray-50'
+                    }`;
+
+                    itemBtn.innerHTML = `
+                        <img src="${prod.imagen}" alt="${prod.nombre}" class="w-11 h-11 rounded-lg object-contain bg-gray-50 p-1 shrink-0 border border-gray-100">
+                        <div class="min-w-0 flex-1">
+                            <span class="block text-[10px] font-mono text-gray-400 font-bold">${prod.id}</span>
+                            <span class="block text-xs font-bold text-gray-900 truncate">${prod.nombre}</span>
+                            <span class="block text-[11px] text-gray-500">Stock: <strong>${prod.existencia} ${prod.tipoEmpaque}</strong></span>
+                        </div>
+                    `;
+
+                    itemBtn.addEventListener('click', () => {
+                        productoSeleccionado = prod;
+                        renderizarListaExistentes();
+                        cargarDetalleSuma(prod);
+                    });
+
+                    listaProductosExistentes.appendChild(itemBtn);
+                });
+            }
+
+            function cargarDetalleSuma(prod) {
+                formSumarStock.classList.remove('hidden');
+                document.getElementById('sumarImg').src = prod.imagen;
+                document.getElementById('sumarIdBadge').textContent = prod.id;
+                document.getElementById('sumarNombre').textContent = prod.nombre;
+                document.getElementById('sumarStockActual').textContent = `${prod.existencia} ${prod.tipoEmpaque}`;
+                document.getElementById('sumarTipoEmpaqueLabel').textContent = prod.tipoEmpaque;
+                cantidadASumar.value = 1;
+                actualizarTotalSuma();
+            }
+
+            function actualizarTotalSuma() {
+                if (!productoSeleccionado) return;
+                const sumar = parseInt(cantidadASumar.value) || 0;
+                const total = productoSeleccionado.existencia + sumar;
+                document.getElementById('sumarNuevoTotal').textContent = `${total} ${productoSeleccionado.tipoEmpaque}`;
+            }
+
+            document.getElementById('btnMenosCantidad').addEventListener('click', () => {
+                const val = parseInt(cantidadASumar.value) || 1;
+                if (val > 1) {
+                    cantidadASumar.value = val - 1;
+                    actualizarTotalSuma();
+                }
+            });
+
+            document.getElementById('btnMasCantidad').addEventListener('click', () => {
+                const val = parseInt(cantidadASumar.value) || 0;
+                cantidadASumar.value = val + 1;
+                actualizarTotalSuma();
+            });
+
+            cantidadASumar.addEventListener('input', actualizarTotalSuma);
+
+            formSumarStock.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!productoSeleccionado) return;
+
+                const cantidad = parseInt(cantidadASumar.value) || 0;
+                productoSeleccionado.existencia += cantidad;
+
+                mostrarToast(`Se agregaron +${cantidad} ${productoSeleccionado.tipoEmpaque.toLowerCase()} a "${productoSeleccionado.nombre}".`);
+                cargarDetalleSuma(productoSeleccionado);
+                renderizarListaExistentes();
+            });
+
+            // ==========================================
+            // 6. BUSCADOR EXPANDIBLE (ACTIVA MODO SUMAR)
+            // ==========================================
+            const searchContainer = document.getElementById('searchContainer');
+            const btnToggleSearch = document.getElementById('btnToggleSearch');
+            const inputBusqueda = document.getElementById('inputBusqueda');
+
+            function abrirBuscador() {
+                searchContainer.classList.remove('w-11', 'rounded-full');
+                searchContainer.classList.add('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+                inputBusqueda.classList.remove('opacity-0');
+                inputBusqueda.classList.add('opacity-100');
+                inputBusqueda.focus();
+            }
+
+            function cerrarBuscador() {
+                if (!inputBusqueda.value.trim()) {
+                    searchContainer.classList.remove('w-72', 'md:w-80', 'rounded-xl', 'ring-2', 'ring-white/40');
+                    searchContainer.classList.add('w-11', 'rounded-full');
+                    inputBusqueda.classList.remove('opacity-100');
+                    inputBusqueda.classList.add('opacity-0');
+                }
+            }
+
+            btnToggleSearch.addEventListener('click', (e) => { e.stopPropagation(); abrirBuscador(); });
+            searchContainer.addEventListener('click', (e) => { e.stopPropagation(); abrirBuscador(); });
+            document.addEventListener('click', (e) => { if (!searchContainer.contains(e.target)) cerrarBuscador(); });
+
+            inputBusqueda.addEventListener('input', (e) => {
+                filtroBusqueda = e.target.value;
+                // Si el usuario escribe en el buscador, cambia automáticamente a la vista de productos existentes
+                if (seccionSumarStock.classList.contains('hidden')) {
+                    activarModoSumar();
+                } else {
+                    renderizarListaExistentes();
+                }
+            });
+
+            // ==========================================
+            // 7. NOTIFICACIÓN TOAST
+            // ==========================================
+            function mostrarToast(mensaje) {
+                const toast = document.getElementById('toastNotificacion');
+                document.getElementById('toastMensaje').textContent = mensaje;
+                toast.classList.remove('translate-y-24', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-24', 'opacity-0');
+                }, 3500);
+            }
+        });
+    </script>
+</body>
+</html>

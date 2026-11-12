@@ -841,6 +841,7 @@
     </div>
 
     <!-- SCRIPTS -->
+    <script src="../Settings/sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // ==========================================
@@ -1248,25 +1249,7 @@
                 }, 3500);
             }
         });
-            const rutasPaginas = {
-            catalogo: 'catalogo.html',
-            inventario: 'inventario.html',
-            administracion: 'administracion.html',
-            clientes: 'clientes.html',
-            pedidos: 'pedidos.html',
-            pagos: 'pagos.html',
-            surtido: 'surtido.html',
-            mostrador: 'mostrador.html'
-        };
-
-        document.querySelectorAll('.sidebar-nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const seccion = btn.getAttribute('data-section');
-                if (rutasPaginas[seccion]) {
-                    window.location.href = rutasPaginas[seccion];
-                }
-            });
-        });
+            
     </script>
 </body>
 </html>

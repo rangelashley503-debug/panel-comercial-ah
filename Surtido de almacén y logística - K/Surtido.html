@@ -5,225 +5,361 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surtido de Almacén y Logística</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
         }
 
-        const carpetaActual = carpetaDe(window.location.pathname);
+        /* Estilos de barra lateral */
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+        #sidebar.collapsed {
+            width: 5rem;
+        }
 
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
+        #sidebar.collapsed .sidebar-text {
+            display: none;
+        }
 
+        #sidebar.collapsed #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        #sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
 </head>
-<body class="bg-white text-black antialiased">
-    <header class="border-b border-gray-200 bg-white shadow-sm">
-    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
-        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+<body class="bg-[#f8fafc] text-slate-900 antialiased flex min-h-screen">
+    <!-- Barra lateral con el estilo de la imagen y tus rutas originales -->
+    <aside id="sidebar" class="w-64 bg-[#183561] text-white flex flex-col shrink-0 select-none shadow-xl z-20">
+        <!-- Encabezado de marca / módulo -->
+        <div class="flex items-center justify-between px-5 py-6 border-b border-white/10">
+            <a href="../index.html" class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-[#e6411c] flex items-center justify-center font-extrabold text-white text-lg shrink-0 shadow-sm">
+                    I
+                </div>
+                <span class="sidebar-text text-lg font-bold tracking-tight whitespace-nowrap">Impulso Mexa</span>
+            </a>
 
-        <!-- Menú con scroll horizontal para pantallas chicas -->
-        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
-            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
-            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
-            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
-            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
-            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
-            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
-            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
-            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
-        </ul>
-    </nav>
-</header>
-
-    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
-
-<h1 class="text-3xl font-bold">Surtido de Almacén y Logística</h1>
-
-<!-- Cola de pedidos para bodega -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-    <!-- Encabezado de la tarjeta -->
-    <div class="flex items-center justify-between p-4">
-        <h2 class="text-xl font-bold">Cola de Surtido</h2>
-        <span class="text-sm text-gray-500">3 pedidos pendientes</span>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <tr>
-                    <th class="p-4 font-semibold">Folio</th>
-                    <th class="p-4 font-semibold">Cliente</th>
-                    <th class="p-4 font-semibold">Volumen</th>
-                    <th class="p-4 font-semibold">Entrega</th>
-                    <th class="p-4 font-semibold">Estatus</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1022</td>
-                    <td class="p-4 font-medium">Abarrotes Don Chuy</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4 text-gray-500">Hoy, 4:00 pm</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1021</td>
-                    <td class="p-4 font-medium">Miscelánea La Esperanza</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4 text-gray-500">Mañana, 10:00 am</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1025</td>
-                    <td class="p-4 font-medium">Super Mayoreo del Centro</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4 text-gray-500">Mañana, 2:00 pm</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<!-- Hoja de surtido del pedido seleccionado -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-    <!-- Encabezado de la tarjeta -->
-    <div class="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-xl font-bold">Hoja de Surtido</h2>
-            <p class="mt-1 text-sm text-gray-500">
-                Pedido <span class="font-mono font-medium text-black">#PED-1022</span> · Abarrotes Don Chuy
-            </p>
+            <button id="btn-toggle-sidebar" type="button" aria-label="Contraer menú" class="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <svg id="toggle-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
         </div>
-        <span class="w-fit rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-    </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <tr>
-                    <th class="p-4 font-semibold">Producto</th>
-                    <th class="p-4 font-semibold">Cantidad</th>
-                    <th class="p-4 font-semibold">Lote</th>
-                    <th class="p-4 font-semibold">Caducidad</th>
-                    <th class="p-4 text-center font-semibold">Verificado</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Monster Energy 473 ml</td>
-                    <td class="p-4">40 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2406-A</td>
-                    <td class="p-4 text-gray-500">15/03/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Red Bull 250 ml (paquete 24 pzs)</td>
-                    <td class="p-4">25 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2407-C</td>
-                    <td class="p-4 text-gray-500">22/04/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Electrolit 600 ml</td>
-                    <td class="p-4">30 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2405-B</td>
-                    <td class="p-4 text-gray-500">10/01/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Caja Panditas 24 pzs</td>
-                    <td class="p-4">50 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2408-D</td>
-                    <td class="p-4 text-gray-500">30/06/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">Paletas Payaso (bolsa 20 pzs)</td>
-                    <td class="p-4">35 cajas</td>
-                    <td class="p-4 font-mono text-gray-500">L-2406-F</td>
-                    <td class="p-4 text-gray-500">18/05/2027</td>
-                    <td class="p-4 text-center">
-                        <input type="checkbox" class="verificado h-4 w-4 accent-orange-600">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Menú de navegación con tus 8 módulos exactos -->
+        <nav class="flex-1 px-3 py-5 overflow-y-auto">
+            <ul id="menu" class="space-y-1.5 text-sm font-medium">
+                <li>
+                    <a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Administración</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Catalogo%20de%20productos-%20H/catalogo.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Catálogo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Clientes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pedidos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Inventario%20y%20existencias-H/inventario.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Inventario</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pagos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Surtido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 6h16a1 1 0 011 1v11a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm5 8h6"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Mostrador</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-    <!-- Pie de la hoja: avance y botón de acción -->
-    <div class="flex flex-col gap-3 border-t border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm text-gray-500">
-            Productos verificados: <span id="contador" class="font-medium text-black">0 de 5</span>
-        </p>
-        <button type="button" id="btn-listo" disabled
-            class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50">
-            Marcar como Listo para ruta
-        </button>
-    </div>
-</section>
+        <!-- Perfil inferior de la barra lateral -->
+        <div class="px-4 py-4 border-t border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-white/10 text-amber-400 font-bold text-xs flex items-center justify-center shrink-0">
+                IM
+            </div>
+            <div class="sidebar-text overflow-hidden">
+                <p class="text-xs font-semibold text-white truncate">Impulso Mexa</p>
+                <p class="text-[11px] text-white/60 truncate">Portal Comercial</p>
+            </div>
+        </div>
+    </aside>
 
-<!-- Script del contador de verificación -->
-<script>
-    // Seleccionamos los elementos que vamos a usar
-    const casillas = document.querySelectorAll('.verificado');
-    const contador = document.getElementById('contador');
-    const botonListo = document.getElementById('btn-listo');
+    <!-- Contenido principal -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div class="mx-auto max-w-6xl space-y-8">
 
-    // Cuenta las casillas marcadas y actualiza la pantalla
-    function actualizarContador() {
-        let marcadas = 0;
+            <!-- Título del módulo -->
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Surtido de Almacén y Logística</h1>
+                <p class="mt-1 text-sm text-slate-500">Gestiona la cola de pedidos en bodega y verifica lotes y caducidades antes del despacho a ruta.</p>
+            </div>
 
+            <!-- Cola de pedidos para bodega -->
+            <section class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <!-- Encabezado de la tarjeta -->
+                <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Cola de Surtido</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">Órdenes programadas para preparación y embarque</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">3 pedidos pendientes</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                            <tr>
+                                <th class="p-4 font-semibold">Folio</th>
+                                <th class="p-4 font-semibold">Cliente</th>
+                                <th class="p-4 font-semibold">Volumen</th>
+                                <th class="p-4 font-semibold">Entrega</th>
+                                <th class="p-4 font-semibold">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1022</td>
+                                <td class="p-4 font-semibold text-slate-900">Abarrotes Don Chuy</td>
+                                <td class="p-4 text-slate-500">Tarima</td>
+                                <td class="p-4 text-slate-500">Hoy, 4:00 pm</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">En preparación</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1021</td>
+                                <td class="p-4 font-semibold text-slate-900">Miscelánea La Esperanza</td>
+                                <td class="p-4 text-slate-500">Caja</td>
+                                <td class="p-4 text-slate-500">Mañana, 10:00 am</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Registrado</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1025</td>
+                                <td class="p-4 font-semibold text-slate-900">Super Mayoreo del Centro</td>
+                                <td class="p-4 text-slate-500">Tarima</td>
+                                <td class="p-4 text-slate-500">Mañana, 2:00 pm</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Registrado</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Hoja de surtido del pedido seleccionado -->
+            <section class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <!-- Encabezado de la tarjeta -->
+                <div class="flex flex-col gap-2 p-6 border-b border-slate-100 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Hoja de Surtido</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            Pedido <span class="font-mono font-semibold text-slate-900">#PED-1022</span> · Abarrotes Don Chuy
+                        </p>
+                    </div>
+                    <span class="w-fit rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">En preparación</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                            <tr>
+                                <th class="p-4 font-semibold">Producto</th>
+                                <th class="p-4 font-semibold">Cantidad</th>
+                                <th class="p-4 font-semibold">Lote</th>
+                                <th class="p-4 font-semibold">Caducidad</th>
+                                <th class="p-4 text-center font-semibold">Verificado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-semibold text-slate-900">Monster Energy 473 ml</td>
+                                <td class="p-4 font-medium text-slate-700">40 cajas</td>
+                                <td class="p-4 font-mono text-slate-500">L-2406-A</td>
+                                <td class="p-4 text-slate-500">15/03/2027</td>
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" class="verificado h-4 w-4 rounded accent-[#e6411c] cursor-pointer">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-semibold text-slate-900">Red Bull 250 ml (paquete 24 pzs)</td>
+                                <td class="p-4 font-medium text-slate-700">25 cajas</td>
+                                <td class="p-4 font-mono text-slate-500">L-2407-C</td>
+                                <td class="p-4 text-slate-500">22/04/2027</td>
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" class="verificado h-4 w-4 rounded accent-[#e6411c] cursor-pointer">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-semibold text-slate-900">Electrolit 600 ml</td>
+                                <td class="p-4 font-medium text-slate-700">30 cajas</td>
+                                <td class="p-4 font-mono text-slate-500">L-2405-B</td>
+                                <td class="p-4 text-slate-500">10/01/2027</td>
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" class="verificado h-4 w-4 rounded accent-[#e6411c] cursor-pointer">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-semibold text-slate-900">Caja Panditas 24 pzs</td>
+                                <td class="p-4 font-medium text-slate-700">50 cajas</td>
+                                <td class="p-4 font-mono text-slate-500">L-2408-D</td>
+                                <td class="p-4 text-slate-500">30/06/2027</td>
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" class="verificado h-4 w-4 rounded accent-[#e6411c] cursor-pointer">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-semibold text-slate-900">Paletas Payaso (bolsa 20 pzs)</td>
+                                <td class="p-4 font-medium text-slate-700">35 cajas</td>
+                                <td class="p-4 font-mono text-slate-500">L-2406-F</td>
+                                <td class="p-4 text-slate-500">18/05/2027</td>
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" class="verificado h-4 w-4 rounded accent-[#e6411c] cursor-pointer">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pie de la hoja: avance y botón de acción -->
+                <div class="flex flex-col gap-3 border-t border-slate-100 bg-slate-50/40 p-6 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-slate-500">
+                        Productos verificados: <span id="contador" class="font-bold text-slate-900">0 de 5</span>
+                    </p>
+                    <button type="button" id="btn-listo" disabled
+                        class="rounded-xl bg-[#183561] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#112647] disabled:cursor-not-allowed disabled:opacity-50 transition-colors">
+                        Marcar como Listo para ruta
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Script del contador de verificación -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const casillas = document.querySelectorAll('.verificado');
+        const contador = document.getElementById('contador');
+        const botonListo = document.getElementById('btn-listo');
+
+        // Cuenta las casillas marcadas y actualiza la pantalla
+        function actualizarContador() {
+            let marcadas = 0;
+
+            casillas.forEach(function (casilla) {
+                if (casilla.checked) {
+                    marcadas++;
+                }
+            });
+
+            // Mostramos "X de Y"
+            contador.textContent = marcadas + ' de ' + casillas.length;
+
+            // El botón solo se habilita cuando todas están marcadas
+            botonListo.disabled = marcadas !== casillas.length;
+        }
+
+        // Cada vez que se marca o desmarca una casilla, se vuelve a contar
         casillas.forEach(function (casilla) {
-            if (casilla.checked) {
-                marcadas++;
-            }
+            casilla.addEventListener('change', actualizarContador);
         });
 
-        // Mostramos "X de Y"
-        contador.textContent = marcadas + ' de ' + casillas.length;
+        // Al hacer clic en el botón, avisamos que el pedido salió a ruta
+        botonListo.addEventListener('click', function () {
+            alert('Pedido #PED-1022 marcado como listo para ruta');
+        });
+    </script>
 
-        // El botón solo se habilita cuando todas están marcadas
-        botonListo.disabled = marcadas !== casillas.length;
-    }
+    <!-- Resalta en naranja el módulo en el que estás y controla el colapso de la barra -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const btnToggle = document.getElementById('btn-toggle-sidebar');
 
-    // Cada vez que se marca o desmarca una casilla, se vuelve a contar
-    casillas.forEach(function (casilla) {
-        casilla.addEventListener('change', actualizarContador);
-    });
+            if (btnToggle && sidebar) {
+                btnToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
 
-    // Al hacer clic en el botón, avisamos que el pedido salió a ruta
-    botonListo.addEventListener('click', function () {
-        alert('Pedido #PED-1022 marcado como listo para ruta');
-    });
-</script>
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: botón naranja sólido como en la captura
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl bg-[#e6411c] text-white font-semibold shadow-md transition-all';
+                } else {
+                    // Los demás: texto blanco translúcido con hover sutil
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

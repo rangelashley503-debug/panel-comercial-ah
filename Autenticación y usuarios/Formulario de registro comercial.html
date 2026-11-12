@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
  
     <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
         .campo-error {
             border-color: #dc2626 !important;
         }
@@ -15,286 +21,410 @@
             outline: 2px solid #fecaca;
             outline-offset: 1px;
         }
+
+        /* Estilos de barra lateral */
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar.collapsed {
+            width: 5rem;
+        }
+
+        #sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        #sidebar.collapsed #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        #sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
     </style>
 </head>
  
-<body class="bg-white text-black antialiased">
-    <header class="border-b border-gray-200 bg-white shadow-sm">
-    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
-        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+<body class="bg-[#f8fafc] text-slate-900 antialiased flex min-h-screen">
+    <!-- Barra lateral con el estilo de la imagen y tus rutas originales -->
+    <aside id="sidebar" class="w-64 bg-[#183561] text-white flex flex-col shrink-0 select-none shadow-xl z-20">
+        <!-- Encabezado de marca / módulo -->
+        <div class="flex items-center justify-between px-5 py-6 border-b border-white/10">
+            <a href="../index.html" class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-[#e6411c] flex items-center justify-center font-extrabold text-white text-lg shrink-0 shadow-sm">
+                    I
+                </div>
+                <span class="sidebar-text text-lg font-bold tracking-tight whitespace-nowrap">Impulso Mexa</span>
+            </a>
+
+            <button id="btn-toggle-sidebar" type="button" aria-label="Contraer menú" class="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <svg id="toggle-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Menú de navegación con tus 8 módulos exactos -->
+        <nav class="flex-1 px-3 py-5 overflow-y-auto">
+            <ul id="menu" class="space-y-1.5 text-sm font-medium">
+                <li>
+                    <a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Administración</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Catalogo%20de%20productos-%20H/catalogo.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Catálogo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Clientes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pedidos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Inventario%20y%20existencias-H/inventario.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Inventario</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pagos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Surtido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 6h16a1 1 0 011 1v11a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm5 8h6"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Mostrador</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Perfil inferior de la barra lateral -->
+        <div class="px-4 py-4 border-t border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-white/10 text-amber-400 font-bold text-xs flex items-center justify-center shrink-0">
+                IM
+            </div>
+            <div class="sidebar-text overflow-hidden">
+                <p class="text-xs font-semibold text-white truncate">Impulso Mexa</p>
+                <p class="text-[11px] text-white/60 truncate">Portal Comercial</p>
+            </div>
+        </div>
+    </aside>
  
-        <!-- Menú con scroll horizontal para pantallas chicas -->
-        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
-            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
-            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
-            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
-            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
-            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
-            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
-            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
-            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
-        </ul>
-    </nav>
-</header>
- 
-    <main class="mx-auto max-w-5xl p-4 py-8">
-        <section
-            class="mx-auto w-full max-w-2xl rounded-xl border
-                   border-gray-200 bg-white p-6 shadow-sm"
-        >
-            <h2 class="text-xl font-bold">Registro Comercial</h2>
- 
-            <p class="mt-1 text-sm text-gray-500">
-                Da de alta tu negocio con sus datos fiscales
-                para solicitar una cuenta de mayoreo.
-            </p>
- 
-            <p class="mt-2 text-sm text-gray-600">
-                Todos los campos son obligatorios.
-            </p>
- 
-            <!-- Los mensajes se controlan con JavaScript. -->
-            <form
-                id="form-registro"
-                class="mt-4 grid gap-4 sm:grid-cols-2"
-                novalidate
+    <!-- Contenido principal -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div class="mx-auto max-w-3xl">
+            <div class="mb-6">
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Registro Comercial</h1>
+                <p class="mt-1 text-sm text-slate-500">
+                    Da de alta tu negocio con sus datos fiscales para solicitar una cuenta de mayoreo.
+                </p>
+            </div>
+
+            <section
+                class="w-full rounded-2xl border
+                       border-slate-200/80 bg-white p-6 md:p-8 shadow-sm"
             >
-                <div class="sm:col-span-2">
-                    <label for="razon" class="block text-sm font-medium">
-                        Razón social
-                    </label>
- 
-                    <input
-                        id="razon"
-                        name="razon"
-                        type="text"
-                        required
-                        autocomplete="organization"
-                        aria-describedby="error-razon"
-                        placeholder="Nombre legal del negocio"
-                        class="mt-1 w-full rounded-lg border border-gray-200
-                               p-2.5 text-sm focus:border-orange-500
-                               focus:outline-none"
-                    >
- 
-                    <p
-                        id="error-razon"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Datos Fiscales y de Acceso</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            Todos los campos son obligatorios.
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-[#e6411c] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                    </div>
                 </div>
  
-                <div>
-                    <label for="reg-rfc" class="block text-sm font-medium">
-                        RFC
-                    </label>
+                <!-- Los mensajes se controlan con JavaScript. -->
+                <form
+                    id="form-registro"
+                    class="mt-6 grid gap-5 sm:grid-cols-2"
+                    novalidate
+                >
+                    <div class="sm:col-span-2">
+                        <label for="razon" class="block text-sm font-semibold text-slate-700">
+                            Razón social
+                        </label>
  
-                    <input
-                        id="reg-rfc"
-                        name="rfc"
-                        type="text"
-                        required
-                        minlength="12"
-                        maxlength="13"
-                        autocapitalize="characters"
-                        spellcheck="false"
-                        aria-describedby="error-reg-rfc"
-                        placeholder="12 o 13 caracteres"
-                        class="mt-1 w-full rounded-lg border border-gray-200
-                               p-2.5 text-sm uppercase focus:border-orange-500
-                               focus:outline-none"
-                    >
- 
-                    <p
-                        id="error-reg-rfc"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
-                </div>
- 
-                <div>
-                    <label
-                        for="reg-telefono"
-                        class="block text-sm font-medium"
-                    >
-                        Teléfono
-                    </label>
- 
-                    <input
-                        id="reg-telefono"
-                        name="telefono"
-                        type="tel"
-                        required
-                        inputmode="numeric"
-                        maxlength="10"
-                        autocomplete="tel-national"
-                        aria-describedby="error-reg-telefono"
-                        placeholder="10 dígitos"
-                        class="mt-1 w-full rounded-lg border border-gray-200
-                               p-2.5 text-sm focus:border-orange-500
-                               focus:outline-none"
-                    >
- 
-                    <p
-                        id="error-reg-telefono"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
-                </div>
- 
-                <div class="sm:col-span-2">
-                    <label
-                        for="reg-correo"
-                        class="block text-sm font-medium"
-                    >
-                        Correo electrónico
-                    </label>
- 
-                    <input
-                        id="reg-correo"
-                        name="correo"
-                        type="email"
-                        required
-                        autocomplete="email"
-                        aria-describedby="error-reg-correo"
-                        placeholder="correo@ejemplo.com"
-                        class="mt-1 w-full rounded-lg border border-gray-200
-                               p-2.5 text-sm focus:border-orange-500
-                               focus:outline-none"
-                    >
- 
-                    <p
-                        id="error-reg-correo"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
-                </div>
- 
-                <div>
-                    <label
-                        for="reg-password"
-                        class="block text-sm font-medium"
-                    >
-                        Contraseña
-                    </label>
- 
-                    <div class="relative mt-1">
                         <input
-                            id="reg-password"
-                            name="password"
-                            type="password"
+                            id="razon"
+                            name="razon"
+                            type="text"
                             required
-                            minlength="8"
-                            autocomplete="new-password"
-                            aria-describedby="ayuda-password error-reg-password"
-                            placeholder="Mínimo 8 caracteres"
-                            class="w-full rounded-lg border border-gray-200
-                                   p-2.5 pr-20 text-sm focus:border-orange-500
-                                   focus:outline-none"
+                            autocomplete="organization"
+                            aria-describedby="error-razon"
+                            placeholder="Nombre legal del negocio"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                   p-3 text-sm text-slate-900 placeholder:text-slate-400
+                                   focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                   focus:outline-none transition-all"
                         >
  
-                        <button
-                            type="button"
-                            data-password="reg-password"
-                            aria-controls="reg-password"
-                            aria-pressed="false"
-                            aria-label="Mostrar contraseña"
-                            class="absolute inset-y-0 right-0 px-3
-                                   text-sm font-medium text-orange-700"
-                        >
-                            Mostrar
-                        </button>
+                        <p
+                            id="error-razon"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
                     </div>
  
-                    <p id="ayuda-password" class="mt-1 text-xs text-gray-500">
-                        Usa al menos 8 caracteres e incluye un número.
-                    </p>
+                    <div>
+                        <label for="reg-rfc" class="block text-sm font-semibold text-slate-700">
+                            RFC
+                        </label>
  
-                    <p
-                        id="error-reg-password"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
-                </div>
- 
-                <div>
-                    <label
-                        for="reg-confirmar"
-                        class="block text-sm font-medium"
-                    >
-                        Confirmar contraseña
-                    </label>
- 
-                    <div class="relative mt-1">
                         <input
-                            id="reg-confirmar"
-                            type="password"
+                            id="reg-rfc"
+                            name="rfc"
+                            type="text"
                             required
-                            autocomplete="new-password"
-                            aria-describedby="error-reg-confirmar"
-                            placeholder="Repite la contraseña"
-                            class="w-full rounded-lg border border-gray-200
-                                   p-2.5 pr-20 text-sm focus:border-orange-500
-                                   focus:outline-none"
+                            minlength="12"
+                            maxlength="13"
+                            autocapitalize="characters"
+                            spellcheck="false"
+                            aria-describedby="error-reg-rfc"
+                            placeholder="12 o 13 caracteres"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                   p-3 text-sm uppercase text-slate-900 placeholder:text-slate-400
+                                   focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                   focus:outline-none transition-all"
                         >
  
-                        <button
-                            type="button"
-                            data-password="reg-confirmar"
-                            aria-controls="reg-confirmar"
-                            aria-pressed="false"
-                            aria-label="Mostrar confirmación de contraseña"
-                            class="absolute inset-y-0 right-0 px-3
-                                   text-sm font-medium text-orange-700"
+                        <p
+                            id="error-reg-rfc"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
+                    </div>
+ 
+                    <div>
+                        <label
+                            for="reg-telefono"
+                            class="block text-sm font-semibold text-slate-700"
                         >
-                            Mostrar
-                        </button>
+                            Teléfono
+                        </label>
+ 
+                        <input
+                            id="reg-telefono"
+                            name="telefono"
+                            type="tel"
+                            required
+                            inputmode="numeric"
+                            maxlength="10"
+                            autocomplete="tel-national"
+                            aria-describedby="error-reg-telefono"
+                            placeholder="10 dígitos"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                   p-3 text-sm text-slate-900 placeholder:text-slate-400
+                                   focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                   focus:outline-none transition-all"
+                        >
+ 
+                        <p
+                            id="error-reg-telefono"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
+                    </div>
+ 
+                    <div class="sm:col-span-2">
+                        <label
+                            for="reg-correo"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Correo electrónico
+                        </label>
+ 
+                        <input
+                            id="reg-correo"
+                            name="correo"
+                            type="email"
+                            required
+                            autocomplete="email"
+                            aria-describedby="error-reg-correo"
+                            placeholder="correo@ejemplo.com"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                   p-3 text-sm text-slate-900 placeholder:text-slate-400
+                                   focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                   focus:outline-none transition-all"
+                        >
+ 
+                        <p
+                            id="error-reg-correo"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
+                    </div>
+ 
+                    <div>
+                        <label
+                            for="reg-password"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Contraseña
+                        </label>
+ 
+                        <div class="relative mt-1.5">
+                            <input
+                                id="reg-password"
+                                name="password"
+                                type="password"
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                                aria-describedby="ayuda-password error-reg-password"
+                                placeholder="Mínimo 8 caracteres"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                       p-3 pr-20 text-sm text-slate-900 placeholder:text-slate-400
+                                       focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                       focus:outline-none transition-all"
+                            >
+ 
+                            <button
+                                type="button"
+                                data-password="reg-password"
+                                aria-controls="reg-password"
+                                aria-pressed="false"
+                                aria-label="Mostrar contraseña"
+                                class="absolute inset-y-0 right-0 px-3.5
+                                       text-xs font-bold text-[#183561] hover:text-[#e6411c] transition-colors"
+                            >
+                                Mostrar
+                            </button>
+                        </div>
+ 
+                        <p id="ayuda-password" class="mt-1.5 text-xs text-slate-500">
+                            Usa al menos 8 caracteres e incluye un número.
+                        </p>
+ 
+                        <p
+                            id="error-reg-password"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
+                    </div>
+ 
+                    <div>
+                        <label
+                            for="reg-confirmar"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Confirmar contraseña
+                        </label>
+ 
+                        <div class="relative mt-1.5">
+                            <input
+                                id="reg-confirmar"
+                                type="password"
+                                required
+                                autocomplete="new-password"
+                                aria-describedby="error-reg-confirmar"
+                                placeholder="Repite la contraseña"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50/50
+                                       p-3 pr-20 text-sm text-slate-900 placeholder:text-slate-400
+                                       focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10
+                                       focus:outline-none transition-all"
+                            >
+ 
+                            <button
+                                type="button"
+                                data-password="reg-confirmar"
+                                aria-controls="reg-confirmar"
+                                aria-pressed="false"
+                                aria-label="Mostrar confirmación de contraseña"
+                                class="absolute inset-y-0 right-0 px-3.5
+                                       text-xs font-bold text-[#183561] hover:text-[#e6411c] transition-colors"
+                            >
+                                Mostrar
+                            </button>
+                        </div>
+ 
+                        <p
+                            id="error-reg-confirmar"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
+                    </div>
+ 
+                    <div class="sm:col-span-2 pt-1">
+                        <label
+                            for="reg-terminos"
+                            class="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer"
+                        >
+                            <input
+                                id="reg-terminos"
+                                name="terminos"
+                                type="checkbox"
+                                required
+                                aria-describedby="error-reg-terminos"
+                                class="h-4 w-4 rounded accent-[#e6411c]"
+                            >
+                            Acepto los términos y condiciones de venta mayorista
+                        </label>
+ 
+                        <p
+                            id="error-reg-terminos"
+                            class="mt-1 text-sm text-red-600"
+                        ></p>
                     </div>
  
                     <p
-                        id="error-reg-confirmar"
-                        class="mt-1 text-sm text-red-600"
+                        id="mensaje-registro"
+                        role="status"
+                        aria-live="polite"
+                        aria-atomic="true"
+                        class="hidden rounded-xl border p-3.5 text-sm sm:col-span-2"
                     ></p>
-                </div>
  
-                <div class="sm:col-span-2">
-                    <label
-                        for="reg-terminos"
-                        class="flex items-center gap-2 text-sm text-gray-600"
-                    >
-                        <input
-                            id="reg-terminos"
-                            name="terminos"
-                            type="checkbox"
-                            required
-                            aria-describedby="error-reg-terminos"
-                            class="h-4 w-4 accent-orange-600"
+                    <div class="text-right sm:col-span-2 pt-2 border-t border-slate-100">
+                        <button
+                            type="submit"
+                            class="w-full rounded-xl bg-[#183561] px-6 py-3
+                                   text-sm font-semibold text-white shadow-sm
+                                   hover:bg-[#112647] disabled:cursor-not-allowed
+                                   disabled:opacity-50 sm:w-auto transition-colors"
                         >
-                        Acepto los términos y condiciones de venta mayorista
-                    </label>
- 
-                    <p
-                        id="error-reg-terminos"
-                        class="mt-1 text-sm text-red-600"
-                    ></p>
-                </div>
- 
-                <p
-                    id="mensaje-registro"
-                    role="status"
-                    aria-live="polite"
-                    aria-atomic="true"
-                    class="hidden rounded-lg border p-3 text-sm sm:col-span-2"
-                ></p>
- 
-                <div class="text-right sm:col-span-2">
-                    <button
-                        type="submit"
-                        class="w-full rounded-lg bg-orange-600 px-6 py-2.5
-                               text-sm font-medium text-white
-                               hover:bg-orange-700 disabled:cursor-not-allowed
-                               disabled:opacity-50 sm:w-auto"
-                    >
-                        Registrar Negocio
-                    </button>
-                </div>
-            </form>
-        </section>
+                            Registrar Negocio
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
     </main>
  
     <!-- Script del formulario de registro (conectado a la API) -->
@@ -322,7 +452,7 @@
             mensajeRegistro.textContent = texto;
  
             mensajeRegistro.className =
-                'rounded-lg border p-3 text-sm sm:col-span-2 ' +
+                'rounded-xl border p-3.5 text-sm sm:col-span-2 ' +
                 (esError
                     ? 'border-red-300 bg-red-50 text-red-700'
                     : 'border-blue-300 bg-blue-50 text-blue-800');
@@ -565,9 +695,18 @@
         });
     </script>
  
-    <!-- Resalta en naranja el módulo en el que estás -->
+    <!-- Resalta en naranja el módulo en el que estás y controla el colapso de la barra -->
     <script>
         (function () {
+            const sidebar = document.getElementById('sidebar');
+            const btnToggle = document.getElementById('btn-toggle-sidebar');
+
+            if (btnToggle && sidebar) {
+                btnToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
             const enlacesMenu = document.querySelectorAll('#menu a');
  
             // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
@@ -581,11 +720,11 @@
                 const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
  
                 if (carpetaEnlace === carpetaActual) {
-                    // Módulo actual: naranja y subrayado
-                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                    // Módulo actual: botón naranja sólido como en la captura
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl bg-[#e6411c] text-white font-semibold shadow-md transition-all';
                 } else {
-                    // Los demás: grises, naranja al pasar el cursor
-                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                    // Los demás: texto blanco translúcido con hover sutil
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all';
                 }
             });
         })();

@@ -5,321 +5,493 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedidos y Cotizaciones</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <script>
-    (function () {
-        const enlacesMenu = document.querySelectorAll('#menu a');
-
-        // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
-        function carpetaDe(ruta) {
-            return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
         }
 
-        const carpetaActual = carpetaDe(window.location.pathname);
+        /* Estilos de barra lateral */
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        enlacesMenu.forEach(function (enlace) {
-            const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+        #sidebar.collapsed {
+            width: 5rem;
+        }
 
-            if (carpetaEnlace === carpetaActual) {
-                // Módulo actual: naranja y subrayado
-                enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
-            } else {
-                // Los demás: grises, naranja al pasar el cursor
-                enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
-            }
-        });
-    })();
-</script>
+        #sidebar.collapsed .sidebar-text {
+            display: none;
+        }
 
+        #sidebar.collapsed #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        #sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
 </head>
-<body class="bg-white text-black antialiased">
-    <header class="border-b border-gray-200 bg-white shadow-sm">
-    <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
-        <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+<body class="bg-[#f8fafc] text-slate-900 antialiased flex min-h-screen">
+    <!-- Barra lateral con el estilo de la imagen y tus rutas originales -->
+    <aside id="sidebar" class="w-64 bg-[#183561] text-white flex flex-col shrink-0 select-none shadow-xl z-20">
+        <!-- Encabezado de marca / módulo -->
+        <div class="flex items-center justify-between px-5 py-6 border-b border-white/10">
+            <a href="../index.html" class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-[#e6411c] flex items-center justify-center font-extrabold text-white text-lg shrink-0 shadow-sm">
+                    I
+                </div>
+                <span class="sidebar-text text-lg font-bold tracking-tight whitespace-nowrap">Impulso Mexa</span>
+            </a>
 
-        <!-- Menú con scroll horizontal para pantallas chicas -->
-        <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
-            <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
-            <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
-            <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
-            <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
-            <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
-            <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
-            <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
-            <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
-        </ul>
-    </nav>
-</header>
-
-    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
-
-<!-- Título del módulo -->
-<h1 class="text-3xl font-bold">Gestión de Pedidos y Cotizaciones</h1>
-
-<!-- Tarjetas resumen: 1 columna en móvil, 2 en tablet, 4 en pantalla grande -->
-<section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">Nuevos</p>
-        <p id="resumen-nuevos" class="mt-1 text-3xl font-bold">2</p>
-    </article>
-    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">En Preparación</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
-    </article>
-    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">En Ruta</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
-    </article>
-    <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p class="text-sm font-medium text-gray-500">Entregados</p>
-        <p class="mt-1 text-3xl font-bold">1</p>
-    </article>
-</section>
-
-<!-- Tabla de pedidos -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-    <!-- Encabezado de la tarjeta -->
-    <div class="flex items-center justify-between p-4">
-        <h2 class="text-xl font-bold">Pedidos Recientes</h2>
-        <span id="total-registros" class="text-sm text-gray-500">5 registros</span>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <tr>
-                    <th class="p-4 font-semibold">Folio</th>
-                    <th class="p-4 font-semibold">Cliente</th>
-                    <th class="p-4 font-semibold">Volumen</th>
-                    <th class="p-4 font-semibold">Total</th>
-                    <th class="p-4 font-semibold">Estatus</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-pedidos" class="divide-y divide-gray-100">
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1021</td>
-                    <td class="p-4 font-medium">Miscelánea La Esperanza</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$3,450.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1022</td>
-                    <td class="p-4 font-medium">Abarrotes Don Chuy</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4">$48,900.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">En preparación</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1023</td>
-                    <td class="p-4 font-medium">Tienda El Güero</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$6,200.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Listo / En ruta</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1024</td>
-                    <td class="p-4 font-medium">Miscelánea Los Pinos</td>
-                    <td class="p-4 text-gray-500">Caja</td>
-                    <td class="p-4">$2,780.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Entregado</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-mono font-medium">#PED-1025</td>
-                    <td class="p-4 font-medium">Super Mayoreo del Centro</td>
-                    <td class="p-4 text-gray-500">Tarima</td>
-                    <td class="p-4">$72,350.00</td>
-                    <td class="p-4">
-                        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<!-- Formulario para registrar o cotizar pedido -->
-<section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-    <h2 class="text-xl font-bold">Registrar / Cotizar Pedido</h2>
-    <p class="mt-1 text-sm text-gray-500">Captura los datos del cliente y los productos solicitados.</p>
-
-    <form id="form-pedido" class="mt-4 grid gap-4 sm:grid-cols-2">
-        <!-- Cliente -->
-        <div class="sm:col-span-2">
-            <label for="cliente" class="block text-sm font-medium">Cliente</label>
-            <input id="cliente" type="text" placeholder="Nombre de la miscelánea o tienda"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
-
-        <!-- Producto (el data-precio es el precio por pieza) -->
-        <div>
-            <label for="producto" class="block text-sm font-medium">Producto</label>
-            <select id="producto"
-                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <optgroup label="Energizantes e isotónicas">
-                    <option data-precio="38">Monster Energy 473 ml</option>
-                    <option data-precio="35">Red Bull 250 ml</option>
-                    <option data-precio="22">Electrolit 600 ml</option>
-                </optgroup>
-                <optgroup label="Confitería">
-                    <option data-precio="4">Panditas (bolsa)</option>
-                    <option data-precio="5">Paletas Payaso</option>
-                    <option data-precio="12">Chocolate en barra</option>
-                </optgroup>
-            </select>
-        </div>
-
-        <!-- Escala de venta (el value es cuántas piezas trae cada escala) -->
-        <div>
-            <label for="escala" class="block text-sm font-medium">Escala de venta</label>
-            <select id="escala"
-                class="mt-1 w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-                <option value="1">Pieza</option>
-                <option value="24">Caja (24 pzs)</option>
-                <option value="960">Tarima / Mayoreo (40 cajas)</option>
-            </select>
-        </div>
-
-        <!-- Cantidad -->
-        <div>
-            <label for="cantidad" class="block text-sm font-medium">Cantidad</label>
-            <input id="cantidad" type="number" min="1" placeholder="0"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
-
-        <!-- Fecha de entrega -->
-        <div>
-            <label for="fecha" class="block text-sm font-medium">Fecha de entrega</label>
-            <input id="fecha" type="date"
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none">
-        </div>
-
-        <!-- Observaciones -->
-        <div class="sm:col-span-2">
-            <label for="notas" class="block text-sm font-medium">Observaciones</label>
-            <textarea id="notas" rows="3" placeholder="Indicaciones de entrega, sabores, etc."
-                class="mt-1 w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none"></textarea>
-        </div>
-
-        <!-- Resultado de la cotización (oculto hasta que se genera) -->
-        <div id="cotizacion" class="hidden rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm sm:col-span-2">
-            <p class="font-semibold">Cotización</p>
-            <p id="cotizacion-detalle" class="mt-1 text-gray-500"></p>
-            <p class="mt-2 text-lg font-bold">Total: <span id="cotizacion-total">$0.00</span></p>
-        </div>
-
-        <!-- Botones de acción -->
-        <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-end">
-            <button type="button" id="btn-cotizar"
-                class="rounded-lg border border-gray-200 px-6 py-2.5 text-sm font-medium hover:bg-gray-50">
-                Generar Cotización
-            </button>
-            <button type="submit"
-                class="rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
-                Registrar Pedido
+            <button id="btn-toggle-sidebar" type="button" aria-label="Contraer menú" class="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <svg id="toggle-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
             </button>
         </div>
-    </form>
-</section>
 
-<!-- Script del módulo de pedidos -->
-<script>
-    // Seleccionamos los elementos que vamos a usar
-    const formulario = document.getElementById('form-pedido');
-    const inputCliente = document.getElementById('cliente');
-    const selectProducto = document.getElementById('producto');
-    const selectEscala = document.getElementById('escala');
-    const inputCantidad = document.getElementById('cantidad');
-    const cajaCotizacion = document.getElementById('cotizacion');
-    const tablaPedidos = document.getElementById('tabla-pedidos');
-    const resumenNuevos = document.getElementById('resumen-nuevos');
-    const totalRegistros = document.getElementById('total-registros');
+        <!-- Menú de navegación con tus 8 módulos exactos -->
+        <nav class="flex-1 px-3 py-5 overflow-y-auto">
+            <ul id="menu" class="space-y-1.5 text-sm font-medium">
+                <li>
+                    <a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Administración</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Catalogo%20de%20productos-%20H/catalogo.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Catálogo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Clientes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pedidos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Inventario%20y%20existencias-H/inventario.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Inventario</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pagos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Surtido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 6h16a1 1 0 011 1v11a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm5 8h6"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Mostrador</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-    // Contadores para el folio, los pedidos nuevos y los registros
-    let siguienteFolio = 1026;
-    let nuevos = 2;
-    let registros = 5;
+        <!-- Perfil inferior de la barra lateral -->
+        <div class="px-4 py-4 border-t border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-white/10 text-amber-400 font-bold text-xs flex items-center justify-center shrink-0">
+                IM
+            </div>
+            <div class="sidebar-text overflow-hidden">
+                <p class="text-xs font-semibold text-white truncate">Impulso Mexa</p>
+                <p class="text-[11px] text-white/60 truncate">Portal Comercial</p>
+            </div>
+        </div>
+    </aside>
 
-    // Convierte un número a pesos mexicanos (ej. $3,450.00)
-    function aPesos(numero) {
-        return numero.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
-    }
+    <!-- Contenido principal -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div class="mx-auto max-w-6xl space-y-8">
 
-    // Calcula el total: precio por pieza x piezas por escala x cantidad
-    function calcularTotal() {
-        const precioPieza = Number(selectProducto.selectedOptions[0].dataset.precio);
-        const piezasPorEscala = Number(selectEscala.value);
-        const cantidad = Number(inputCantidad.value);
+            <!-- Título del módulo -->
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Gestión de Pedidos y Cotizaciones</h1>
+                <p class="mt-1 text-sm text-slate-500">Monitorea el estatus de los pedidos activos y genera nuevas cotizaciones o solicitudes mayoristas.</p>
+            </div>
 
-        return precioPieza * piezasPorEscala * cantidad;
-    }
+            <!-- Tarjetas resumen: 1 columna en móvil, 2 en tablet, 4 en pantalla grande -->
+            <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Nuevos</p>
+                        <p id="resumen-nuevos" class="mt-2 text-3xl font-extrabold text-slate-900">2</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#183561] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </div>
+                </article>
+                <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">En Preparación</p>
+                        <p class="mt-2 text-3xl font-extrabold text-slate-900">1</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                </article>
+                <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">En Ruta</p>
+                        <p class="mt-2 text-3xl font-extrabold text-slate-900">1</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-[#e6411c] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1"/>
+                        </svg>
+                    </div>
+                </article>
+                <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Entregados</p>
+                        <p class="mt-2 text-3xl font-extrabold text-slate-900">1</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                </article>
+            </section>
 
-    // Revisa que el formulario tenga datos válidos
-    function datosValidos() {
-        if (inputCliente.value.trim() === '' || Number(inputCantidad.value) <= 0) {
-            alert('Escribe el nombre del cliente y una cantidad mayor a 0.');
-            return false;
+            <!-- Tabla de pedidos -->
+            <section class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <!-- Encabezado de la tarjeta -->
+                <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Pedidos Recientes</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">Listado actualizado de órdenes comerciales y mayoristas</p>
+                    </div>
+                    <span id="total-registros" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">5 registros</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                            <tr>
+                                <th class="p-4 font-semibold">Folio</th>
+                                <th class="p-4 font-semibold">Cliente</th>
+                                <th class="p-4 font-semibold">Volumen</th>
+                                <th class="p-4 font-semibold">Total</th>
+                                <th class="p-4 font-semibold">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-pedidos" class="divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1021</td>
+                                <td class="p-4 font-semibold text-slate-900">Miscelánea La Esperanza</td>
+                                <td class="p-4 text-slate-500">Caja</td>
+                                <td class="p-4 font-medium text-slate-800">$3,450.00</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Registrado</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1022</td>
+                                <td class="p-4 font-semibold text-slate-900">Abarrotes Don Chuy</td>
+                                <td class="p-4 text-slate-500">Tarima</td>
+                                <td class="p-4 font-medium text-slate-800">$48,900.00</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">En preparación</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1023</td>
+                                <td class="p-4 font-semibold text-slate-900">Tienda El Güero</td>
+                                <td class="p-4 text-slate-500">Caja</td>
+                                <td class="p-4 font-medium text-slate-800">$6,200.00</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-semibold text-[#183561]">Listo / En ruta</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1024</td>
+                                <td class="p-4 font-semibold text-slate-900">Miscelánea Los Pinos</td>
+                                <td class="p-4 text-slate-500">Caja</td>
+                                <td class="p-4 font-medium text-slate-800">$2,780.00</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700">Entregado</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-mono font-semibold text-slate-700">#PED-1025</td>
+                                <td class="p-4 font-semibold text-slate-900">Super Mayoreo del Centro</td>
+                                <td class="p-4 text-slate-500">Tarima</td>
+                                <td class="p-4 font-medium text-slate-800">$72,350.00</td>
+                                <td class="p-4">
+                                    <span class="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Registrado</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Formulario para registrar o cotizar pedido -->
+            <section class="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Registrar / Cotizar Pedido</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">Captura los datos del cliente y los productos solicitados.</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-[#e6411c] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <form id="form-pedido" class="mt-6 grid gap-5 sm:grid-cols-2">
+                    <!-- Cliente -->
+                    <div class="sm:col-span-2">
+                        <label for="cliente" class="block text-sm font-semibold text-slate-700">Cliente</label>
+                        <input id="cliente" type="text" placeholder="Nombre de la miscelánea o tienda"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                    </div>
+
+                    <!-- Producto (el data-precio es el precio por pieza) -->
+                    <div>
+                        <label for="producto" class="block text-sm font-semibold text-slate-700">Producto</label>
+                        <select id="producto"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                            <optgroup label="Energizantes e isotónicas">
+                                <option data-precio="38">Monster Energy 473 ml</option>
+                                <option data-precio="35">Red Bull 250 ml</option>
+                                <option data-precio="22">Electrolit 600 ml</option>
+                            </optgroup>
+                            <optgroup label="Confitería">
+                                <option data-precio="4">Panditas (bolsa)</option>
+                                <option data-precio="5">Paletas Payaso</option>
+                                <option data-precio="12">Chocolate en barra</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Escala de venta (el value es cuántas piezas trae cada escala) -->
+                    <div>
+                        <label for="escala" class="block text-sm font-semibold text-slate-700">Escala de venta</label>
+                        <select id="escala"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                            <option value="1">Pieza</option>
+                            <option value="24">Caja (24 pzs)</option>
+                            <option value="960">Tarima / Mayoreo (40 cajas)</option>
+                        </select>
+                    </div>
+
+                    <!-- Cantidad -->
+                    <div>
+                        <label for="cantidad" class="block text-sm font-semibold text-slate-700">Cantidad</label>
+                        <input id="cantidad" type="number" min="1" placeholder="0"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                    </div>
+
+                    <!-- Fecha de entrega -->
+                    <div>
+                        <label for="fecha" class="block text-sm font-semibold text-slate-700">Fecha de entrega</label>
+                        <input id="fecha" type="date"
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="sm:col-span-2">
+                        <label for="notas" class="block text-sm font-semibold text-slate-700">Observaciones</label>
+                        <textarea id="notas" rows="3" placeholder="Indicaciones de entrega, sabores, etc."
+                            class="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all"></textarea>
+                    </div>
+
+                    <!-- Resultado de la cotización (oculto hasta que se genera) -->
+                    <div id="cotizacion" class="hidden rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-sm sm:col-span-2">
+                        <p class="font-bold text-[#183561]">Cotización</p>
+                        <p id="cotizacion-detalle" class="mt-1 text-slate-600"></p>
+                        <p class="mt-2 text-lg font-extrabold text-slate-900">Total: <span id="cotizacion-total" class="text-[#e6411c]">$0.00</span></p>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:justify-end pt-2 border-t border-slate-100">
+                        <button type="button" id="btn-cotizar"
+                            class="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                            Generar Cotización
+                        </button>
+                        <button type="submit"
+                            class="rounded-xl bg-[#183561] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#112647] transition-colors">
+                            Registrar Pedido
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Script del módulo de pedidos -->
+    <script>
+        // Seleccionamos los elementos que vamos a usar
+        const formulario = document.getElementById('form-pedido');
+        const inputCliente = document.getElementById('cliente');
+        const selectProducto = document.getElementById('producto');
+        const selectEscala = document.getElementById('escala');
+        const inputCantidad = document.getElementById('cantidad');
+        const cajaCotizacion = document.getElementById('cotizacion');
+        const tablaPedidos = document.getElementById('tabla-pedidos');
+        const resumenNuevos = document.getElementById('resumen-nuevos');
+        const totalRegistros = document.getElementById('total-registros');
+
+        // Contadores para el folio, los pedidos nuevos y los registros
+        let siguienteFolio = 1026;
+        let nuevos = 2;
+        let registros = 5;
+
+        // Convierte un número a pesos mexicanos (ej. $3,450.00)
+        function aPesos(numero) {
+            return numero.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
         }
-        return true;
-    }
 
-    // Botón "Generar Cotización": muestra el resumen sin guardar el pedido
-    document.getElementById('btn-cotizar').addEventListener('click', function () {
-        if (!datosValidos()) {
-            return;
+        // Calcula el total: precio por pieza x piezas por escala x cantidad
+        function calcularTotal() {
+            const precioPieza = Number(selectProducto.selectedOptions[0].dataset.precio);
+            const piezasPorEscala = Number(selectEscala.value);
+            const cantidad = Number(inputCantidad.value);
+
+            return precioPieza * piezasPorEscala * cantidad;
         }
 
-        const escalaTexto = selectEscala.selectedOptions[0].text;
-
-        document.getElementById('cotizacion-detalle').textContent =
-            inputCantidad.value + ' x ' + escalaTexto + ' de ' + selectProducto.value +
-            ' para ' + inputCliente.value.trim();
-        document.getElementById('cotizacion-total').textContent = aPesos(calcularTotal());
-
-        cajaCotizacion.classList.remove('hidden');
-    });
-
-    // Botón "Registrar Pedido": agrega una fila nueva a la tabla
-    formulario.addEventListener('submit', function (evento) {
-        // Evitamos que la página se recargue
-        evento.preventDefault();
-
-        if (!datosValidos()) {
-            return;
+        // Revisa que el formulario tenga datos válidos
+        function datosValidos() {
+            if (inputCliente.value.trim() === '' || Number(inputCantidad.value) <= 0) {
+                alert('Escribe el nombre del cliente y una cantidad mayor a 0.');
+                return false;
+            }
+            return true;
         }
 
-        // Nombre corto de la escala: Pieza, Caja o Tarima
-        const volumen = selectEscala.selectedOptions[0].text.split(' ')[0];
+        // Botón "Generar Cotización": muestra el resumen sin guardar el pedido
+        document.getElementById('btn-cotizar').addEventListener('click', function () {
+            if (!datosValidos()) {
+                return;
+            }
 
-        const fila = document.createElement('tr');
-        fila.className = 'hover:bg-gray-50';
-        fila.innerHTML =
-            '<td class="p-4 font-mono font-medium">#PED-' + siguienteFolio + '</td>' +
-            '<td class="p-4 font-medium">' + inputCliente.value.trim() + '</td>' +
-            '<td class="p-4 text-gray-500">' + volumen + '</td>' +
-            '<td class="p-4">' + aPesos(calcularTotal()) + '</td>' +
-            '<td class="p-4"><span class="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold">Registrado</span></td>';
+            const escalaTexto = selectEscala.selectedOptions[0].text;
 
-        // Insertamos la fila al principio de la tabla
-        tablaPedidos.prepend(fila);
+            document.getElementById('cotizacion-detalle').textContent =
+                inputCantidad.value + ' x ' + escalaTexto + ' de ' + selectProducto.value +
+                ' para ' + inputCliente.value.trim();
+            document.getElementById('cotizacion-total').textContent = aPesos(calcularTotal());
 
-        // Actualizamos los contadores
-        siguienteFolio++;
-        nuevos++;
-        registros++;
-        resumenNuevos.textContent = nuevos;
-        totalRegistros.textContent = registros + ' registros';
+            cajaCotizacion.classList.remove('hidden');
+        });
 
-        // Limpiamos el formulario y ocultamos la cotización
-        formulario.reset();
-        cajaCotizacion.classList.add('hidden');
-    });
-</script>
+        // Botón "Registrar Pedido": agrega una fila nueva a la tabla
+        formulario.addEventListener('submit', function (evento) {
+            // Evitamos que la página se recargue
+            evento.preventDefault();
+
+            if (!datosValidos()) {
+                return;
+            }
+
+            // Nombre corto de la escala: Pieza, Caja o Tarima
+            const volumen = selectEscala.selectedOptions[0].text.split(' ')[0];
+
+            const fila = document.createElement('tr');
+            fila.className = 'hover:bg-slate-50/80 transition-colors';
+            fila.innerHTML =
+                '<td class="p-4 font-mono font-semibold text-slate-700">#PED-' + siguienteFolio + '</td>' +
+                '<td class="p-4 font-semibold text-slate-900">' + inputCliente.value.trim() + '</td>' +
+                '<td class="p-4 text-slate-500">' + volumen + '</td>' +
+                '<td class="p-4 font-medium text-slate-800">' + aPesos(calcularTotal()) + '</td>' +
+                '<td class="p-4"><span class="rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">Registrado</span></td>';
+
+            // Insertamos la fila al principio de la tabla
+            tablaPedidos.prepend(fila);
+
+            // Actualizamos los contadores
+            siguienteFolio++;
+            nuevos++;
+            registros++;
+            resumenNuevos.textContent = nuevos;
+            totalRegistros.textContent = registros + ' registros';
+
+            // Limpiamos el formulario y ocultamos la cotización
+            formulario.reset();
+            cajaCotizacion.classList.add('hidden');
+        });
+    </script>
+
+    <!-- Resalta en naranja el módulo en el que estás y controla el colapso de la barra -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const btnToggle = document.getElementById('btn-toggle-sidebar');
+
+            if (btnToggle && sidebar) {
+                btnToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
+            const enlacesMenu = document.querySelectorAll('#menu a');
+
+            // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
+            function carpetaDe(ruta) {
+                return decodeURIComponent(ruta).split('/').slice(0, -1).join('/');
+            }
+
+            const carpetaActual = carpetaDe(window.location.pathname);
+
+            enlacesMenu.forEach(function (enlace) {
+                const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
+
+                if (carpetaEnlace === carpetaActual) {
+                    // Módulo actual: botón naranja sólido como en la captura
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl bg-[#e6411c] text-white font-semibold shadow-md transition-all';
+                } else {
+                    // Los demás: texto blanco translúcido con hover sutil
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

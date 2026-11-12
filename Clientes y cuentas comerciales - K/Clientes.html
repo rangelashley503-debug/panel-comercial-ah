@@ -5,70 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clientes y cuentas comerciales</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-white text-black antialiased">
-    <header class="border-b border-gray-200 bg-white shadow-sm">
-        <nav class="mx-auto flex max-w-5xl items-center gap-6 p-4">
-            <a href="../index.html" class="shrink-0 text-xl font-bold tracking-tight">Impulso Mexa</a>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-            <!-- Menú con scroll horizontal para pantallas chicas -->
-            <ul id="menu" class="flex gap-5 overflow-x-auto whitespace-nowrap text-sm font-medium">
-                <li><a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html">Administración</a></li>
-                <li><a href="../Catalogo%20de%20productos-%20H/catalogo.html">Catálogo</a></li>
-                <li><a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html">Clientes</a></li>
-                <li><a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html">Pedidos</a></li>
-                <li><a href="../Inventario%20y%20existencias-H/inventario.html">Inventario</a></li>
-                <li><a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html">Pagos</a></li>
-                <li><a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html">Surtido</a></li>
-                <li><a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html">Mostrador</a></li>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Estilos de barra lateral */
+        #sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar.collapsed {
+            width: 5rem;
+        }
+
+        #sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        #sidebar.collapsed #toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        #sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-900 antialiased flex min-h-screen">
+    <!-- Barra lateral -->
+    <aside id="sidebar" class="w-64 bg-[#183561] text-white flex flex-col shrink-0 select-none shadow-xl z-20">
+        <!-- Encabezado de marca / módulo -->
+        <div class="flex items-center justify-between px-5 py-6 border-b border-white/10">
+            <a href="../index.html" class="flex items-center gap-3 overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-[#e6411c] flex items-center justify-center font-extrabold text-white text-lg shrink-0 shadow-sm">
+                    I
+                </div>
+                <span class="sidebar-text text-lg font-bold tracking-tight whitespace-nowrap">Impulso Mexa</span>
+            </a>
+
+            <button id="btn-toggle-sidebar" type="button" aria-label="Contraer menú" class="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <svg id="toggle-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Menú de navegación con tus 8 módulos exactos -->
+        <nav class="flex-1 px-3 py-5 overflow-y-auto">
+            <ul id="menu" class="space-y-1.5 text-sm font-medium">
+                <li>
+                    <a href="../Administraci%C3%B3n%20y%20supervisi%C3%B3n-H/admi.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Administración</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Catalogo%20de%20productos-%20H/catalogo.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Catálogo</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Clientes%20y%20cuentas%20comerciales%20-%20K/Clientes.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Clientes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Gesti%C3%B3n%20de%20pedidos%20y%20cotizaciones%20-%20K/Gesti%C3%B3n.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pedidos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Inventario%20y%20existencias-H/inventario.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Inventario</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Pagos%2C%20reportes%20y%20panel%20-%20K/Pagos.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Pagos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Surtido%20de%20almac%C3%A9n%20y%20log%C3%ADstica%20-%20K/Surtido.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Surtido</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../Ventas%20de%20mostrador-H/ventas_mostrador.html" class="nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 6h16a1 1 0 011 1v11a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm5 8h6"/>
+                        </svg>
+                        <span class="sidebar-text whitespace-nowrap">Mostrador</span>
+                    </a>
+                </li>
             </ul>
         </nav>
-    </header>
 
-    <main class="mx-auto max-w-5xl space-y-8 p-4 py-8">
-
-<!-- Título del módulo -->
-<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <h1 class="text-3xl font-bold">Clientes y Cuentas Comerciales</h1>
-    <a href="registrar%20nueva%20cuenta%20comercial.html"
-        class="w-fit rounded-lg bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700">
-        Registrar Nueva Cuenta
-    </a>
-</div>
-
-<!-- Directorio de clientes mayoristas -->
-<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-    <!-- Encabezado de la tarjeta con buscador -->
-    <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-xl font-bold">Directorio de Clientes</h2>
-            <p id="total-clientes" class="text-sm text-gray-500">4 clientes registrados</p>
+        <!-- Perfil inferior de la barra lateral -->
+        <div class="px-4 py-4 border-t border-white/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-white/10 text-amber-400 font-bold text-xs flex items-center justify-center shrink-0">
+                IM
+            </div>
+            <div class="sidebar-text overflow-hidden">
+                <p class="text-xs font-semibold text-white truncate">Impulso Mexa</p>
+                <p class="text-[11px] text-white/60 truncate">Portal Comercial</p>
+            </div>
         </div>
-        <input id="buscador" type="text" placeholder="Buscar por nombre o RFC"
-            class="w-full rounded-lg border border-gray-200 p-2.5 text-sm focus:border-orange-500 focus:outline-none sm:w-64">
-    </div>
+    </aside>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <tr>
-                    <th class="p-4 font-semibold">Cliente</th>
-                    <th class="p-4 font-semibold">RFC</th>
-                    <th class="p-4 font-semibold">Contacto</th>
-                    <th class="p-4 font-semibold">Teléfono</th>
-                    <th class="p-4 font-semibold">Estatus</th>
-                    <th class="p-4 font-semibold">Acción</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-clientes" class="divide-y divide-gray-100">
-            </tbody>
-        </table>
-    </div>
+    <!-- Contenido principal -->
+    <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div class="mx-auto max-w-6xl space-y-8">
 
-    <!-- Mensaje cuando la búsqueda no encuentra resultados -->
-    <p id="sin-resultados" class="hidden p-4 text-center text-sm text-gray-500">No se encontraron clientes.</p>
-</section>
+            <!-- Título del módulo -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">Clientes y Cuentas Comerciales</h1>
+                    <p class="mt-1 text-sm text-slate-500">Consulta y administra las cuentas comerciales y datos fiscales de tus clientes mayoristas.</p>
+                </div>
+                <a href="registrar%20nueva%20cuenta%20comercial.html"
+                    class="inline-flex items-center justify-center gap-2 w-fit rounded-xl bg-[#183561] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#112647] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Registrar Nueva Cuenta
+                </a>
+            </div>
 
+            <!-- Directorio de clientes mayoristas -->
+            <section class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <!-- Encabezado de la tarjeta con buscador -->
+                <div class="flex flex-col gap-4 p-6 border-b border-slate-100 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Directorio de Clientes</h2>
+                        <p id="total-clientes" class="mt-0.5 text-xs text-slate-500">4 clientes registrados</p>
+                    </div>
+                    <div class="relative w-full sm:w-72">
+                        <input id="buscador" type="text" placeholder="Buscar por nombre o RFC"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 px-3.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#183561] focus:ring-2 focus:ring-[#183561]/10 focus:outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                            <tr>
+                                <th class="p-4 font-semibold">Cliente</th>
+                                <th class="p-4 font-semibold">RFC</th>
+                                <th class="p-4 font-semibold">Contacto</th>
+                                <th class="p-4 font-semibold">Teléfono</th>
+                                <th class="p-4 font-semibold">Estatus</th>
+                                <th class="p-4 font-semibold">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-clientes" class="divide-y divide-slate-100">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mensaje cuando la búsqueda no encuentra resultados -->
+                <p id="sin-resultados" class="hidden p-6 text-center text-sm text-slate-500">No se encontraron clientes.</p>
+            </section>
+
+        </div>
     </main>
 
     <!-- Script del directorio de clientes (conectado a la API) -->
@@ -96,32 +220,34 @@
         // Crea la fila de un cliente
         function crearFila(cliente) {
             const fila = document.createElement('tr');
-            fila.className = 'hover:bg-gray-50';
+            fila.className = 'hover:bg-slate-50/80 transition-colors';
 
             // Celda del cliente con su dirección debajo
             const celdaCliente = document.createElement('td');
             celdaCliente.className = 'p-4';
             const nombre = document.createElement('p');
-            nombre.className = 'font-medium';
+            nombre.className = 'font-semibold text-slate-900';
             nombre.textContent = cliente.tienda;
             const direccion = document.createElement('p');
-            direccion.className = 'text-xs text-gray-500';
+            direccion.className = 'text-xs text-slate-500 mt-0.5';
             direccion.textContent = cliente.direccion || 'Sin dirección registrada';
             celdaCliente.append(nombre, direccion);
             fila.appendChild(celdaCliente);
 
-            fila.appendChild(crearCelda(cliente.rfc, 'p-4 font-mono text-gray-500'));
-            fila.appendChild(crearCelda(cliente.contacto || '—', 'p-4'));
+            fila.appendChild(crearCelda(cliente.rfc, 'p-4 font-mono text-slate-500'));
+            fila.appendChild(crearCelda(cliente.contacto || '—', 'p-4 text-slate-700'));
 
             // Teléfono con formato 418 100 2345
             const telefono = (cliente.telefono || '').replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-            fila.appendChild(crearCelda(telefono || '—', 'p-4 text-gray-500'));
+            fila.appendChild(crearCelda(telefono || '—', 'p-4 text-slate-500'));
 
             // Badge de estatus
             const celdaEstatus = document.createElement('td');
             celdaEstatus.className = 'p-4';
             const badge = document.createElement('span');
-            badge.className = 'rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold';
+            badge.className = cliente.estatus === 'Activo'
+                ? 'rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700'
+                : 'rounded-full bg-red-50 border border-red-200 px-3 py-1 text-xs font-semibold text-red-700';
             badge.textContent = cliente.estatus;
             celdaEstatus.appendChild(badge);
             fila.appendChild(celdaEstatus);
@@ -132,7 +258,7 @@
             if (esAdmin) {
                 const boton = document.createElement('button');
                 boton.type = 'button';
-                boton.className = 'btn-estatus text-sm font-medium text-orange-600 hover:text-orange-700';
+                boton.className = 'btn-estatus text-sm font-semibold text-[#e6411c] hover:text-[#c93412] transition-colors';
                 boton.dataset.id = cliente.id;
                 boton.dataset.nuevo = cliente.estatus === 'Activo' ? 'Suspendido' : 'Activo';
                 boton.textContent = cliente.estatus === 'Activo' ? 'Suspender' : 'Activar';
@@ -225,9 +351,18 @@
         iniciar();
     </script>
 
-    <!-- Resalta en naranja el módulo en el que estás -->
+    <!-- Resalta en naranja el módulo en el que estás y controla el colapso de la barra -->
     <script>
         (function () {
+            const sidebar = document.getElementById('sidebar');
+            const btnToggle = document.getElementById('btn-toggle-sidebar');
+
+            if (btnToggle && sidebar) {
+                btnToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
             const enlacesMenu = document.querySelectorAll('#menu a');
 
             // Devuelve la carpeta de una ruta (todo lo que va antes del nombre del archivo)
@@ -241,11 +376,11 @@
                 const carpetaEnlace = carpetaDe(new URL(enlace.href).pathname);
 
                 if (carpetaEnlace === carpetaActual) {
-                    // Módulo actual: naranja y subrayado
-                    enlace.className = 'border-b-2 border-orange-600 pb-1 text-orange-600';
+                    // Módulo actual: botón naranja sólido como en la captura
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl bg-[#e6411c] text-white font-semibold shadow-md transition-all';
                 } else {
-                    // Los demás: grises, naranja al pasar el cursor
-                    enlace.className = 'border-b-2 border-transparent pb-1 text-gray-500 hover:text-orange-600';
+                    // Los demás: texto blanco translúcido con hover sutil
+                    enlace.className = 'nav-link flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all';
                 }
             });
         })();

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inventario: '../Inventario y existencias-H/inventario.html',
         administracion: '../Administración y supervisión-H/admi.html',
         clientes: '../Clientes y cuentas comerciales - K/Clientes.html',
-        pedidos: '../Gestión de pedidos y cotizaciones - K/Pedidos.html',
+        pedidos: '../Gestión de pedidos y cotizaciones - K/Gestión.html',
         pagos: '../Pagos, reportes y panel - K/Pagos.html',
         surtido: '../Surtido de almacén y logística - K/Surtido.html',
         mostrador: '../Ventas de mostrador-H/ventas_mostrador.html'

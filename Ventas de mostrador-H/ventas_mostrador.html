@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas de Mostrador - Punto de Venta</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tu archivo de colores centralizado -->
+    <script src="../Paletadecolores.js"></script>
+
+    <style>
+        /* Transición suave de sidebar y contenido */
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #main-wrapper {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* En escritorio (>= 1024px) */
+        @media (min-width: 1024px) {
+            #main-wrapper {
+                margin-left: 16rem;
+            }
+
+            #sidebar.is-collapsed {
+                width: 5rem;
+            }
+
+            #sidebar.is-collapsed .sidebar-label,
+            #sidebar.is-collapsed .brand-name {
+                display: none;
+            }
+
+            #sidebar.is-collapsed .toggle-icon {
+                transform: rotate(180deg);
+            }
+
+            #sidebar.is-collapsed ~ #main-wrapper {
+                margin-left: 5rem;
+            }
+        }
+
+        /* En móviles (< 1024px) */
+        @media (max-width: 1023px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            #main-wrapper {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Personalización de scrollbar */
+        nav::-webkit-scrollbar,
+        #listaTicket::-webkit-scrollbar,
+        #gridProductosMostrador::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        nav::-webkit-scrollbar-track,
+        body::-webkit-scrollbar-track {
+            background-color: #1A3A68;
+            border-radius: 9999px;
+        }
+
+        nav::-webkit-scrollbar-thumb,
+        body::-webkit-scrollbar-thumb {
+            background-color: #07A6D8;
+            border-radius: 9999px;
+            border: 2px solid #1A3A68;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover,
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: #F09D25;
+        }
+
+        nav, body {
+            scrollbar-width: thin;
+            scrollbar-color: #07A6D8 #1A3A68;
+        }
+
+        /* Estilos exclusivos al imprimir el ticket */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #areaImpresionTicket, #areaImpresionTicket * {
+                visibility: visible;
+            }
+            #areaImpresionTicket {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col lg:flex-row">
+
+    <!-- Backdrop móvil del sidebar -->
+    <div
+        id="sidebarBackdrop"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-300"
+    ></div>
+
+    <!-- SIDEBAR ESTANDARIZADO -->
+    <aside
+        id="sidebar"
+        class="fixed top-0 left-0 z-40 h-screen w-64 bg-brand-navy text-white flex flex-col justify-between shadow-xl"
+        aria-label="Navegación principal"
+    >
+        <div>
+            <!-- Header del Sidebar -->
+            <div class="flex items-center justify-between p-5 border-b border-white/10 h-20">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div id="userBadgeIcon" class="h-10 w-10 shrink-0 rounded-xl bg-brand-terracotta flex items-center justify-center font-bold text-lg shadow-md">
+                        A
+                    </div>
+                    <span id="sidebarHeaderTitle" class="brand-name font-bold text-lg tracking-wide whitespace-nowrap">
+                        Administrador
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    id="toggleSidebar"
+                    class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Colapsar menú"
+                >
+                    <svg class="w-5 h-5 toggle-icon transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Navegación dinámica (se llena con sidebar.js) -->
+            <nav id="sidebarNav" class="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-10rem)]"></nav>
+        </div>
+
+        <!-- Usuario -->
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div id="userAvatarText" class="h-9 w-9 shrink-0 rounded-full bg-brand-cream/20 text-brand-amber flex items-center justify-center font-bold text-xs uppercase border border-white/10">
+                    RV
+                </div>
+                <div class="sidebar-label leading-tight overflow-hidden text-ellipsis whitespace-nowrap">
+                    <p id="userNameText" class="text-xs font-semibold text-white">Ray Vázquez</p>
+                    <p id="userRoleText" class="text-[11px] text-gray-300">Administrador</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="main-wrapper" class="flex-1 w-full min-h-screen">
+        <main class="mx-auto max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+
+            <!-- Barra móvil superior -->
+            <div class="flex items-center justify-between lg:hidden pb-3 border-b border-gray-200">
+                <button
+                    type="button"
+                    id="openMobileSidebar"
+                    class="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 text-sm font-semibold"
+                >
+                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>Menú</span>
+                </button>
+                <span id="mobileRoleTitle" class="text-sm font-bold text-gray-800">Mostrador</span>
+            </div>
+
+            <!-- ENCABEZADO -->
+            <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Ventas de Mostrador</h1>
+                    <p class="text-xs sm:text-sm text-gray-500">
+                        Selecciona productos de bodega para sumarlos a la nota de venta y elige el método de cobro.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="px-3 py-1.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-600 shadow-xs">
+                        Caja 01 • Turno Activo
+                    </span>
+                </div>
+            </header>
+
+            <!-- ============================================================== -->
+            <!-- DISEÑO DE 2 COLUMNAS: CATÁLOGO DE BODEGA (IZQ) + NOTA (DER)    -->
+            <!-- ============================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                <!-- COLUMNA IZQUIERDA (7 cols): BUSCADOR Y PRODUCTOS DE BODEGA -->
+                <section class="lg:col-span-7 bg-white rounded-3xl border border-gray-200 shadow-sm p-5 space-y-4">
+                    <!-- Buscador rápido estilo punto de venta -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-1">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                id="buscadorMostrador"
+                                placeholder="Buscar producto o presionar Enter para agregar..."
+                                autocomplete="off"
+                                class="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-navy/25 focus:border-brand-navy transition-all"
+                            >
+                        </div>
+
+                        <!-- Selector de modo de venta: Caja/Presentación vs Pieza -->
+                        <div class="flex rounded-2xl bg-gray-100 p-1 shrink-0 self-start sm:self-auto">
+                            <button
+                                type="button"
+                                id="btnModoCaja"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-navy text-white shadow-xs transition-all"
+                            >
+                                Por Caja / Bolsa
+                            </button>
+                            <button
+                                type="button"
+                                id="btnModoPieza"
+                                class="px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition-all"
+                            >
+                                Pieza Suelta
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros de categoría -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1" id="filtrosCategoriaMostrador">
+                        <button type="button" data-cat="todos" class="cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-navy text-white whitespace-nowrap">Todos</button>
+                        <button type="button" data-cat="Dulces" class="cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Dulces</button>
+                        <button type="button" data-cat="Energizantes" class="cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Energizantes</button>
+                        <button type="button" data-cat="Abarrotes" class="cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Abarrotes</button>
+                        <button type="button" data-cat="Jugos" class="cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Jugos</button>
+                    </div>
+
+                    <!-- Grilla de productos disponibles en bodega -->
+                    <div
+                        id="gridProductosMostrador"
+                        class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[560px] overflow-y-auto pr-1"
+                    >
+                        <!-- Se llena dinámicamente con JS -->
+                    </div>
+                </section>
+
+                <!-- COLUMNA DERECHA (5 cols): NOTA DE VENTA AUTOFOLIADA Y COBRO -->
+                <section class="lg:col-span-5 bg-white rounded-3xl border-2 border-gray-200 shadow-lg overflow-hidden flex flex-col">
+
+                    <!-- Cabecera estilo Nota de Remisión Autofoliada -->
+                    <div class="bg-brand-navy text-white p-5 flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md bg-brand-terracotta text-[10px] font-black uppercase tracking-wider">
+                                    Nota de Venta
+                                </span>
+                                <span id="fechaNotaActual" class="text-[11px] text-gray-300"></span>
+                            </div>
+                            <h2 class="text-xl font-black tracking-wide mt-1 flex items-center gap-2">
+                                <span>Folio:</span>
+                                <span id="folioNota" class="text-brand-amber font-mono">REM-0001</span>
+                            </h2>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="btnLimpiarNota"
+                            title="Vaciar nota actual"
+                            class="p-2 rounded-xl bg-white/10 hover:bg-red-500/80 text-white transition-colors text-xs font-semibold flex items-center gap-1"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span class="hidden sm:inline">Limpiar</span>
+                        </button>
+                    </div>
+
+                    <!-- Lista de productos agregados a la nota -->
+                    <div class="p-4 bg-gray-50/70 border-b border-gray-200">
+                        <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-gray-400 px-1 pb-2 border-b border-gray-200">
+                            <span>Producto / Presentación</span>
+                            <span>Cant. y Subtotal</span>
+                        </div>
+
+                        <div id="listaTicket" class="divide-y divide-gray-200/80 max-h-64 overflow-y-auto pr-1">
+                            <!-- Estado vacío inicial -->
+                            <div id="estadoVacioTicket" class="py-10 text-center space-y-1">
+                                <p class="text-sm font-bold text-gray-400">La nota está vacía</p>
+                                <p class="text-xs text-gray-400">Toca un producto de la izquierda para sumarlo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Totales -->
+                    <div class="p-5 space-y-4 bg-white">
+                        <div class="space-y-1.5 text-sm">
+                            <div class="flex justify-between text-gray-500">
+                                <span>Artículos sumados:</span>
+                                <strong id="totalArticulos" class="text-gray-800">0</strong>
+                            </div>
+                            <div class="flex justify-between items-baseline pt-2 border-t border-dashed border-gray-200">
+                                <span class="text-base font-extrabold text-gray-900">TOTAL A PAGAR:</span>
+                                <span id="totalNota" class="text-3xl font-black text-brand-navy">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Selección de Método de Pago: Efectivo, Tarjeta o Crédito Empresa -->
+                        <div class="space-y-2.5 pt-2">
+                            <span class="block text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                                Método de Pago
+                            </span>
+
+                            <div class="grid grid-cols-3 gap-2">
+                                <button
+                                    type="button"
+                                    data-metodo="efectivo"
+                                    class="btn-metodo-pago active-metodo flex flex-col items-center justify-center gap-1 p-2.5 rounded-2xl border-2 border-brand-navy bg-blue-50/70 text-brand-navy font-bold text-xs transition-all"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span>Efectivo</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-metodo="tarjeta"
+                                    class="btn-metodo-pago flex flex-col items-center justify-center gap-1 p-2.5 rounded-2xl border-2 border-gray-200 bg-white text-gray-600 hover:border-gray-300 font-bold text-xs transition-all"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2" />
+                                        <line x1="2" y1="10" x2="22" y2="10" stroke-width="2" />
+                                    </svg>
+                                    <span>Tarjeta</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-metodo="credito"
+                                    class="btn-metodo-pago flex flex-col items-center justify-center gap-1 p-2.5 rounded-2xl border-2 border-gray-200 bg-white text-gray-600 hover:border-gray-300 font-bold text-xs transition-all"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span>Crédito Empresa</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel Dinámico según Método de Pago -->
+                        <div class="p-3.5 rounded-2xl bg-gray-50 border border-gray-200/80 space-y-3">
+                            <!-- 1. Opción Efectivo -->
+                            <div id="panelPagoEfectivo" class="space-y-2.5">
+                                <div class="flex items-center justify-between gap-3">
+                                    <label for="inputEfectivoRecibido" class="text-xs font-bold text-gray-700">Efectivo recibido:</label>
+                                    <div class="relative w-36">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">$</span>
+                                        <input
+                                            type="number"
+                                            id="inputEfectivoRecibido"
+                                            min="0"
+                                            step="0.50"
+                                            placeholder="0.00"
+                                            class="w-full pl-7 pr-3 py-1.5 rounded-xl border border-gray-300 bg-white text-right text-sm font-black text-gray-900 focus:outline-none focus:border-brand-navy"
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Billetes rápidos -->
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button type="button" id="btnPagoExacto" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-bold hover:bg-emerald-200">Exacto</button>
+                                    <button type="button" data-billete="100" class="btn-billete px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 text-[11px] font-bold hover:bg-gray-100">$100</button>
+                                    <button type="button" data-billete="200" class="btn-billete px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 text-[11px] font-bold hover:bg-gray-100">$200</button>
+                                    <button type="button" data-billete="500" class="btn-billete px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 text-[11px] font-bold hover:bg-gray-100">$500</button>
+                                    <button type="button" data-billete="1000" class="btn-billete px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 text-[11px] font-bold hover:bg-gray-100">$1,000</button>
+                                </div>
+
+                                <div class="flex justify-between items-center pt-1 border-t border-gray-200 text-xs">
+                                    <span class="font-bold text-gray-600">Cambio a entregar:</span>
+                                    <span id="textoCambio" class="text-base font-black text-emerald-600">$0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Opción Tarjeta -->
+                            <div id="panelPagoTarjeta" class="hidden space-y-2.5">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label for="tipoTarjeta" class="block text-[11px] font-bold text-gray-600 mb-1">Tipo de Tarjeta</label>
+                                        <select id="tipoTarjeta" class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold">
+                                            <option value="Débito">Tarjeta de Débito</option>
+                                            <option value="Crédito">Tarjeta de Crédito</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="referenciaTarjeta" class="block text-[11px] font-bold text-gray-600 mb-1">Últimos 4 dígitos / Auth</label>
+                                        <input
+                                            type="text"
+                                            id="referenciaTarjeta"
+                                            maxlength="8"
+                                            placeholder="Ej. 4821"
+                                            class="w-full px-2.5 py-1.5 rounded-xl border border-gray-200 bg-white text-xs font-semibold"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Opción Crédito de Nuestra Empresa -->
+                            <div id="panelPagoCredito" class="hidden space-y-2">
+                                <label for="selectClienteCredito" class="block text-[11px] font-bold text-gray-700">
+                                    Selecciona Cliente con Línea de Crédito:
+                                </label>
+                                <select
+                                    id="selectClienteCredito"
+                                    class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-800 focus:outline-none focus:border-brand-navy"
+                                >
+                                    <option value="Abarrotes La Esquina" data-disponible="8500">Abarrotes La Esquina (Disp: $8,500.00)</option>
+                                    <option value="Miscelánea El Sol" data-disponible="4200">Miscelánea El Sol (Disp: $4,200.00)</option>
+                                    <option value="Tienda Doña Mary" data-disponible="1500">Tienda Doña Mary (Disp: $1,500.00)</option>
+                                    <option value="Minisúper San José" data-disponible="12000">Minisúper San José (Disp: $12,000.00)</option>
+                                </select>
+                                <p id="infoCreditoCliente" class="text-[11px] text-brand-navy font-semibold">
+                                    Plazo autorizado: 15 días • Saldo disponible suficiente.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Botón Principal de Cobrar y Generar Nota -->
+                        <button
+                            type="button"
+                            id="btnFinalizarVenta"
+                            class="w-full py-3.5 px-6 rounded-2xl font-black text-sm text-white bg-brand-terracotta hover:bg-brand-terracotta/90 shadow-lg shadow-brand-terracotta/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Cobrar y Emitir Nota</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL COMPROBANTE / TICKET DE NOTA EMITIDA                     -->
+    <!-- ============================================================== -->
+    <div
+        id="modalTicketBackdrop"
+        class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4"
+    >
+        <div id="areaImpresionTicket" class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-gray-200">
+            <div class="text-center border-b border-dashed border-gray-300 pb-4 space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+                    ✓ Venta Registrada
+                </span>
+                <h3 class="text-lg font-black text-gray-900">DISTRIBUIDORA IMPULSO</h3>
+                <p class="text-[11px] text-gray-500">Nota de Venta Mostrador</p>
+                <p class="text-sm font-mono font-black text-brand-navy" id="ticketModalFolio">REM-0001</p>
+                <p class="text-[10px] text-gray-400" id="ticketModalFecha"></p>
+            </div>
+
+            <!-- Renglones del ticket -->
+            <div id="ticketModalItems" class="space-y-1.5 text-xs max-h-52 overflow-y-auto border-b border-dashed border-gray-300 pb-3">
+                <!-- Dinámico -->
+            </div>
+
+            <!-- Totales y método -->
+            <div class="space-y-1 text-xs">
+                <div class="flex justify-between font-black text-base text-gray-900">
+                    <span>TOTAL:</span>
+                    <span id="ticketModalTotal">$0.00</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>Método de pago:</span>
+                    <strong id="ticketModalMetodo" class="text-gray-900">Efectivo</strong>
+                </div>
+                <div id="ticketModalDetallePago" class="text-[11px] text-gray-500 text-right"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 pt-2">
+                <button
+                    type="button"
+                    onclick="window.print()"
+                    class="py-2.5 px-4 rounded-xl text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Imprimir</span>
+                </button>
+                <button
+                    type="button"
+                    id="btnNuevaNota"
+                    class="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navy/90 transition-colors"
+                >
+                    Siguiente Nota →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICACIÓN -->
+    <div
+        id="toastNotificacion"
+        class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-gray-900 text-white shadow-xl translate-y-24 opacity-0 transition-all duration-300 pointer-events-none"
+    >
+        <span id="toastMensaje" class="text-sm font-semibold">Aviso</span>
+    </div>
+
+    <!-- ARCHIVO CENTRALIZADO DE ROLES Y NAVEGACIÓN -->
+    <script src="../Settings/sidebar.js"></script>
+
+    <!-- LÓGICA DE VENTAS DE MOSTRADOR -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // 1. CATÁLOGO DE PRODUCTOS DE BODEGA
+            // ==========================================
+            const productosBodega = [
+                { id: 1, nombre: "Canels Celofan", categoria: "Dulces", imagen: "../Imagenes/Catalogo/2.png", presentacion: "Caja c/60 paq", piezas: 60, precioCaja: 180.00, precioPieza: 5.00, stock: 24 },
+                { id: 2, nombre: "Paleta ChupaChups", categoria: "Dulces", imagen: "../Imagenes/Catalogo/3.png", presentacion: "Bolsa c/40 pzas", piezas: 40, precioCaja: 220.00, precioPieza: 8.50, stock: 18 },
+                { id: 3, nombre: "Gomitas Frutas", categoria: "Dulces", imagen: "../Imagenes/Catalogo/4.png", presentacion: "Display c/12", piezas: 12, precioCaja: 135.00, precioPieza: 18.00, stock: 15 },
+                { id: 4, nombre: "Chocolate Carlos V", categoria: "Dulces", imagen: "../Imagenes/Catalogo/5.png", presentacion: "Caja c/24 barras", piezas: 24, precioCaja: 195.00, precioPieza: 12.00, stock: 9 },
+                { id: 5, nombre: "Caramelo JollyRancher", categoria: "Dulces", imagen: "../Imagenes/Catalogo/6.png", presentacion: "Bolsa c/100 pzas", piezas: 100, precioCaja: 280.00, precioPieza: 4.50, stock: 30 },
+                { id: 6, nombre: "Paleta PintaColores", categoria: "Dulces", imagen: "../Imagenes/Catalogo/7.png", presentacion: "Bolsa c/30 pzas", piezas: 30, precioCaja: 125.00, precioPieza: 7.00, stock: 22 },
+                { id: 7, nombre: "Paleta Pachicleta", categoria: "Dulces", imagen: "../Imagenes/Catalogo/8.png", presentacion: "Bolsa c/25 pzas", piezas: 25, precioCaja: 140.00, precioPieza: 9.00, stock: 14 },
+                { id: 8, nombre: "Wafer Kalu", categoria: "Dulces", imagen: "../Imagenes/Catalogo/11.png", presentacion: "Caja c/18 paq", piezas: 18, precioCaja: 165.00, precioPieza: 14.00, stock: 11 },
+                { id: 9, nombre: "Pastillas Halls", categoria: "Dulces", imagen: "../Imagenes/Catalogo/16.png", presentacion: "Caja c/18 rollos", piezas: 18, precioCaja: 150.00, precioPieza: 13.00, stock: 20 },
+                { id: 10, nombre: "Chicle Orbit", categoria: "Dulces", imagen: "../Imagenes/Catalogo/19.png", presentacion: "Caja c/12 cajitas", piezas: 12, precioCaja: 130.00, precioPieza: 16.00, stock: 17 },
+                { id: 11, nombre: "Paleta Pelon Peloneta", categoria: "Dulces", imagen: "../Imagenes/Catalogo/20.png", presentacion: "Bolsa c/30 pzas", piezas: 30, precioCaja: 210.00, precioPieza: 11.00, stock: 12 },
+                { id: 12, nombre: "Chiclosos Café", categoria: "Dulces", imagen: "../Imagenes/Catalogo/21.png", presentacion: "Bolsa c/65 pzas", piezas: 65, precioCaja: 290.00, precioPieza: 7.50, stock: 8 }
+            ];
+
+            // ==========================================
+            // 2. SISTEMA DE FOLIO AUTOMÁTICO Y FECHA
+            // ==========================================
+            let numeroFolio = parseInt(localStorage.getItem('ultimoFolioMostrador') || '1', 10);
+
+            function actualizarFolioYFecha() {
+                const folioFormateado = `REM-${String(numeroFolio).padStart(4, '0')}`;
+                document.getElementById('folioNota').textContent = folioFormateado;
+
+                const ahora = new Date();
+                const fechaTexto = ahora.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+                const horaTexto = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('fechaNotaActual').textContent = `${fechaTexto} • ${horaTexto}`;
+                return { folioFormateado, fechaCompleta: `${fechaTexto} ${horaTexto}` };
+            }
+            actualizarFolioYFecha();
+
+            // ==========================================
+            // 3. ESTADO DEL PUNTO DE VENTA
+            // ==========================================
+            let carritoNota = []; // { key, id, nombre, tipo ('Caja' | 'Pieza'), precioUnitario, cantidad }
+            let modoVenta = 'caja'; // 'caja' | 'pieza'
+            let categoriaActual = 'todos';
+            let metodoPagoActivo = 'efectivo';
+
+            const formatoMoneda = new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN'
+            });
+
+            // ==========================================
+            // 4. RENDERIZADO DE PRODUCTOS DE BODEGA
+            // ==========================================
+            const gridProductos = document.getElementById('gridProductosMostrador');
+            const buscador = document.getElementById('buscadorMostrador');
+
+            function obtenerProductosFiltrados() {
+                const q = buscador.value.toLowerCase().trim();
+                return productosBodega.filter(p => {
+                    const coincideCat = categoriaActual === 'todos' || p.categoria === categoriaActual;
+                    const coincideTexto = p.nombre.toLowerCase().includes(q) || p.presentacion.toLowerCase().includes(q);
+                    return coincideCat && coincideTexto;
+                });
+            }
+
+            function renderizarGridProductos() {
+                const lista = obtenerProductosFiltrados();
+
+                if (lista.length === 0) {
+                    gridProductos.innerHTML = `
+                        <div class="col-span-full py-12 text-center text-xs text-gray-400">
+                            No hay productos en bodega que coincidan con "${buscador.value}".
+                        </div>
+                    `;
+                    return;
+                }
+
+                gridProductos.innerHTML = lista.map(p => {
+                    const precioMostrar = modoVenta === 'caja' ? p.precioCaja : p.precioPieza;
+                    const etiquetaUnidad = modoVenta === 'caja' ? p.presentacion : 'Por pieza suelta';
+
+                    return `
+                        <button
+                            type="button"
+                            data-id="${p.id}"
+                            class="card-producto-pos text-left p-3 rounded-2xl border border-gray-200 bg-white hover:border-brand-navy hover:shadow-md transition-all flex flex-col justify-between group active:scale-95"
+                        >
+                            <div class="space-y-2">
+                                <div class="relative aspect-square rounded-xl bg-gray-50 overflow-hidden flex items-center justify-center p-2">
+                                    <img src="${p.imagen}" alt="${p.nombre}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform">
+                                    <span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md bg-white/90 text-[10px] font-bold text-gray-600 shadow-2xs">
+                                        Stock: ${p.stock}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-xs font-bold text-gray-900 line-clamp-1 group-hover:text-brand-navy">${p.nombre}</h3>
+                                    <p class="text-[10px] text-gray-500 line-clamp-1">${etiquetaUnidad}</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 mt-2 border-t border-gray-100 flex items-center justify-between">
+                                <span class="text-sm font-black text-brand-navy">${formatoMoneda.format(precioMostrar)}</span>
+                                <span class="h-6 w-6 rounded-lg bg-brand-terracotta/10 text-brand-terracotta group-hover:bg-brand-terracotta group-hover:text-white flex items-center justify-center font-black text-sm transition-colors">
+                                    +
+                                </span>
+                            </div>
+                        </button>
+                    `;
+                }).join('');
+
+                gridProductos.querySelectorAll('.card-producto-pos').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = parseInt(btn.getAttribute('data-id'), 10);
+                        agregarProductoANota(id);
+                    });
+                });
+            }
+
+            // Cambio entre Por Caja/Bolsa y Pieza Suelta
+            const btnModoCaja = document.getElementById('btnModoCaja');
+            const btnModoPieza = document.getElementById('btnModoPieza');
+
+            btnModoCaja.addEventListener('click', () => {
+                modoVenta = 'caja';
+                btnModoCaja.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-navy text-white shadow-xs transition-all';
+                btnModoPieza.className = 'px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition-all';
+                renderizarGridProductos();
+            });
+
+            btnModoPieza.addEventListener('click', () => {
+                modoVenta = 'pieza';
+                btnModoPieza.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-navy text-white shadow-xs transition-all';
+                btnModoCaja.className = 'px-3.5 py-2 rounded-xl text-xs font-bold text-gray-600 hover:text-gray-900 transition-all';
+                renderizarGridProductos();
+            });
+
+            // Filtros de categoría
+            document.querySelectorAll('.cat-mostrador-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.cat-mostrador-btn').forEach(b => {
+                        b.className = 'cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap';
+                    });
+                    btn.className = 'cat-mostrador-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-brand-navy text-white whitespace-nowrap';
+                    categoriaActual = btn.getAttribute('data-cat');
+                    renderizarGridProductos();
+                });
+            });
+
+            buscador.addEventListener('input', renderizarGridProductos);
+            buscador.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const filtrados = obtenerProductosFiltrados();
+                    if (filtrados.length === 1) {
+                        agregarProductoANota(filtrados[0].id);
+                        buscador.value = '';
+                        renderizarGridProductos();
+                    }
+                }
+            });
+
+            // ==========================================
+            // 5. GESTIÓN DE LA NOTA DE VENTA (TICKET)
+            // ==========================================
+            function agregarProductoANota(idProducto) {
+                const prod = productosBodega.find(p => p.id === idProducto);
+                if (!prod) return;
+
+                const tipoTexto = modoVenta === 'caja' ? prod.presentacion : 'Pieza suelta';
+                const precio = modoVenta === 'caja' ? prod.precioCaja : prod.precioPieza;
+                const key = `${prod.id}-${modoVenta}`;
+
+                const existente = carritoNota.find(item => item.key === key);
+                if (existente) {
+                    existente.cantidad += 1;
+                } else {
+                    carritoNota.push({
+                        key,
+                        id: prod.id,
+                        nombre: prod.nombre,
+                        tipo: tipoTexto,
+                        precioUnitario: precio,
+                        cantidad: 1
+                    });
+                }
+
+                renderizarTicket();
+            }
+
+            function calcularTotalNota() {
+                return carritoNota.reduce((acc, item) => acc + (item.precioUnitario * item.cantidad), 0);
+            }
+
+            function renderizarTicket() {
+                const contenedor = document.getElementById('listaTicket');
+                const totalArticulosEl = document.getElementById('totalArticulos');
+                const totalNotaEl = document.getElementById('totalNota');
+
+                if (carritoNota.length === 0) {
+                    contenedor.innerHTML = `
+                        <div class="py-10 text-center space-y-1">
+                            <p class="text-sm font-bold text-gray-400">La nota está vacía</p>
+                            <p class="text-xs text-gray-400">Toca un producto de la izquierda para sumarlo.</p>
+                        </div>
+                    `;
+                    totalArticulosEl.textContent = '0';
+                    totalNotaEl.textContent = '$0.00';
+                    actualizarCambioEfectivo();
+                    return;
+                }
+
+                contenedor.innerHTML = carritoNota.map((item, idx) => {
+                    const subtotal = item.precioUnitario * item.cantidad;
+                    return `
+                        <div class="py-2.5 flex items-center justify-between gap-2">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-bold text-gray-900 truncate">${item.nombre}</p>
+                                <p class="text-[10px] text-gray-500">${item.tipo} • ${formatoMoneda.format(item.precioUnitario)} c/u</p>
+                            </div>
+
+                            <!-- Controles de cantidad -->
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <button
+                                    type="button"
+                                    data-idx="${idx}"
+                                    data-accion="restar"
+                                    class="btn-cant-ticket h-6 w-6 rounded-lg bg-white border border-gray-300 text-gray-700 font-bold text-xs hover:bg-gray-100"
+                                >-</button>
+                                <span class="w-6 text-center text-xs font-black text-gray-900">${item.cantidad}</span>
+                                <button
+                                    type="button"
+                                    data-idx="${idx}"
+                                    data-accion="sumar"
+                                    class="btn-cant-ticket h-6 w-6 rounded-lg bg-white border border-gray-300 text-gray-700 font-bold text-xs hover:bg-gray-100"
+                                >+</button>
+                            </div>
+
+                            <div class="text-right w-20 shrink-0">
+                                <span class="text-xs font-black text-gray-900">${formatoMoneda.format(subtotal)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                contenedor.querySelectorAll('.btn-cant-ticket').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+                        const accion = btn.getAttribute('data-accion');
+                        if (accion === 'sumar') {
+                            carritoNota[idx].cantidad += 1;
+                        } else {
+                            carritoNota[idx].cantidad -= 1;
+                            if (carritoNota[idx].cantidad <= 0) {
+                                carritoNota.splice(idx, 1);
+                            }
+                        }
+                        renderizarTicket();
+                    });
+                });
+
+                const sumaPiezas = carritoNota.reduce((acc, i) => acc + i.cantidad, 0);
+                const total = calcularTotalNota();
+
+                totalArticulosEl.textContent = sumaPiezas;
+                totalNotaEl.textContent = formatoMoneda.format(total);
+                actualizarCambioEfectivo();
+            }
+
+            document.getElementById('btnLimpiarNota').addEventListener('click', () => {
+                carritoNota = [];
+                document.getElementById('inputEfectivoRecibido').value = '';
+                renderizarTicket();
+            });
+
+            // ==========================================
+            // 6. MÉTODOS DE PAGO (EFECTIVO, TARJETA, CRÉDITO EMPRESA)
+            // ==========================================
+            const panelEfectivo = document.getElementById('panelPagoEfectivo');
+            const panelTarjeta = document.getElementById('panelPagoTarjeta');
+            const panelCredito = document.getElementById('panelPagoCredito');
+            const inputEfectivo = document.getElementById('inputEfectivoRecibido');
+            const textoCambio = document.getElementById('textoCambio');
+
+            document.querySelectorAll('.btn-metodo-pago').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.btn-metodo-pago').forEach(b => {
+                        b.className = 'btn-metodo-pago flex flex-col items-center justify-center gap-1 p-2.5 rounded-2xl border-2 border-gray-200 bg-white text-gray-600 hover:border-gray-300 font-bold text-xs transition-all';
+                    });
+
+                    btn.className = 'btn-metodo-pago active-metodo flex flex-col items-center justify-center gap-1 p-2.5 rounded-2xl border-2 border-brand-navy bg-blue-50/70 text-brand-navy font-bold text-xs transition-all';
+                    metodoPagoActivo = btn.getAttribute('data-metodo');
+
+                    panelEfectivo.classList.toggle('hidden', metodoPagoActivo !== 'efectivo');
+                    panelTarjeta.classList.toggle('hidden', metodoPagoActivo !== 'tarjeta');
+                    panelCredito.classList.toggle('hidden', metodoPagoActivo !== 'credito');
+                    validarCreditoCliente();
+                });
+            });
+
+            function actualizarCambioEfectivo() {
+                const total = calcularTotalNota();
+                const recibido = parseFloat(inputEfectivo.value) || 0;
+                const cambio = recibido - total;
+
+                if (recibido === 0) {
+                    textoCambio.textContent = '$0.00';
+                    textoCambio.className = 'text-base font-black text-gray-500';
+                } else if (cambio < 0) {
+                    textoCambio.textContent = `Faltan ${formatoMoneda.format(Math.abs(cambio))}`;
+                    textoCambio.className = 'text-sm font-black text-red-600';
+                } else {
+                    textoCambio.textContent = formatoMoneda.format(cambio);
+                    textoCambio.className = 'text-base font-black text-emerald-600';
+                }
+            }
+
+            inputEfectivo.addEventListener('input', actualizarCambioEfectivo);
+
+            document.getElementById('btnPagoExacto').addEventListener('click', () => {
+                const total = calcularTotalNota();
+                inputEfectivo.value = total.toFixed(2);
+                actualizarCambioEfectivo();
+            });
+
+            document.querySelectorAll('.btn-billete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const monto = parseFloat(btn.getAttribute('data-billete'));
+                    inputEfectivo.value = monto.toFixed(2);
+                    actualizarCambioEfectivo();
+                });
+            });
+
+            const selectClienteCredito = document.getElementById('selectClienteCredito');
+            const infoCreditoCliente = document.getElementById('infoCreditoCliente');
+
+            function validarCreditoCliente() {
+                const total = calcularTotalNota();
+                const opcion = selectClienteCredito.options[selectClienteCredito.selectedIndex];
+                const disponible = parseFloat(opcion.getAttribute('data-disponible')) || 0;
+
+                if (total > disponible) {
+                    infoCreditoCliente.textContent = `⚠️ El total excede el crédito disponible ($${disponible.toLocaleString()}).`;
+                    infoCreditoCliente.className = 'text-[11px] text-red-600 font-bold';
+                    return false;
+                } else {
+                    infoCreditoCliente.textContent = `✓ Crédito autorizado • Saldo restante tras compra: ${formatoMoneda.format(disponible - total)}`;
+                    infoCreditoCliente.className = 'text-[11px] text-emerald-700 font-semibold';
+                    return true;
+                }
+            }
+
+            selectClienteCredito.addEventListener('change', validarCreditoCliente);
+
+            // ==========================================
+            // 7. COBRAR, EMITIR NOTA Y AVANZAR FOLIO
+            // ==========================================
+            const modalTicket = document.getElementById('modalTicketBackdrop');
+
+            document.getElementById('btnFinalizarVenta').addEventListener('click', () => {
+                if (carritoNota.length === 0) {
+                    mostrarToast('Agrega al menos un producto a la nota antes de cobrar.');
+                    return;
+                }
+
+                const total = calcularTotalNota();
+                let etiquetaMetodo = '';
+                let detalleExtra = '';
+
+                if (metodoPagoActivo === 'efectivo') {
+                    const recibido = parseFloat(inputEfectivo.value) || 0;
+                    if (recibido < total) {
+                        mostrarToast('El efectivo recibido es menor al total de la nota.');
+                        inputEfectivo.focus();
+                        return;
+                    }
+                    etiquetaMetodo = 'Efectivo';
+                    detalleExtra = `Recibido: ${formatoMoneda.format(recibido)} | Cambio: ${formatoMoneda.format(recibido - total)}`;
+                } else if (metodoPagoActivo === 'tarjeta') {
+                    const tipo = document.getElementById('tipoTarjeta').value;
+                    const ref = document.getElementById('referenciaTarjeta').value.trim();
+                    etiquetaMetodo = `Tarjeta (${tipo})`;
+                    detalleExtra = ref ? `Terminación / Auth: ${ref}` : 'Cobro con terminal aprobado';
+                } else if (metodoPagoActivo === 'credito') {
+                    if (!validarCreditoCliente()) {
+                        mostrarToast('Crédito insuficiente para autorizar esta nota.');
+                        return;
+                    }
+                    const cliente = selectClienteCredito.value;
+                    etiquetaMetodo = 'Crédito de la Empresa';
+                    detalleExtra = `Cargado a cuenta: ${cliente}`;
+                }
+
+                // Descontar existencias simuladas en bodega
+                carritoNota.forEach(item => {
+                    if (item.tipo !== 'Pieza suelta') {
+                        const prod = productosBodega.find(p => p.id === item.id);
+                        if (prod && prod.stock >= item.cantidad) {
+                            prod.stock -= item.cantidad;
+                        }
+                    }
+                });
+
+                // Llenar comprobante modal
+                const infoFolio = actualizarFolioYFecha();
+                document.getElementById('ticketModalFolio').textContent = infoFolio.folioFormateado;
+                document.getElementById('ticketModalFecha').textContent = infoFolio.fechaCompleta;
+
+                document.getElementById('ticketModalItems').innerHTML = carritoNota.map(i => `
+                    <div class="flex justify-between gap-2">
+                        <span class="truncate">${i.cantidad}x ${i.nombre} (${i.tipo})</span>
+                        <span class="font-bold shrink-0">${formatoMoneda.format(i.precioUnitario * i.cantidad)}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('ticketModalTotal').textContent = formatoMoneda.format(total);
+                document.getElementById('ticketModalMetodo').textContent = etiquetaMetodo;
+                document.getElementById('ticketModalDetallePago').textContent = detalleExtra;
+
+                modalTicket.classList.remove('hidden');
+                modalTicket.classList.add('flex');
+            });
+
+            // Siguiente nota: incrementa el folio automáticamente y limpia el ticket
+            document.getElementById('btnNuevaNota').addEventListener('click', () => {
+                numeroFolio += 1;
+                localStorage.setItem('ultimoFolioMostrador', numeroFolio.toString());
+
+                carritoNota = [];
+                inputEfectivo.value = '';
+                document.getElementById('referenciaTarjeta').value = '';
+
+                modalTicket.classList.add('hidden');
+                modalTicket.classList.remove('flex');
+
+                actualizarFolioYFecha();
+                renderizarTicket();
+                renderizarGridProductos();
+                mostrarToast(`Lista para nueva venta • Folio ${document.getElementById('folioNota').textContent}`);
+            });
+
+            function mostrarToast(msg) {
+                const toast = document.getElementById('toastNotificacion');
+                document.getElementById('toastMensaje').textContent = msg;
+                toast.classList.remove('translate-y-24', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-24', 'opacity-0');
+                }, 3200);
+            }
+
+            // Render inicial
+            renderizarGridProductos();
+        });
+    </script>
+</body>
+</html>
